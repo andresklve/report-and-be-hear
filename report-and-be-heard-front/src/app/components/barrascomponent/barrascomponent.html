@@ -1,0 +1,11 @@
+<ul class="barras" [class]="'barras barras-' + tono()">
+  @for (b of items(); track b.label) {
+    <li>
+      <span class="b-lbl" [title]="b.label">{{ b.label }}</span>
+      <span class="b-track"><i [style.width.%]="(b.valor / max()) * 100"></i></span>
+      <b class="b-val">{{ b.texto ?? b.valor }}</b>
+    </li>
+  } @empty {
+    <li class="b-vacio">{{ vacio() }}</li>
+  }
+</ul>

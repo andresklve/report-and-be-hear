@@ -1,0 +1,36 @@
+<div class="auth-caja">
+  <h1>Crea tu cuenta</h1>
+  <p class="muted">Para reportar y recibir el seguimiento de tus casos. Es gratis.</p>
+
+  <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+    <div class="fila-2">
+      <label class="campo">
+        <span class="campo-lbl">Nombres</span>
+        <input class="input" formControlName="nombres" autocomplete="given-name" [class.mal]="mal('nombres')" />
+      </label>
+      <label class="campo">
+        <span class="campo-lbl">Apellidos</span>
+        <input class="input" formControlName="apellidos" autocomplete="family-name" [class.mal]="mal('apellidos')" />
+      </label>
+    </div>
+    <label class="campo">
+      <span class="campo-lbl">Correo</span>
+      <input class="input" type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" [class.mal]="mal('correo')" />
+      @if (mal('correo')) { <span class="campo-error">Ingresa un correo válido.</span> }
+    </label>
+    <label class="campo">
+      <span class="campo-lbl">Contraseña</span>
+      <span class="input-pass">
+        <input class="input" [type]="verPass() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" [class.mal]="mal('password')" />
+        <button type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'"><span class="ms">{{ verPass() ? 'visibility_off' : 'visibility' }}</span></button>
+      </span>
+      <span class="fuerza" [attr.data-n]="fuerza()"><i></i><i></i><i></i><i></i></span>
+      <span class="campo-ayuda">{{ fuerzaTxt() }} · mínimo 6 caracteres</span>
+    </label>
+    @if (error()) { <p class="alerta"><span class="ms">error</span>{{ error() }}</p> }
+    <button type="submit" class="btn btn-signal btn-lg btn-block" [disabled]="cargando()">
+      @if (cargando()) { <span class="spinner"></span>Creando cuenta… } @else { Crear cuenta }
+    </button>
+  </form>
+  <p class="auth-alt">¿Ya tienes cuenta? <a [routerLink]="['/ingresar']" [queryParams]="volver ? { volver } : {}">Ingresa</a></p>
+</div>

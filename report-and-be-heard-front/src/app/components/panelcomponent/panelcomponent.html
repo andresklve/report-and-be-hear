@@ -1,0 +1,29 @@
+<div class="panel">
+  <aside class="panel-side">
+    <div class="panel-quien">
+      <span class="avatar">{{ auth.iniciales() }}</span>
+      <div>
+        <strong>{{ auth.sesion()?.nombres }} {{ auth.sesion()?.apellidos }}</strong>
+        <span>{{ auth.esAdmin() ? 'Administrador' : 'Municipalidad' }}</span>
+      </div>
+    </div>
+    <nav class="panel-nav">
+      <span class="panel-grupo">Gestión</span>
+      <a routerLink="/panel/resumen" routerLinkActive="on"><span class="ms">monitoring</span>Resumen</a>
+      <a routerLink="/panel/bandeja" routerLinkActive="on"><span class="ms">inbox</span>Bandeja de reportes</a>
+      <a routerLink="/panel/moderaciones" routerLinkActive="on"><span class="ms">gavel</span>Moderaciones</a>
+      <span class="panel-grupo">Catálogos</span>
+      <a routerLink="/panel/zonas" routerLinkActive="on"><span class="ms">location_on</span>Zonas</a>
+      <a routerLink="/panel/categorias" routerLinkActive="on"><span class="ms">category</span>Categorías</a>
+      @if (auth.esAdmin()) {
+        <span class="panel-grupo">Administración</span>
+        <a routerLink="/panel/usuarios" routerLinkActive="on"><span class="ms">group</span>Usuarios</a>
+        <a routerLink="/panel/roles" routerLinkActive="on"><span class="ms">badge</span>Roles</a>
+      }
+    </nav>
+    <a routerLink="/" class="panel-salir"><span class="ms">arrow_back</span>Volver al sitio</a>
+  </aside>
+  <main class="panel-main">
+    <router-outlet />
+  </main>
+</div>

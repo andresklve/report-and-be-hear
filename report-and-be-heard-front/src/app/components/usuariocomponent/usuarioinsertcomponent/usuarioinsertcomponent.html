@@ -1,0 +1,31 @@
+<a routerLink="/panel/usuarios" class="volver"><span class="ms">arrow_back</span>Usuarios</a>
+<div class="form-panel card">
+  <header>
+    <span class="form-ico"><span class="ms">person_add</span></span>
+    <div><h1>Nuevo usuario</h1><p class="muted">Crea cuentas para el equipo municipal o para ciudadanos que lo soliciten.</p></div>
+  </header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="form-grid" novalidate>
+    <label class="campo"><span class="campo-lbl">Nombres</span><input class="input" formControlName="nombres" [class.mal]="mal('nombres')" /></label>
+    <label class="campo"><span class="campo-lbl">Apellidos</span><input class="input" formControlName="apellidos" [class.mal]="mal('apellidos')" /></label>
+    <label class="campo campo-full"><span class="campo-lbl">Correo</span><input class="input" type="email" formControlName="correo" [class.mal]="mal('correo')" placeholder="persona@municipalidad.gob.pe" /></label>
+    <label class="campo campo-full"><span class="campo-lbl">Contraseña inicial</span><input class="input" type="text" formControlName="passwordHash" [class.mal]="mal('passwordHash')" /><span class="campo-ayuda">Mínimo 6 caracteres. Compártela de forma segura.</span></label>
+    <fieldset class="campo campo-full">
+      <legend class="campo-lbl">Rol</legend>
+      <div class="rol-opciones">
+        @for (r of roles(); track r.idRol) {
+          <label class="rol-op" [class.on]="form.value.idRol === r.idRol">
+            <input type="radio" formControlName="idRol" [value]="r.idRol" />
+            <strong>{{ r.nombreRol }}</strong>
+            <small>{{ r.descripcionRol }}</small>
+          </label>
+        }
+      </div>
+    </fieldset>
+    @if (error()) { <p class="alerta campo-full"><span class="ms">error</span>{{ error() }}</p> }
+    <footer class="form-acciones campo-full">
+      <a routerLink="/panel/usuarios" class="btn btn-quiet">Cancelar</a>
+      <span class="spacer"></span>
+      <button type="submit" class="btn btn-ink" [disabled]="guardando()">@if (guardando()) { <span class="spinner"></span> } Crear usuario</button>
+    </footer>
+  </form>
+</div>

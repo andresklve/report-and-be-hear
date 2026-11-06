@@ -1,0 +1,43 @@
+<a routerLink="/panel/zonas" class="volver"><span class="ms">arrow_back</span>Zonas</a>
+<div class="form-panel card">
+  <header>
+    <span class="form-ico"><span class="ms">location_on</span></span>
+    <div><h1>Nueva zona</h1><p class="muted">Distritos donde la ciudadanía puede reportar. Sus coordenadas alimentan el mapa de calor.</p></div>
+  </header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="form-grid" novalidate>
+      <label class="campo campo-full">
+        <span class="campo-lbl">Distrito o zona</span>
+        <input class="input" type="text" formControlName="nombreZona" placeholder="Miraflores" [class.mal]="mal('nombreZona')" />
+        @if (mal('nombreZona')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+      <label class="campo">
+        <span class="campo-lbl">Provincia</span>
+        <input class="input" type="text" formControlName="provinciaZona" placeholder="Lima" [class.mal]="mal('provinciaZona')" />
+        @if (mal('provinciaZona')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+      <label class="campo">
+        <span class="campo-lbl">Departamento</span>
+        <input class="input" type="text" formControlName="departamentoZona" placeholder="Lima" [class.mal]="mal('departamentoZona')" />
+        @if (mal('departamentoZona')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+      <label class="campo">
+        <span class="campo-lbl">Latitud</span>
+        <input class="input" type="number" step="any" formControlName="latitudZona" placeholder="-12.1211" [class.mal]="mal('latitudZona')" />
+        @if (mal('latitudZona')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+      <label class="campo">
+        <span class="campo-lbl">Longitud</span>
+        <input class="input" type="number" step="any" formControlName="longitudZona" placeholder="-77.0297" [class.mal]="mal('longitudZona')" />
+        @if (mal('longitudZona')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+    @if (error()) { <p class="alerta campo-full"><span class="ms">error</span>{{ error() }}</p> }
+    <footer class="form-acciones campo-full">
+      <a routerLink="/panel/zonas" class="btn btn-quiet">Cancelar</a>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-line" (click)="registrar(true)" [disabled]="guardando()">Guardar y agregar otra</button>
+      <button type="submit" class="btn btn-ink" [disabled]="guardando()">
+        @if (guardando()) { <span class="spinner"></span> } Guardar
+      </button>
+    </footer>
+  </form>
+</div>

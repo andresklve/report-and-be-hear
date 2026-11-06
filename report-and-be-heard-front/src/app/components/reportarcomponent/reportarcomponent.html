@@ -1,0 +1,206 @@
+@if (creado(); as c) {
+  <!-- ===== Confirmacion ===== -->
+  <section class="wrap exito">
+    <div class="exito-sello" aria-hidden="true">
+      <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" /><path d="M38 62l15 15 30-34" /></svg>
+    </div>
+    <p class="eyebrow">Reporte enviado</p>
+    <h1 class="page-title">Te escuchamos, {{ auth.sesion()?.nombres }}.</h1>
+    <p class="lead">Tu reporte ya está en la bandeja de la municipalidad. Guarda tu número de referencia para seguirlo.</p>
+    <div class="exito-ref">
+      <span>Referencia</span>
+      <b class="mono">{{ ref(c.idTestimonio) }}</b>
+    </div>
+    <div class="exito-track"><app-estado-track estado="PENDIENTE" /></div>
+    <div class="exito-acts">
+      <a [routerLink]="['/reporte', c.idTestimonio]" class="btn btn-ink btn-lg">Ver mi reporte</a>
+      <a routerLink="/mis-reportes" class="btn btn-line btn-lg">Mis reportes</a>
+      <button class="btn btn-quiet btn-lg" (click)="nuevo()"><span class="ms">add</span>Reportar otro</button>
+    </div>
+  </section>
+} @else {
+  <section class="wrap reportar">
+    <header class="reportar-head">
+      <a routerLink="/" class="volver"><span class="ms">close</span>Cancelar</a>
+      <ol class="stepper" aria-label="Progreso">
+        @for (p of pasos; track p; let i = $index) {
+          <li [class.hecho]="i + 1 < paso()" [class.actual]="i + 1 === paso()">
+            <button type="button" (click)="irAPaso(i + 1)" [disabled]="i + 1 >= paso()">
+              <span class="st-n">@if (i + 1 < paso()) { <span class="ms">check</span> } @else { {{ i + 1 }} }</span>
+              <span class="st-l">{{ p }}</span>
+            </button>
+          </li>
+        }
+      </ol>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" class="reportar-body" novalidate>
+
+      <!-- ===== Paso 1: que pasa ===== -->
+      @if (paso() === 1) {
+        <div class="paso">
+          <h1 class="paso-titulo">¿Qué está pasando?</h1>
+          <p class="paso-sub">Elige el tipo de problema y cuéntalo con tus palabras.</p>
+
+          <fieldset class="campo">
+            <legend class="campo-lbl">Tipo de problema</legend>
+            <div class="opciones-cat">
+              @for (cat of datos()?.categorias ?? []; track cat.idCategoria) {
+                @if (cat.activo) {
+                  <button type="button" class="opcion" [class.on]="valor().idCategoria === cat.idCategoria"
+                          (click)="elegirCategoria(cat.idCategoria)" [attr.aria-pressed]="valor().idCategoria === cat.idCategoria">
+                    <span class="ms">{{ iconoCategoria(cat.nombreCategoria) }}</span>
+                    <strong>{{ cat.nombreCategoria }}</strong>
+                    <small>{{ cat.descripcionCategoria }}</small>
+                  </button>
+                }
+              } @empty {
+                @for (i of [0,1,2,3]; track i) { <div class="skeleton sk-opcion"></div> }
+              }
+            </div>
+            @if (invalido('idCategoria')) { <p class="campo-error">Elige una categoría.</p> }
+          </fieldset>
+
+          <div class="campo">
+            <label class="campo-lbl" for="desc">Describe el problema</label>
+            <textarea id="desc" formControlName="descripcionTexto" rows="5" class="input input-area"
+                      placeholder="Ej.: Hay un bache grande en la Av. Larco, frente al parque Kennedy. Ya hubo dos accidentes de motos."></textarea>
+            <div class="campo-pie">
+              @if (invalido('descripcionTexto')) { <span class="campo-error">Cuéntanos un poco más (mínimo 15 caracteres).</span> }
+              @else { <span class="campo-ayuda">Mientras más detalle, más rápido se puede atender.</span> }
+              <span class="mono contador" [class.ok]="largo() >= 15">{{ largo() }}</span>
+            </div>
+          </div>
+
+          <div class="proximo">
+            <span class="ms">auto_awesome</span>
+            <div>
+              <strong>Próximamente: clasificación con IA</strong>
+              <p>A partir de tu texto, sugeriremos la categoría y la dirección automáticamente.</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ===== Paso 2: donde ===== -->
+      @if (paso() === 2) {
+        <div class="paso paso-donde">
+          <div>
+            <h1 class="paso-titulo">¿Dónde ocurre?</h1>
+            <p class="paso-sub">Busca tu distrito o toca el lugar exacto en el mapa. Puedes arrastrar el marcador.</p>
+
+            <div class="geo-buscar">
+              <label class="buscador buscador-sm">
+                <span class="ms">search</span>
+                <input type="search" placeholder="Ej.: San Juan de Lurigancho" autocomplete="off" [value]="busca()" (input)="buscar($any($event.target).value)" />
+              </label>
+              @if (resultados().length) {
+                <ul class="geo-resultados">
+                  @for (r of resultados(); track r.t + r.id) {
+                    <li><button type="button" (click)="irA(r)"><span class="ms">{{ r.t === 'x' ? 'location_on' : 'map' }}</span><span><b>{{ r.n }}</b><small>{{ r.p || 'Departamento' }}</small></span></button></li>
+                  }
+                </ul>
+              }
+            </div>
+
+            <div class="ubicacion" [class.ok]="distrito()" [class.mal]="fueraDePeru()">
+              <span class="ms">{{ ubicando() ? 'progress_activity' : distrito() ? 'check_circle' : fueraDePeru() ? 'wrong_location' : 'touch_app' }}</span>
+              @if (ubicando()) {
+                <span>Ubicando…</span>
+              } @else if (distrito(); as d) {
+                <span><b>{{ d.nombre }}</b><small>{{ d.provNombre }}, {{ d.depNombre }}</small></span>
+              } @else if (fueraDePeru()) {
+                <span>Ese punto está fuera del Perú. Elige otro.</span>
+              } @else {
+                <span>Aún no marcas un punto en el mapa.</span>
+              }
+            </div>
+
+            <div class="campo">
+              <label class="campo-lbl" for="dir">Dirección o referencia <span class="opc">opcional</span></label>
+              <input id="dir" class="input" formControlName="direccionTextoExtraida" placeholder="Ej.: Av. Próceres 1520, frente al mercado" />
+            </div>
+            <div class="campo">
+              <label class="campo-lbl" for="foto">Enlace a una foto <span class="opc">opcional</span></label>
+              <input id="foto" class="input" formControlName="fotoUrl" placeholder="https://…" />
+              @if (invalido('fotoUrl')) { <p class="campo-error">Debe empezar con http:// o https://</p> }
+            </div>
+          </div>
+
+          <div class="donde-mapa">
+            <app-mapa-picker [lat]="valor().latitud" [lng]="valor().longitud" [editable]="true" [encuadre]="encuadre()" (punto)="marcar($event)" />
+          </div>
+        </div>
+      }
+
+      <!-- ===== Paso 3: revisar y enviar ===== -->
+      @if (paso() === 3) {
+        <div class="paso paso-enviar">
+          <div>
+            <h1 class="paso-titulo">Revisa y envía</h1>
+            <p class="paso-sub">Así se verá tu reporte. Será público para que todos puedan seguirlo.</p>
+
+            <div class="resumen">
+              <div class="resumen-fila">
+                <span class="cat-tag"><span class="ms">{{ iconoCategoria(catSel()?.nombreCategoria) }}</span>{{ catSel()?.nombreCategoria }}</span>
+                <button type="button" class="link" (click)="irAPaso(1)">Editar</button>
+              </div>
+              <p class="resumen-txt">“{{ valor().descripcionTexto }}”</p>
+              <div class="resumen-fila">
+                <span class="rcard-zona"><span class="ms">location_on</span>{{ valor().direccionTextoExtraida ? valor().direccionTextoExtraida + ' · ' : '' }}{{ distrito()?.nombre }}, {{ distrito()?.provNombre }}, {{ distrito()?.depNombre }}</span>
+                <button type="button" class="link" (click)="irAPaso(2)">Editar</button>
+              </div>
+              @if (valor().fotoUrl) { <img class="resumen-foto" [src]="valor().fotoUrl" alt="Vista previa de la foto" /> }
+            </div>
+          </div>
+
+          <div class="enviar-col">
+            @if (auth.sesion(); as s) {
+              <div class="quien">
+                <span class="avatar avatar-lg">{{ auth.iniciales() }}</span>
+                <div><span class="muted">Reportas como</span><strong>{{ s.nombres }} {{ s.apellidos }}</strong><small>{{ s.correo }}</small></div>
+              </div>
+            } @else {
+              <div class="cuenta-inline" [formGroup]="cuenta">
+                <h2>Un último paso</h2>
+                <p class="muted">Necesitamos saber quién reporta para avisarte cómo avanza. Lo que escribiste no se pierde.</p>
+                <div class="segmented segmented-full" role="tablist">
+                  <button type="button" role="tab" [class.on]="modoCuenta() === 'registro'" (click)="cambiarModo('registro')">Soy nuevo</button>
+                  <button type="button" role="tab" [class.on]="modoCuenta() === 'ingreso'" (click)="cambiarModo('ingreso')">Ya tengo cuenta</button>
+                </div>
+                @if (modoCuenta() === 'registro') {
+                  <div class="fila-2">
+                    <label class="campo"><span class="campo-lbl">Nombres</span><input class="input" formControlName="nombres" autocomplete="given-name" [class.mal]="invalido('nombres', cuenta)" /></label>
+                    <label class="campo"><span class="campo-lbl">Apellidos</span><input class="input" formControlName="apellidos" autocomplete="family-name" [class.mal]="invalido('apellidos', cuenta)" /></label>
+                  </div>
+                }
+                <label class="campo"><span class="campo-lbl">Correo</span><input class="input" type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" [class.mal]="invalido('correo', cuenta)" /></label>
+                <label class="campo">
+                  <span class="campo-lbl">Contraseña</span>
+                  <span class="input-pass">
+                    <input class="input" [type]="verPass() ? 'text' : 'password'" formControlName="password" [attr.autocomplete]="modoCuenta() === 'registro' ? 'new-password' : 'current-password'" [class.mal]="invalido('password', cuenta)" />
+                    <button type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'"><span class="ms">{{ verPass() ? 'visibility_off' : 'visibility' }}</span></button>
+                  </span>
+                  @if (modoCuenta() === 'registro') { <span class="campo-ayuda">Mínimo 6 caracteres.</span> }
+                </label>
+                @if (errorCuenta()) { <p class="alerta"><span class="ms">error</span>{{ errorCuenta() }}</p> }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <footer class="reportar-acciones">
+        @if (paso() > 1) { <button type="button" class="btn btn-quiet btn-lg" (click)="atras()"><span class="ms">arrow_back</span>Atrás</button> }
+        <span class="spacer"></span>
+        @if (paso() < 3) {
+          <button type="button" class="btn btn-ink btn-lg" (click)="siguiente()">Continuar<span class="ms">arrow_forward</span></button>
+        } @else {
+          <button type="submit" class="btn btn-signal btn-lg" [disabled]="enviando()">
+            @if (enviando()) { <span class="spinner"></span>Enviando… } @else { <span class="ms">send</span>{{ auth.sesion() ? 'Enviar reporte' : (modoCuenta() === 'registro' ? 'Crear cuenta y enviar' : 'Ingresar y enviar') }} }
+          </button>
+        }
+      </footer>
+    </form>
+  </section>
+}

@@ -1,0 +1,136 @@
+<section class="mp" [class.mp-panel-cerrado]="!panelAbierto()">
+  <div class="mp-mapa" #lienzo aria-label="Mapa del Perú con quejas por zona"></div>
+
+  <!-- Buscador -->
+  <div class="mp-buscar" role="search">
+    <div class="mp-buscar-caja">
+      <span class="ms">search</span>
+      <input type="search" placeholder="Busca un departamento, provincia o distrito…" autocomplete="off"
+             [value]="busqueda()" (input)="buscar($any($event.target).value)" (keydown)="teclado($event)"
+             aria-label="Buscar lugar" aria-autocomplete="list" [attr.aria-expanded]="resultados().length > 0" />
+      @if (busqueda()) {
+        <button class="icon-btn" (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda"><span class="ms">close</span></button>
+      }
+    </div>
+    @if (resultados().length) {
+      <ul class="mp-resultados" role="listbox">
+        @for (r of resultados(); track r.t + r.id; let i = $index) {
+          <li role="option" [class.on]="i === activo()" [attr.aria-selected]="i === activo()"
+              (mousedown)="irA(r)" (mouseenter)="activo.set(i)">
+            <span class="ms">{{ r.t === 'x' ? 'location_on' : r.t === 'p' ? 'map' : 'public' }}</span>
+            <span class="mp-r-txt"><b>{{ r.n }}</b><small>{{ tipo(r.t) }}{{ r.p ? ' · ' + r.p : '' }}</small></span>
+          </li>
+        }
+      </ul>
+    } @else if (escribiendo() && busqueda().length >= 2) {
+      <div class="mp-resultados mp-sin">No encontramos “{{ busqueda() }}” en el Perú.</div>
+    }
+  </div>
+
+  <!-- Leyenda -->
+  <div class="mp-leyenda">
+    <span class="mp-ley-titulo">Quejas por {{ nivelVista() === 'departamentos' ? 'departamento' : nivelVista() === 'provincias' ? 'provincia' : 'distrito' }}</span>
+    <span><i [style.background]="colores.bajo"></i>Pocas</span>
+    <span><i [style.background]="colores.medio"></i>Moderadas</span>
+    <span><i [style.background]="colores.alto"></i>Muchas</span>
+    <span><i [style.background]="colores.sin" class="borde"></i>Sin quejas</span>
+  </div>
+
+  @if (cargando()) {
+    <div class="mp-cargando"><span class="spinner"></span>Cargando mapa del Perú…</div>
+  }
+  @if (error()) {
+    <div class="mp-cargando mp-error"><span class="ms">cloud_off</span>No pudimos conectar con el servidor.</div>
+  }
+
+  <!-- Panel -->
+  <aside class="mp-panel" aria-label="Detalle de la zona">
+    <button class="mp-panel-toggle" (click)="panelAbierto.set(!panelAbierto())" [attr.aria-label]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'">
+      <span class="ms">{{ panelAbierto() ? 'chevron_right' : 'chevron_left' }}</span>
+    </button>
+
+    <div class="mp-panel-in">
+      <nav class="migas" aria-label="Ubicación">
+        @for (m of migas(); track m.id; let ultimo = $last) {
+          <button (click)="m.nivel === 'pais' ? volverPeru() : elegir(m, true)">{{ m.nombre }}</button>
+          <span class="ms">chevron_right</span>
+        }
+        <span class="miga-actual">{{ sel().nombre }}</span>
+      </nav>
+
+      <header class="mp-head">
+        <h1>{{ sel().nombre }}</h1>
+        <p>{{ sel().sub }}</p>
+      </header>
+
+      <div class="mp-total">
+        <div><b>{{ resumen().total.toLocaleString('es-PE') }}</b><span>quejas registradas</span></div>
+        <div><b>{{ resumen().resueltos | number:'1.0-0' }}%</b><span>resueltas</span></div>
+      </div>
+
+      @if (resumen().total) {
+        <div class="mp-estados" aria-label="Estado de las quejas">
+          <div class="barra-estados">
+            @for (e of resumen().estados; track e.key) {
+              <i [class]="'be-' + e.tono" [style.width.%]="e.pct" [title]="e.label + ': ' + e.n"></i>
+            }
+          </div>
+          <ul>
+            @for (e of resumen().estados; track e.key) {
+              <li><span class="dot" [class]="'dot dot-' + e.tono"></span>{{ e.label }}<b>{{ e.n }}</b></li>
+            }
+          </ul>
+        </div>
+
+        <h2 class="mp-sec">Qué se reporta</h2>
+        <ul class="mp-cats">
+          @for (c of resumen().categorias; track c.nombre) {
+            <li>
+              <span class="ms">{{ iconoCategoria(c.nombre) }}</span>
+              <span class="mp-cat-n">{{ c.nombre }}</span>
+              <span class="mp-cat-bar"><i [style.width.%]="c.pct"></i></span>
+              <b>{{ c.n }}</b>
+            </li>
+          }
+        </ul>
+      } @else if (!cargando()) {
+        <p class="mp-vacio">Aún no hay quejas registradas aquí.</p>
+      }
+
+      @if (hijos().length) {
+        <h2 class="mp-sec">{{ tituloHijos() }} con más quejas</h2>
+        <ol class="mp-hijos">
+          @for (h of hijos(); track h.f.properties.id) {
+            <li>
+              <button (click)="elegirHijo(h.f)">
+                <i class="sw" [style.background]="colores[h.nivel]"></i>
+                <span class="mp-h-n">{{ h.f.properties.nombre }}</span>
+                <b>{{ h.n }}</b>
+              </button>
+            </li>
+          }
+        </ol>
+      }
+
+      @if (resumen().ultimos.length) {
+        <h2 class="mp-sec">Últimas quejas</h2>
+        <ul class="mp-ultimos">
+          @for (u of resumen().ultimos; track u.t.idTestimonio) {
+            <li>
+              <a [routerLink]="['/reporte', u.t.idTestimonio]">
+                <span class="mp-u-top"><span>{{ u.categoria }} · {{ u.zona }}</span><span class="pill" [class]="'pill pill-' + estadoInfo(u.t.estado).tono">{{ estadoInfo(u.t.estado).label }}</span></span>
+                <span class="mp-u-txt">{{ u.t.descripcionTexto }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <footer class="mp-panel-pie">
+      <a routerLink="/reportar" [queryParams]="reportarParams()" class="btn btn-signal btn-block">
+        <span class="ms">add</span>Reportar un problema{{ sel().nivel === 'distrito' ? ' en ' + sel().nombre : '' }}
+      </a>
+    </footer>
+  </aside>
+</section>

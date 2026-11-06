@@ -1,0 +1,66 @@
+<section class="wrap detalle">
+  <a routerLink="/" class="volver"><span class="ms">arrow_back</span>Volver al mapa</a>
+
+  @if (t(); as t) {
+    <div class="detalle-grid">
+      <article class="detalle-main">
+        <div class="detalle-meta">
+          <span class="cat-tag cat-tag-lg"><span class="ms">{{ icono() }}</span>{{ categoria()?.nombreCategoria }}</span>
+          <span class="mono muted">{{ ref() }}</span>
+          @if (esMio()) { <span class="pill pill-neutral">Tu reporte</span> }
+        </div>
+        <h1 class="detalle-txt">“{{ t.descripcionTexto }}”</h1>
+        <p class="detalle-lugar"><span class="ms">location_on</span>
+          {{ t.direccionTextoExtraida ? t.direccionTextoExtraida + ' · ' : '' }}{{ zona()?.nombreZona }}, {{ zona()?.departamentoZona }}
+        </p>
+
+        @if (t.fotoUrl) {
+          <figure class="detalle-foto"><img [src]="t.fotoUrl" alt="Foto adjunta al reporte" loading="lazy" /></figure>
+        }
+
+        <div class="detalle-estado">
+          <app-estado-track [estado]="t.estado" />
+        </div>
+
+        <h2 class="h-sec">Historial</h2>
+        <ol class="timeline">
+          <li class="tl-item">
+            <span class="tl-dot"></span>
+            <div><strong>Reporte recibido</strong><p class="muted">La ciudadanía registró el problema con la referencia {{ ref() }}.</p></div>
+          </li>
+          @for (m of historial(); track m.idModeracion) {
+            <li class="tl-item" [class]="'tl-item tl-' + estadoInfo(m.accion).tono">
+              <span class="tl-dot"></span>
+              <div>
+                <strong>{{ estadoInfo(m.accion).label }}</strong>
+                @if (m.fechaAccion) { <span class="tl-fecha mono">{{ m.fechaAccion | date:'d MMM y, HH:mm' }}</span> }
+                @if (m.motivo) { <p>{{ m.motivo }}</p> }
+                @if (m.costo) { <p class="tl-costo">Inversión: <b>{{ soles(m.costo) }}</b></p> }
+              </div>
+            </li>
+          } @empty {
+            <li class="tl-item tl-espera">
+              <span class="tl-dot"></span>
+              <div><strong>Esperando revisión</strong><p class="muted">La municipalidad todavía no registró acciones sobre este reporte.</p></div>
+            </li>
+          }
+        </ol>
+      </article>
+
+      <aside class="detalle-side">
+        <div class="card card-flush detalle-mapa"><app-mapa-picker [lat]="t.latitud" [lng]="t.longitud" /></div>
+        <dl class="datos-lista">
+          <div><dt>Estado</dt><dd><span class="pill" [class]="'pill pill-' + estadoInfo(t.estado).tono">{{ estadoInfo(t.estado).label }}</span></dd></div>
+          <div><dt>Zona</dt><dd>{{ zona()?.nombreZona }}</dd></div>
+          <div><dt>Provincia</dt><dd>{{ zona()?.provinciaZona }}</dd></div>
+          <div><dt>Coordenadas</dt><dd class="mono">{{ t.latitud }}, {{ t.longitud }}</dd></div>
+        </dl>
+        <a routerLink="/reportar" class="btn btn-line btn-block"><span class="ms">add_comment</span>Reportar otro problema</a>
+      </aside>
+    </div>
+  } @else if (noExiste()) {
+    <div class="vacio vacio-grande"><span class="ms">find_in_page</span><h3>Este reporte no existe</h3><p>Puede que haya sido eliminado.</p><a routerLink="/" class="btn btn-line">Volver al mapa</a></div>
+  } @else {
+    <div class="skeleton sk-hero"></div>
+  }
+</section>

@@ -1,0 +1,28 @@
+<a routerLink="/panel/roles" class="volver"><span class="ms">arrow_back</span>Roles</a>
+<div class="form-panel card">
+  <header>
+    <span class="form-ico"><span class="ms">badge</span></span>
+    <div><h1>Nuevo rol</h1><p class="muted">Perfiles de acceso. El sistema usa ADMINISTRADOR, MUNICIPALIDAD y CIUDADANO.</p></div>
+  </header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="form-grid" novalidate>
+      <label class="campo campo-full">
+        <span class="campo-lbl">Nombre del rol</span>
+        <input class="input" type="text" formControlName="nombreRol" placeholder="MUNICIPALIDAD" [class.mal]="mal('nombreRol')" />
+        @if (mal('nombreRol')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+      <label class="campo campo-full">
+        <span class="campo-lbl">Descripción <span class="opc">opcional</span></span>
+        <input class="input" type="text" formControlName="descripcionRol" placeholder="Atiende y modera los testimonios" [class.mal]="mal('descripcionRol')" />
+        @if (mal('descripcionRol')) { <span class="campo-error">Campo obligatorio.</span> }
+      </label>
+    @if (error()) { <p class="alerta campo-full"><span class="ms">error</span>{{ error() }}</p> }
+    <footer class="form-acciones campo-full">
+      <a routerLink="/panel/roles" class="btn btn-quiet">Cancelar</a>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-line" (click)="registrar(true)" [disabled]="guardando()">Guardar y agregar otro</button>
+      <button type="submit" class="btn btn-ink" [disabled]="guardando()">
+        @if (guardando()) { <span class="spinner"></span> } Guardar
+      </button>
+    </footer>
+  </form>
+</div>

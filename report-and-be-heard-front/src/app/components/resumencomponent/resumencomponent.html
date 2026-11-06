@@ -1,0 +1,78 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Resumen</p>
+    <h1>¿Cómo va la ciudad hoy?</h1>
+  </div>
+  <a routerLink="/panel/bandeja" class="btn btn-ink"><span class="ms">inbox</span>Atender pendientes
+    @if (kpis().pendientes) { <span class="badge">{{ kpis().pendientes }}</span> }
+  </a>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><span class="kpi-lbl">Reportes</span><b>{{ kpis().total }}</b><span class="kpi-sub">en total</span></div>
+  <div class="kpi kpi-warn"><span class="kpi-lbl">Por atender</span><b>{{ kpis().pendientes }}</b><span class="kpi-sub">recibidos sin acción</span></div>
+  <div class="kpi kpi-info"><span class="kpi-lbl">En atención</span><b>{{ kpis().proceso }}</b><span class="kpi-sub">con cuadrilla asignada</span></div>
+  <div class="kpi kpi-ok"><span class="kpi-lbl">Resueltos</span><b>{{ kpis().resueltos }}</b><span class="kpi-sub">{{ kpis().pct }}% del total</span></div>
+  <div class="kpi"><span class="kpi-lbl">Tiempo de atención</span><b class="kpi-txt">{{ kpis().tiempo }}</b><span class="kpi-sub">promedio · US13</span></div>
+  <div class="kpi"><span class="kpi-lbl">Inversión</span><b class="kpi-txt">{{ kpis().inversion }}</b><span class="kpi-sub">acumulada · US11</span></div>
+</div>
+
+<div class="p-grid">
+  <section class="card p-card p-span2">
+    <header class="p-card-head">
+      <div><h2>Tendencia de reportes</h2><span class="muted">US09</span></div>
+      <div class="segmented segmented-sm">
+        <button [class.on]="agrupacion() === 'dia'" (click)="cargarTendencia('dia')">Por día</button>
+        <button [class.on]="agrupacion() === 'mes'" (click)="cargarTendencia('mes')">Por mes</button>
+      </div>
+    </header>
+    <div class="columnas">
+      @for (c of columnas(); track c.periodo) {
+        <div class="col">
+          <span class="col-val">{{ c.totalTestimonios }}</span>
+          <span class="col-bar"><i [style.height.%]="c.pct"></i></span>
+          <span class="col-lbl mono">{{ c.periodo }}</span>
+        </div>
+      } @empty { <p class="muted">Sin datos.</p> }
+    </div>
+  </section>
+
+  <section class="card p-card">
+    <header class="p-card-head"><div><h2>Por categoría</h2><span class="muted">US08</span></div></header>
+    <app-barras [items]="barrasCategoria()" />
+  </section>
+
+  <section class="card p-card">
+    <header class="p-card-head"><div><h2>Zonas más activas</h2><span class="muted">US10</span></div></header>
+    <app-barras [items]="barrasRanking()" tono="ink" />
+  </section>
+
+  <section class="card p-card">
+    <header class="p-card-head"><div><h2>Inversión por departamento</h2><span class="muted">US11</span></div></header>
+    <app-barras [items]="barrasInversion()" tono="ok" vacio="Aún no hay inversión registrada" />
+  </section>
+
+  <section class="card p-card">
+    <header class="p-card-head"><div><h2>Costo por categoría</h2><span class="muted">US12</span></div></header>
+    <app-barras [items]="barrasCosto()" tono="ok" vacio="Aún no hay costos registrados" />
+  </section>
+
+  <section class="card p-card p-span2">
+    <header class="p-card-head"><div><h2>Desempeño de la IA</h2><span class="muted">US14 · solo administrador</span></div></header>
+    @if (ia().length) {
+      <table class="tabla">
+        <thead><tr><th>Categoría</th><th>Modelo</th><th>Confianza promedio</th></tr></thead>
+        <tbody>
+          @for (r of ia(); track r.nombreCategoria + r.modeloIA) {
+            <tr><td>{{ r.nombreCategoria }}</td><td class="mono">{{ r.modeloIA }}</td><td>{{ r.confianzaPromedio * 100 | number:'1.0-1' }}%</td></tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="proximo proximo-panel">
+        <span class="ms">auto_awesome</span>
+        <div><strong>Se activa con la API de IA</strong><p>Cuando los reportes se clasifiquen automáticamente, aquí verás qué tan segura está la IA en cada categoría.</p></div>
+      </div>
+    }
+  </section>
+</div>

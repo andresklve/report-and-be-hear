@@ -1,0 +1,45 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Catálogo</p>
+    <h1>Roles</h1>
+    <p class="muted">Perfiles de acceso. El sistema usa ADMINISTRADOR, MUNICIPALIDAD y CIUDADANO.</p>
+  </div>
+  <a routerLink="/panel/roles/nuevo" class="btn btn-signal"><span class="ms">add</span>Nuevo rol</a>
+</header>
+
+<div class="toolbar">
+  <label class="buscador buscador-sm">
+    <span class="ms">search</span>
+    <input type="search" placeholder="Buscar…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </label>
+  <span class="muted">{{ filtrados().length }} de {{ dataSource().length }}</span>
+</div>
+
+<div class="card card-flush">
+  <table class="tabla">
+    <thead><tr><th class="t-id">ID</th><th>Rol</th><th>Descripción</th><th class="t-acc"></th></tr></thead>
+    <tbody>
+      @if (cargando()) {
+        @for (i of [0,1,2]; track i) { <tr><td colspan="4"><div class="skeleton sk-line"></div></td></tr> }
+      } @else if (error()) {
+        <tr><td colspan="4"><div class="vacio"><span class="ms">cloud_off</span><p>No se pudo conectar con el servidor.</p></div></td></tr>
+      } @else {
+        @for (x of filtrados(); track x.idRol) {
+          <tr>
+            <td class="t-id mono muted">{{ x.idRol }}</td>
+            <td><span class="mono">{{ x.nombreRol }}</span></td><td class="muted">{{ x.descripcionRol || '—' }}</td>
+            <td class="t-acc">
+              <button class="icon-btn" [class.peligro]="confirmando() === x.idRol" (click)="eliminar(x.idRol)"
+                      [title]="confirmando() === x.idRol ? 'Clic otra vez para eliminar' : 'Eliminar'">
+                <span class="ms">{{ confirmando() === x.idRol ? 'delete_forever' : 'delete' }}</span>
+                @if (confirmando() === x.idRol) { <span class="confirmar">¿Eliminar?</span> }
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4"><div class="vacio"><span class="ms">badge</span><p>No hay registros.</p></div></td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

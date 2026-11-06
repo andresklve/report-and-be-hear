@@ -1,0 +1,36 @@
+<div class="auth-caja">
+  <h1>Bienvenido de vuelta</h1>
+  <p class="muted">Ingresa para seguir tus reportes{{ volver?.startsWith('/panel') ? ' o gestionar tu municipalidad' : '' }}.</p>
+
+  <form [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
+    <label class="campo">
+      <span class="campo-lbl">Correo</span>
+      <input class="input" type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com"
+             [class.mal]="form.controls.correo.invalid && form.controls.correo.touched" />
+    </label>
+    <label class="campo">
+      <span class="campo-lbl">Contraseña</span>
+      <span class="input-pass">
+        <input class="input" [type]="verPass() ? 'text' : 'password'" formControlName="password" autocomplete="current-password"
+               [class.mal]="form.controls.password.invalid && form.controls.password.touched" />
+        <button type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'"><span class="ms">{{ verPass() ? 'visibility_off' : 'visibility' }}</span></button>
+      </span>
+    </label>
+    @if (error()) { <p class="alerta"><span class="ms">error</span>{{ error() }}</p> }
+    <button type="submit" class="btn btn-ink btn-lg btn-block" [disabled]="cargando()">
+      @if (cargando()) { <span class="spinner"></span>Ingresando… } @else { Ingresar }
+    </button>
+  </form>
+
+  <p class="auth-alt">¿No tienes cuenta? <a [routerLink]="['/registro']" [queryParams]="volver ? { volver } : {}">Créala en 30 segundos</a></p>
+  <p class="auth-alt muted">No necesitas cuenta para ver el mapa. <a routerLink="/">Ir al mapa</a></p>
+
+  <div class="demo">
+    <span class="eyebrow">Cuentas de demostración</span>
+    <div class="demo-btns">
+      <button type="button" (click)="demo('ana.torres@demo.pe')"><span class="ms">person</span>Ciudadana</button>
+      <button type="button" (click)="demo('municipalidad@demo.pe')"><span class="ms">account_balance</span>Municipalidad</button>
+      <button type="button" (click)="demo('admin@demo.pe')"><span class="ms">admin_panel_settings</span>Admin</button>
+    </div>
+  </div>
+</div>

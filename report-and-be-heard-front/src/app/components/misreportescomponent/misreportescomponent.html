@@ -1,0 +1,44 @@
+<section class="page-top wrap">
+  <p class="eyebrow">Mis reportes</p>
+  <h1 class="page-title">Hola, {{ auth.sesion()?.nombres }}.</h1>
+  @if (datos()) {
+    <p class="lead">
+      @if (resumen().total === 0) { Aún no has reportado nada. Cuando lo hagas, verás aquí cómo avanza cada caso. }
+      @else { Tienes <b>{{ resumen().abiertos }}</b> {{ resumen().abiertos === 1 ? 'caso abierto' : 'casos abiertos' }} y <b>{{ resumen().resueltos }}</b> {{ resumen().resueltos === 1 ? 'resuelto' : 'resueltos' }}. }
+    </p>
+  }
+</section>
+
+<section class="wrap mis">
+  @for (x of mios(); track x.t.idTestimonio) {
+    <a class="mi-item" [routerLink]="['/reporte', x.t.idTestimonio]">
+      <span class="mi-ico"><span class="ms">{{ iconoCategoria(x.categoria) }}</span></span>
+      <div class="mi-body">
+        <div class="mi-top">
+          <span class="mono muted">{{ referencia(x.t.idTestimonio) }}</span>
+          <span class="pill" [class]="'pill pill-' + estadoInfo(x.t.estado).tono">{{ estadoInfo(x.t.estado).label }}</span>
+        </div>
+        <p class="mi-txt">{{ x.t.descripcionTexto }}</p>
+        <span class="rcard-zona"><span class="ms">location_on</span>{{ x.zona }} · {{ x.categoria }}</span>
+        @if (x.ultima?.motivo) {
+          <p class="mi-nota"><span class="ms">chat_bubble</span><span><b>Municipalidad:</b> {{ x.ultima?.motivo }}</span></p>
+        }
+      </div>
+      <div class="mi-track"><app-estado-track [estado]="x.t.estado" /></div>
+    </a>
+  } @empty {
+    @if (datos()) {
+      <div class="vacio vacio-grande">
+        <span class="ms">edit_note</span>
+        <h3>Tu primer reporte está a un minuto</h3>
+        <p>Cuenta qué pasa en tu barrio y síguelo desde aquí.</p>
+        <a routerLink="/reportar" class="btn btn-signal btn-lg"><span class="ms">add_comment</span>Reportar un problema</a>
+      </div>
+    } @else if (error()) {
+      <div class="vacio vacio-grande"><span class="ms">cloud_off</span><h3>Sin conexión</h3></div>
+    } @else {
+      @for (i of [0,1,2]; track i) { <div class="skeleton sk-row"></div> }
+    }
+  }
+</section>
+

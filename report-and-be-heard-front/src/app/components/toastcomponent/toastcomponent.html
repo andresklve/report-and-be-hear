@@ -1,0 +1,9 @@
+<div class="toasts" aria-live="polite">
+  @for (t of tS.toasts(); track t.id) {
+    <div class="toast" [class]="'toast toast-' + t.tono">
+      <span class="ms">{{ t.tono === 'ok' ? 'check_circle' : t.tono === 'error' ? 'error' : 'info' }}</span>
+      <span class="toast-txt">{{ t.texto }}</span>
+      <button (click)="tS.cerrar(t.id)" aria-label="Cerrar"><span class="ms">close</span></button>
+    </div>
+  }
+</div>

@@ -1,0 +1,45 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Catálogo</p>
+    <h1>Zonas</h1>
+    <p class="muted">Distritos donde la ciudadanía puede reportar. Sus coordenadas alimentan el mapa de calor.</p>
+  </div>
+  <a routerLink="/panel/zonas/nuevo" class="btn btn-signal"><span class="ms">add</span>Nueva zona</a>
+</header>
+
+<div class="toolbar">
+  <label class="buscador buscador-sm">
+    <span class="ms">search</span>
+    <input type="search" placeholder="Buscar…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </label>
+  <span class="muted">{{ filtrados().length }} de {{ dataSource().length }}</span>
+</div>
+
+<div class="card card-flush">
+  <table class="tabla">
+    <thead><tr><th class="t-id">ID</th><th>Zona</th><th>Provincia</th><th>Departamento</th><th>Coordenadas</th><th class="t-acc"></th></tr></thead>
+    <tbody>
+      @if (cargando()) {
+        @for (i of [0,1,2]; track i) { <tr><td colspan="6"><div class="skeleton sk-line"></div></td></tr> }
+      } @else if (error()) {
+        <tr><td colspan="6"><div class="vacio"><span class="ms">cloud_off</span><p>No se pudo conectar con el servidor.</p></div></td></tr>
+      } @else {
+        @for (x of filtrados(); track x.idZona) {
+          <tr>
+            <td class="t-id mono muted">{{ x.idZona }}</td>
+            <td><strong>{{ x.nombreZona }}</strong></td><td>{{ x.provinciaZona }}</td><td>{{ x.departamentoZona }}</td><td class="mono muted">{{ x.latitudZona }}, {{ x.longitudZona }}</td>
+            <td class="t-acc">
+              <button class="icon-btn" [class.peligro]="confirmando() === x.idZona" (click)="eliminar(x.idZona)"
+                      [title]="confirmando() === x.idZona ? 'Clic otra vez para eliminar' : 'Eliminar'">
+                <span class="ms">{{ confirmando() === x.idZona ? 'delete_forever' : 'delete' }}</span>
+                @if (confirmando() === x.idZona) { <span class="confirmar">¿Eliminar?</span> }
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6"><div class="vacio"><span class="ms">location_on</span><p>No hay registros.</p></div></td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

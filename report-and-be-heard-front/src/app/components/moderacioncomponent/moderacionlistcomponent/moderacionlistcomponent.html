@@ -1,0 +1,39 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Gestión</p>
+    <h1>Moderaciones</h1>
+    <p class="muted">Cada acción tomada sobre un reporte. Total invertido: <b>{{ total() }}</b></p>
+  </div>
+  <a routerLink="/panel/bandeja" class="btn btn-signal"><span class="ms">inbox</span>Ir a la bandeja</a>
+</header>
+
+<div class="card card-flush">
+  <table class="tabla">
+    <thead><tr><th>Fecha</th><th>Reporte</th><th>Acción</th><th>Nota</th><th>Costo</th><th>Por</th><th class="t-acc"></th></tr></thead>
+    <tbody>
+      @if (cargando()) {
+        @for (i of [0,1,2]; track i) { <tr><td colspan="7"><div class="skeleton sk-line"></div></td></tr> }
+      } @else {
+        @for (m of moderaciones(); track m.idModeracion) {
+          <tr>
+            <td class="mono muted">{{ m.fechaAccion | date:'dd/MM/yy HH:mm' }}</td>
+            <td><a class="link mono" [routerLink]="['/reporte', m.idTestimonio]">{{ referencia(m.idTestimonio) }}</a>
+              <p class="clamp muted">{{ testimonios().get(m.idTestimonio)?.descripcionTexto }}</p></td>
+            <td><span class="pill" [class]="'pill pill-' + estadoInfo(m.accion).tono">{{ estadoInfo(m.accion).label }}</span></td>
+            <td class="muted">{{ m.motivo || '—' }}</td>
+            <td class="mono">{{ m.costo ? soles(m.costo) : '—' }}</td>
+            <td>{{ usuarios().get(m.idUsuarioAdmin)?.nombres ?? '—' }}</td>
+            <td class="t-acc">
+              <button class="icon-btn" [class.peligro]="confirmando() === m.idModeracion" (click)="eliminar(m.idModeracion)" title="Eliminar">
+                <span class="ms">{{ confirmando() === m.idModeracion ? 'delete_forever' : 'delete' }}</span>
+                @if (confirmando() === m.idModeracion) { <span class="confirmar">¿Eliminar?</span> }
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7"><div class="vacio"><span class="ms">gavel</span><p>Aún no hay acciones registradas.</p></div></td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

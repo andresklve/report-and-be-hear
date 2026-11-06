@@ -1,0 +1,54 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Administración</p>
+    <h1>Usuarios</h1>
+    <p class="muted">Ciudadanía registrada y cuentas del equipo municipal.</p>
+  </div>
+  <a routerLink="/panel/usuarios/nuevo" class="btn btn-signal"><span class="ms">person_add</span>Nuevo usuario</a>
+</header>
+
+<div class="toolbar">
+  <label class="buscador buscador-sm">
+    <span class="ms">search</span>
+    <input type="search" placeholder="Nombre o correo…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </label>
+  <div class="segmented segmented-sm">
+    <button [class.on]="rolFiltro() === null" (click)="rolFiltro.set(null)">Todos <i>{{ usuarios().length }}</i></button>
+    @for (r of roles(); track r.idRol) {
+      <button [class.on]="rolFiltro() === r.idRol" (click)="rolFiltro.set(r.idRol)">{{ r.nombreRol | slice:0:1 }}{{ r.nombreRol.slice(1).toLowerCase() }} <i>{{ conteoRol().get(r.idRol) ?? 0 }}</i></button>
+    }
+  </div>
+</div>
+
+<div class="card card-flush">
+  <table class="tabla">
+    <thead><tr><th>Persona</th><th>Rol</th><th>Registro</th><th>Estado</th><th class="t-acc"></th></tr></thead>
+    <tbody>
+      @if (cargando()) {
+        @for (i of [0,1,2]; track i) { <tr><td colspan="5"><div class="skeleton sk-line"></div></td></tr> }
+      } @else {
+        @for (u of filtrados(); track u.idUsuario) {
+          <tr>
+            <td>
+              <div class="t-persona">
+                <span class="avatar avatar-sm">{{ iniciales(u) }}</span>
+                <div><strong>{{ u.nombres }} {{ u.apellidos }}</strong><span class="muted">{{ u.correo }}</span></div>
+              </div>
+            </td>
+            <td><span class="pill" [class]="'pill ' + tonoRol(u.idRol)">{{ rolNombre().get(u.idRol) }}</span></td>
+            <td class="muted">{{ u.fechaRegistro | date:'d MMM y' }}</td>
+            <td><span class="pill" [class]="u.activo ? 'pill pill-ok' : 'pill pill-neutral'">{{ u.activo ? 'Activo' : 'Inactivo' }}</span></td>
+            <td class="t-acc">
+              <button class="icon-btn" [class.peligro]="confirmando() === u.idUsuario" (click)="eliminar(u)" title="Eliminar">
+                <span class="ms">{{ confirmando() === u.idUsuario ? 'delete_forever' : 'delete' }}</span>
+                @if (confirmando() === u.idUsuario) { <span class="confirmar">¿Eliminar?</span> }
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5"><div class="vacio"><span class="ms">group</span><p>No hay usuarios con ese filtro.</p></div></td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
