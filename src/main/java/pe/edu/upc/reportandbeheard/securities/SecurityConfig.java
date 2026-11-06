@@ -2,21 +2,19 @@ package pe.edu.upc.reportandbeheard.securities;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
-@EnableMethodSecurity
+// @EnableMethodSecurity  // inhabilitado: los @PreAuthorize de los controllers no se aplican
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
@@ -50,10 +48,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
 
+        // SEGURIDAD INHABILITADA: todos los endpoints son publicos para el desarrollo del frontend.
+        // El login (/login) sigue generando el JWT, pero no se exige para consumir la API.
         http
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                 .csrf(csrf -> csrf.disable())
 
@@ -64,34 +65,7 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
-                        // Login publico
-                        .requestMatchers("/login").permitAll()
-
-                        // Registro publico de usuarios
-                        .requestMatchers(HttpMethod.POST, "/apis/usuarios").permitAll()
-
-                        // Swagger
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**"
-                        ).permitAll()
-
-                        // CORS
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
-
-                        // Todo lo demas requiere autenticacion
-                        .anyRequest().authenticated()
-                )
-
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwt ->
-                                jwt.jwtAuthenticationConverter(
-                                        new CustomJwtAuthenticationConverter()
-                                )
-                        )
+                        .anyRequest().permitAll()
                 );
 
         return http.build();
