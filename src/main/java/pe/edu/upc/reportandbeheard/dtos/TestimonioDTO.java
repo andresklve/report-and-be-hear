@@ -51,6 +51,15 @@ public class TestimonioDTO {
     @Schema(description = "Estado del testimonio", example = "PENDIENTE")
     private String estado;
 
+    @DecimalMin(value = "0.0", message = "La confianza de la IA debe estar entre 0 y 1.")
+    @DecimalMax(value = "1.0", message = "La confianza de la IA debe estar entre 0 y 1.")
+    @Schema(description = "Nivel de confianza de la IA al clasificar el testimonio (0 a 1). Opcional.", example = "0.87")
+    private Double confianzaIA;
+
+    @Size(max = 50, message = "El modelo de IA no puede exceder 50 caracteres.")
+    @Schema(description = "Nombre del modelo de IA que clasificó el testimonio. Opcional.", example = "gemini-2.0-flash")
+    private String modeloIA;
+
     public Long getIdTestimonio() {
         return idTestimonio;
     }
@@ -129,5 +138,21 @@ public class TestimonioDTO {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Double getConfianzaIA() {
+        return confianzaIA;
+    }
+
+    public void setConfianzaIA(Double confianzaIA) {
+        this.confianzaIA = confianzaIA;
+    }
+
+    public String getModeloIA() {
+        return modeloIA;
+    }
+
+    public void setModeloIA(String modeloIA) {
+        this.modeloIA = modeloIA;
     }
 }

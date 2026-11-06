@@ -73,6 +73,8 @@ public class TestimonioController {
         testimonio.setLatitud(dto.getLatitud());
         testimonio.setLongitud(dto.getLongitud());
         testimonio.setEstado(dto.getEstado());
+        testimonio.setConfianzaIA(dto.getConfianzaIA());
+        testimonio.setModeloIA(dto.getModeloIA());
         testimonio.setFechaCreacion(LocalDateTime.now());
 
         tS.insert(testimonio);
@@ -155,6 +157,8 @@ public class TestimonioController {
         testimonio.setLatitud(dto.getLatitud());
         testimonio.setLongitud(dto.getLongitud());
         testimonio.setEstado(dto.getEstado());
+        testimonio.setConfianzaIA(dto.getConfianzaIA());
+        testimonio.setModeloIA(dto.getModeloIA());
         testimonio.setFechaActualizacion(LocalDateTime.now());
 
         tS.update(testimonio);

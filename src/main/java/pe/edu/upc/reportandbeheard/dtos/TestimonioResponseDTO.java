@@ -35,6 +35,12 @@ public class TestimonioResponseDTO {
     @Schema(description = "Estado del testimonio", example = "PENDIENTE")
     private String estado;
 
+    @Schema(description = "Nivel de confianza de la IA (0 a 1)", example = "0.87")
+    private Double confianzaIA;
+
+    @Schema(description = "Modelo de IA que clasificó el testimonio", example = "gemini-2.0-flash")
+    private String modeloIA;
+
     public Long getIdTestimonio() {
         return idTestimonio;
     }
@@ -113,5 +119,21 @@ public class TestimonioResponseDTO {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Double getConfianzaIA() {
+        return confianzaIA;
+    }
+
+    public void setConfianzaIA(Double confianzaIA) {
+        this.confianzaIA = confianzaIA;
+    }
+
+    public String getModeloIA() {
+        return modeloIA;
+    }
+
+    public void setModeloIA(String modeloIA) {
+        this.modeloIA = modeloIA;
     }
 }
