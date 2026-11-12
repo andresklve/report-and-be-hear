@@ -1,25 +1,18 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-export interface Toast { id: number; texto: string; tono: 'ok' | 'error' | 'info'; }
-
+// Avisos cortos al pie de la pantalla (MatSnackBar de Angular Material)
 @Injectable({
   providedIn: 'root',
 })
 export class Toastservice {
-  readonly toasts = signal<Toast[]>([])
-  private seq = 0
+  private snack = inject(MatSnackBar)
 
-  ok(texto: string) { this.push(texto, 'ok') }
-  error(texto: string) { this.push(texto, 'error') }
-  info(texto: string) { this.push(texto, 'info') }
+  ok(texto: string) { this.abrir(texto, 'snack-ok') }
+  error(texto: string) { this.abrir(texto, 'snack-error') }
+  info(texto: string) { this.abrir(texto, 'snack-info') }
 
-  cerrar(id: number) {
-    this.toasts.update(l => l.filter(t => t.id !== id))
-  }
-
-  private push(texto: string, tono: Toast['tono']) {
-    const id = ++this.seq
-    this.toasts.update(l => [...l, { id, texto, tono }])
-    setTimeout(() => this.cerrar(id), 4200)
+  private abrir(texto: string, clase: string) {
+    this.snack.open(texto, 'Cerrar', { duration: 4200, panelClass: clase, horizontalPosition: 'center', verticalPosition: 'bottom' })
   }
 }

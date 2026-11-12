@@ -32,6 +32,22 @@ export function iconoCategoria(nombre: string | null | undefined): string {
   return 'campaign';
 }
 
+// Paleta de los reportes: un color fijo por categoria (ver styles/_variables.scss)
+export function colorCategoria(nombre: string | null | undefined): string {
+  const n = (nombre ?? '').toLowerCase();
+  if (/bache|pista|vered|vía|via|calle/.test(n)) return 'var(--cat-baches)';
+  if (/basura|residuo|limpie/.test(n)) return 'var(--cat-basura)';
+  if (/segur|robo|delinc/.test(n)) return 'var(--cat-seguridad)';
+  if (/luz|alumbr|poste/.test(n)) return 'var(--cat-alumbrado)';
+  if (/agua|desag|fuga/.test(n)) return 'var(--cat-agua)';
+  return 'var(--cat-otros)';
+}
+
+// Color de grafico para cada estado
+export function colorEstado(key: string | null | undefined): string {
+  return `var(--${estadoInfo(key).tono}-chart)`;
+}
+
 export function soles(v: number | null | undefined): string {
   const n = Number(v ?? 0);
   return 'S/ ' + n.toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -49,4 +65,14 @@ export function duracion(dias: number | null | undefined): string {
 
 export function referencia(id: number): string {
   return 'RYA-' + String(id).padStart(4, '0');
+}
+
+// Filtro por rango de fechas (mat-date-range-input). "hasta" incluye todo ese dia.
+export function enRango(fecha: string | null | undefined, desde: Date | null, hasta: Date | null): boolean {
+  if (!desde && !hasta) return true;
+  if (!fecha) return false;
+  const f = new Date(fecha).getTime();
+  if (desde && f < new Date(desde.getFullYear(), desde.getMonth(), desde.getDate()).getTime()) return false;
+  if (hasta && f >= new Date(hasta.getFullYear(), hasta.getMonth(), hasta.getDate() + 1).getTime()) return false;
+  return true;
 }

@@ -11,6 +11,7 @@ import pe.edu.upc.reportandbeheard.entities.Testimonio;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
 import pe.edu.upc.reportandbeheard.exceptions.ResourceNotFoundException;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IModeracionService;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.INotificacionService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.ITestimonioService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IUsuarioService;
 
@@ -24,11 +25,14 @@ public class ModeracionController {
     private final IModeracionService mS;
     private final ITestimonioService tS;
     private final IUsuarioService uS;
+    private final INotificacionService nS;
 
-    public ModeracionController(IModeracionService mS, ITestimonioService tS, IUsuarioService uS) {
+    public ModeracionController(IModeracionService mS, ITestimonioService tS, IUsuarioService uS,
+                                INotificacionService nS) {
         this.mS = mS;
         this.tS = tS;
         this.uS = uS;
+        this.nS = nS;
     }
 
     @GetMapping
@@ -59,6 +63,7 @@ public class ModeracionController {
         }
 
         mS.insert(moderacion);
+        notificarAutor(moderacion);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -134,6 +139,26 @@ public class ModeracionController {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("No existe un usuario con el id: " + idUsuario)
                 );
+    }
+
+    // Aviso al ciudadano cuando la municipalidad registra una accion sobre su testimonio
+    private void notificarAutor(Moderacion moderacion) {
+        Testimonio testimonio = moderacion.getTestimonio();
+        Usuario autor = testimonio.getUsuario();
+        if (autor.getIdUsuario().equals(moderacion.getUsuarioAdmin().getIdUsuario())) {
+            return;
+        }
+        String ref = String.format("RYA-%04d", testimonio.getIdTestimonio());
+        String mensaje = switch (moderacion.getAccion()) {
+            case "EN_PROCESO" -> "La municipalidad está atendiendo tu reporte " + ref + ".";
+            case "RESUELTO" -> "Tu reporte " + ref + " fue resuelto.";
+            case "RECHAZADO" -> "Tu reporte " + ref + " fue descartado.";
+            default -> "Tu reporte " + ref + " tiene una actualización.";
+        };
+        if (moderacion.getMotivo() != null && !moderacion.getMotivo().isBlank()) {
+            mensaje += " " + moderacion.getMotivo();
+        }
+        nS.notificar(autor, testimonio, "ESTADO", mensaje);
     }
 
     private ModeracionDTO toDTO(Moderacion moderacion) {

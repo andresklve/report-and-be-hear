@@ -10,35 +10,41 @@
 </section>
 
 <section class="wrap mis">
-  @for (x of mios(); track x.t.idTestimonio) {
-    <a class="mi-item" [routerLink]="['/reporte', x.t.idTestimonio]">
-      <span class="mi-ico"><span class="ms">{{ iconoCategoria(x.categoria) }}</span></span>
-      <div class="mi-body">
-        <div class="mi-top">
-          <span class="mono muted">{{ referencia(x.t.idTestimonio) }}</span>
-          <span class="pill" [class]="'pill pill-' + estadoInfo(x.t.estado).tono">{{ estadoInfo(x.t.estado).label }}</span>
+  @if (!datos() && !error()) { <mat-progress-bar mode="indeterminate" /> }
+
+  @for (x of pagina(); track x.t.idTestimonio) {
+    <mat-card appearance="outlined" class="mi-item">
+      <a class="mi-link" [routerLink]="['/reporte', x.t.idTestimonio]" matRipple>
+        <span class="mi-ico" [style.color]="colorCategoria(x.categoria)"><mat-icon>{{ iconoCategoria(x.categoria) }}</mat-icon></span>
+        <div class="mi-body">
+          <div class="mi-top">
+            <span class="mono muted">{{ referencia(x.t.idTestimonio) }}</span>
+            <app-estadochipcomponent [estado]="x.t.estado" />
+          </div>
+          <p class="mi-txt">{{ x.t.descripcionTexto }}</p>
+          <span class="lugar"><mat-icon>location_on</mat-icon>{{ x.zona }} · {{ x.categoria }}</span>
+          @if (x.ultima?.motivo) {
+            <p class="mi-nota"><mat-icon>chat_bubble</mat-icon><span><b>Municipalidad:</b> {{ x.ultima?.motivo }}</span></p>
+          }
         </div>
-        <p class="mi-txt">{{ x.t.descripcionTexto }}</p>
-        <span class="rcard-zona"><span class="ms">location_on</span>{{ x.zona }} · {{ x.categoria }}</span>
-        @if (x.ultima?.motivo) {
-          <p class="mi-nota"><span class="ms">chat_bubble</span><span><b>Municipalidad:</b> {{ x.ultima?.motivo }}</span></p>
-        }
-      </div>
-      <div class="mi-track"><app-estado-track [estado]="x.t.estado" /></div>
-    </a>
+        <div class="mi-track"><app-estadotrackcomponent [estado]="x.t.estado" /></div>
+      </a>
+    </mat-card>
   } @empty {
     @if (datos()) {
-      <div class="vacio vacio-grande">
-        <span class="ms">edit_note</span>
+      <mat-card appearance="outlined" class="vacio-grande">
+        <img src="img/sin-reportes.svg" alt="" width="480" height="240" class="vacio-img" />
         <h3>Tu primer reporte está a un minuto</h3>
-        <p>Cuenta qué pasa en tu barrio y síguelo desde aquí.</p>
-        <a routerLink="/reportar" class="btn btn-signal btn-lg"><span class="ms">add_comment</span>Reportar un problema</a>
-      </div>
+        <p class="muted">Cuenta qué pasa en tu barrio y síguelo desde aquí.</p>
+        <a matButton="filled" routerLink="/reportar"><mat-icon>add_comment</mat-icon>Reportar un problema</a>
+      </mat-card>
     } @else if (error()) {
-      <div class="vacio vacio-grande"><span class="ms">cloud_off</span><h3>Sin conexión</h3></div>
-    } @else {
-      @for (i of [0,1,2]; track i) { <div class="skeleton sk-row"></div> }
+      <div class="vacio"><mat-icon>cloud_off</mat-icon><h3>Sin conexión</h3></div>
     }
   }
-</section>
 
+  @if (mios().length > pageSize()) {
+    <mat-paginator [length]="mios().length" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+                   [pageSizeOptions]="[5, 10, 20]" (page)="cambiarPagina($event)" showFirstLastButtons />
+  }
+</section>

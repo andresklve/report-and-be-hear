@@ -1,206 +1,216 @@
 @if (creado(); as c) {
   <!-- ===== Confirmacion ===== -->
   <section class="wrap exito">
-    <div class="exito-sello" aria-hidden="true">
-      <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" /><path d="M38 62l15 15 30-34" /></svg>
-    </div>
-    <p class="eyebrow">Reporte enviado</p>
-    <h1 class="page-title">Te escuchamos, {{ auth.sesion()?.nombres }}.</h1>
-    <p class="lead">Tu reporte ya está en la bandeja de la municipalidad. Guarda tu número de referencia para seguirlo.</p>
-    <div class="exito-ref">
-      <span>Referencia</span>
-      <b class="mono">{{ ref(c.idTestimonio) }}</b>
-    </div>
-    <div class="exito-track"><app-estado-track estado="PENDIENTE" /></div>
-    <div class="exito-acts">
-      <a [routerLink]="['/reporte', c.idTestimonio]" class="btn btn-ink btn-lg">Ver mi reporte</a>
-      <a routerLink="/mis-reportes" class="btn btn-line btn-lg">Mis reportes</a>
-      <button class="btn btn-quiet btn-lg" (click)="nuevo()"><span class="ms">add</span>Reportar otro</button>
-    </div>
+    <mat-card appearance="outlined" class="exito-card">
+      <div class="exito-sello" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" /><path d="M38 62l15 15 30-34" /></svg>
+      </div>
+      <p class="eyebrow">Reporte enviado</p>
+      <h1 class="page-title">Te escuchamos, {{ auth.sesion()?.nombres }}.</h1>
+      <p class="lead">Tu reporte ya está en la bandeja de la municipalidad. Guarda tu número de referencia para seguirlo.</p>
+      <div class="exito-ref">
+        <span>Referencia</span>
+        <b class="mono">{{ ref(c.idTestimonio) }}</b>
+      </div>
+      <div class="exito-track"><app-estadotrackcomponent estado="PENDIENTE" /></div>
+      <div class="exito-acts">
+        <a matButton="filled" class="oscuro" [routerLink]="['/reporte', c.idTestimonio]">Ver mi reporte</a>
+        <a matButton="outlined" routerLink="/mis-reportes">Mis reportes</a>
+        <button matButton (click)="nuevo()"><mat-icon>add</mat-icon>Reportar otro</button>
+      </div>
+    </mat-card>
   </section>
 } @else {
   <section class="wrap reportar">
-    <header class="reportar-head">
-      <a routerLink="/" class="volver"><span class="ms">close</span>Cancelar</a>
-      <ol class="stepper" aria-label="Progreso">
-        @for (p of pasos; track p; let i = $index) {
-          <li [class.hecho]="i + 1 < paso()" [class.actual]="i + 1 === paso()">
-            <button type="button" (click)="irAPaso(i + 1)" [disabled]="i + 1 >= paso()">
-              <span class="st-n">@if (i + 1 < paso()) { <span class="ms">check</span> } @else { {{ i + 1 }} }</span>
-              <span class="st-l">{{ p }}</span>
-            </button>
-          </li>
-        }
-      </ol>
-    </header>
+    <a matButton routerLink="/" class="volver"><mat-icon>close</mat-icon>Cancelar</a>
 
-    <form [formGroup]="form" (ngSubmit)="enviar()" class="reportar-body" novalidate>
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <mat-card appearance="outlined" class="reportar-card">
+        <mat-stepper #stepper linear animationDuration="0" (selectionChange)="cambioPaso($event)" class="stepper">
 
-      <!-- ===== Paso 1: que pasa ===== -->
-      @if (paso() === 1) {
-        <div class="paso">
-          <h1 class="paso-titulo">¿Qué está pasando?</h1>
-          <p class="paso-sub">Elige el tipo de problema y cuéntalo con tus palabras.</p>
+          <!-- ===== Paso 1: que pasa ===== -->
+          <mat-step label="Qué pasa">
+            <ng-template matStepContent>
+              <h1 class="paso-titulo">Descripción del problema</h1>
+              <p class="paso-sub">Elige el tipo de problema y cuéntalo con tus palabras.</p>
 
-          <fieldset class="campo">
-            <legend class="campo-lbl">Tipo de problema</legend>
-            <div class="opciones-cat">
-              @for (cat of datos()?.categorias ?? []; track cat.idCategoria) {
-                @if (cat.activo) {
-                  <button type="button" class="opcion" [class.on]="valor().idCategoria === cat.idCategoria"
-                          (click)="elegirCategoria(cat.idCategoria)" [attr.aria-pressed]="valor().idCategoria === cat.idCategoria">
-                    <span class="ms">{{ iconoCategoria(cat.nombreCategoria) }}</span>
+              <span class="lbl">Tipo de problema</span>
+              <mat-button-toggle-group class="opciones-cat" [value]="valor().idCategoria" (change)="elegirCategoria($event.value)" hideSingleSelectionIndicator aria-label="Tipo de problema">
+                @for (cat of categoriasActivas(); track cat.idCategoria) {
+                  <mat-button-toggle class="opcion" [value]="cat.idCategoria" [style.--cat]="colorCategoria(cat.nombreCategoria)">
+                    <mat-icon>{{ iconoCategoria(cat.nombreCategoria) }}</mat-icon>
                     <strong>{{ cat.nombreCategoria }}</strong>
                     <small>{{ cat.descripcionCategoria }}</small>
-                  </button>
+                  </mat-button-toggle>
                 }
-              } @empty {
-                @for (i of [0,1,2,3]; track i) { <div class="skeleton sk-opcion"></div> }
-              }
-            </div>
-            @if (invalido('idCategoria')) { <p class="campo-error">Elige una categoría.</p> }
-          </fieldset>
+              </mat-button-toggle-group>
+              @if (!categoriasActivas().length) { <mat-progress-bar mode="indeterminate" /> }
+              @if (invalido('idCategoria')) { <p class="campo-error">Elige una categoría.</p> }
 
-          <div class="campo">
-            <label class="campo-lbl" for="desc">Describe el problema</label>
-            <textarea id="desc" formControlName="descripcionTexto" rows="5" class="input input-area"
-                      placeholder="Ej.: Hay un bache grande en la Av. Larco, frente al parque Kennedy. Ya hubo dos accidentes de motos."></textarea>
-            <div class="campo-pie">
-              @if (invalido('descripcionTexto')) { <span class="campo-error">Cuéntanos un poco más (mínimo 15 caracteres).</span> }
-              @else { <span class="campo-ayuda">Mientras más detalle, más rápido se puede atender.</span> }
-              <span class="mono contador" [class.ok]="largo() >= 15">{{ largo() }}</span>
-            </div>
-          </div>
+              <mat-form-field class="full desc">
+                <mat-label>Describe el problema</mat-label>
+                <textarea matInput formControlName="descripcionTexto" rows="5"
+                          placeholder="Ej.: Hay un bache grande en la Av. Larco, frente al parque Kennedy. Ya hubo dos accidentes de motos."></textarea>
+                <mat-hint>Mientras más detalle, más rápido se puede atender.</mat-hint>
+                <mat-hint align="end" [class.ok]="largo() >= 15">{{ largo() }} / 15 mín.</mat-hint>
+                <mat-error>Cuéntanos un poco más (mínimo 15 caracteres).</mat-error>
+              </mat-form-field>
 
-          <div class="proximo">
-            <span class="ms">auto_awesome</span>
-            <div>
-              <strong>Próximamente: clasificación con IA</strong>
-              <p>A partir de tu texto, sugeriremos la categoría y la dirección automáticamente.</p>
-            </div>
-          </div>
-        </div>
-      }
+              <mat-card appearance="outlined" class="proximo">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>auto_awesome</mat-icon>
+                  <mat-card-title>Próximamente: clasificación con IA</mat-card-title>
+                  <mat-card-subtitle>A partir de tu texto, sugeriremos la categoría y la dirección automáticamente.</mat-card-subtitle>
+                </mat-card-header>
+              </mat-card>
+            </ng-template>
+          </mat-step>
 
-      <!-- ===== Paso 2: donde ===== -->
-      @if (paso() === 2) {
-        <div class="paso paso-donde">
-          <div>
-            <h1 class="paso-titulo">¿Dónde ocurre?</h1>
-            <p class="paso-sub">Busca tu distrito o toca el lugar exacto en el mapa. Puedes arrastrar el marcador.</p>
+          <!-- ===== Paso 2: donde ===== -->
+          <mat-step label="Dónde">
+            <ng-template matStepContent>
+              <div class="paso-donde">
+                <div>
+                  <h1 class="paso-titulo">Ubicación del problema</h1>
+                  <p class="paso-sub">Busca tu distrito o toca el lugar exacto en el mapa. Puedes arrastrar el marcador.</p>
 
-            <div class="geo-buscar">
-              <label class="buscador buscador-sm">
-                <span class="ms">search</span>
-                <input type="search" placeholder="Ej.: San Juan de Lurigancho" autocomplete="off" [value]="busca()" (input)="buscar($any($event.target).value)" />
-              </label>
-              @if (resultados().length) {
-                <ul class="geo-resultados">
-                  @for (r of resultados(); track r.t + r.id) {
-                    <li><button type="button" (click)="irA(r)"><span class="ms">{{ r.t === 'x' ? 'location_on' : 'map' }}</span><span><b>{{ r.n }}</b><small>{{ r.p || 'Departamento' }}</small></span></button></li>
-                  }
-                </ul>
-              }
-            </div>
+                  <mat-form-field class="full">
+                    <mat-label>Buscar distrito</mat-label>
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput type="search" placeholder="Ej.: San Juan de Lurigancho" [value]="busca()"
+                           (input)="buscar($any($event.target).value)" [matAutocomplete]="autoGeo" />
+                    <mat-autocomplete #autoGeo="matAutocomplete" (optionSelected)="irA($event.option.value)" [displayWith]="nombreGeo">
+                      @for (r of resultados(); track r.t + r.id) {
+                        <mat-option [value]="r">
+                          <mat-icon>{{ r.t === 'x' ? 'location_on' : 'map' }}</mat-icon>
+                          <span class="opt-n">{{ r.n }}</span> <small class="muted">{{ r.p || 'Departamento' }}</small>
+                        </mat-option>
+                      }
+                    </mat-autocomplete>
+                  </mat-form-field>
 
-            <div class="ubicacion" [class.ok]="distrito()" [class.mal]="fueraDePeru()">
-              <span class="ms">{{ ubicando() ? 'progress_activity' : distrito() ? 'check_circle' : fueraDePeru() ? 'wrong_location' : 'touch_app' }}</span>
-              @if (ubicando()) {
-                <span>Ubicando…</span>
-              } @else if (distrito(); as d) {
-                <span><b>{{ d.nombre }}</b><small>{{ d.provNombre }}, {{ d.depNombre }}</small></span>
-              } @else if (fueraDePeru()) {
-                <span>Ese punto está fuera del Perú. Elige otro.</span>
-              } @else {
-                <span>Aún no marcas un punto en el mapa.</span>
-              }
-            </div>
-
-            <div class="campo">
-              <label class="campo-lbl" for="dir">Dirección o referencia <span class="opc">opcional</span></label>
-              <input id="dir" class="input" formControlName="direccionTextoExtraida" placeholder="Ej.: Av. Próceres 1520, frente al mercado" />
-            </div>
-            <div class="campo">
-              <label class="campo-lbl" for="foto">Enlace a una foto <span class="opc">opcional</span></label>
-              <input id="foto" class="input" formControlName="fotoUrl" placeholder="https://…" />
-              @if (invalido('fotoUrl')) { <p class="campo-error">Debe empezar con http:// o https://</p> }
-            </div>
-          </div>
-
-          <div class="donde-mapa">
-            <app-mapa-picker [lat]="valor().latitud" [lng]="valor().longitud" [editable]="true" [encuadre]="encuadre()" (punto)="marcar($event)" />
-          </div>
-        </div>
-      }
-
-      <!-- ===== Paso 3: revisar y enviar ===== -->
-      @if (paso() === 3) {
-        <div class="paso paso-enviar">
-          <div>
-            <h1 class="paso-titulo">Revisa y envía</h1>
-            <p class="paso-sub">Así se verá tu reporte. Será público para que todos puedan seguirlo.</p>
-
-            <div class="resumen">
-              <div class="resumen-fila">
-                <span class="cat-tag"><span class="ms">{{ iconoCategoria(catSel()?.nombreCategoria) }}</span>{{ catSel()?.nombreCategoria }}</span>
-                <button type="button" class="link" (click)="irAPaso(1)">Editar</button>
-              </div>
-              <p class="resumen-txt">“{{ valor().descripcionTexto }}”</p>
-              <div class="resumen-fila">
-                <span class="rcard-zona"><span class="ms">location_on</span>{{ valor().direccionTextoExtraida ? valor().direccionTextoExtraida + ' · ' : '' }}{{ distrito()?.nombre }}, {{ distrito()?.provNombre }}, {{ distrito()?.depNombre }}</span>
-                <button type="button" class="link" (click)="irAPaso(2)">Editar</button>
-              </div>
-              @if (valor().fotoUrl) { <img class="resumen-foto" [src]="valor().fotoUrl" alt="Vista previa de la foto" /> }
-            </div>
-          </div>
-
-          <div class="enviar-col">
-            @if (auth.sesion(); as s) {
-              <div class="quien">
-                <span class="avatar avatar-lg">{{ auth.iniciales() }}</span>
-                <div><span class="muted">Reportas como</span><strong>{{ s.nombres }} {{ s.apellidos }}</strong><small>{{ s.correo }}</small></div>
-              </div>
-            } @else {
-              <div class="cuenta-inline" [formGroup]="cuenta">
-                <h2>Un último paso</h2>
-                <p class="muted">Necesitamos saber quién reporta para avisarte cómo avanza. Lo que escribiste no se pierde.</p>
-                <div class="segmented segmented-full" role="tablist">
-                  <button type="button" role="tab" [class.on]="modoCuenta() === 'registro'" (click)="cambiarModo('registro')">Soy nuevo</button>
-                  <button type="button" role="tab" [class.on]="modoCuenta() === 'ingreso'" (click)="cambiarModo('ingreso')">Ya tengo cuenta</button>
-                </div>
-                @if (modoCuenta() === 'registro') {
-                  <div class="fila-2">
-                    <label class="campo"><span class="campo-lbl">Nombres</span><input class="input" formControlName="nombres" autocomplete="given-name" [class.mal]="invalido('nombres', cuenta)" /></label>
-                    <label class="campo"><span class="campo-lbl">Apellidos</span><input class="input" formControlName="apellidos" autocomplete="family-name" [class.mal]="invalido('apellidos', cuenta)" /></label>
+                  <div class="ubicacion" [class.ok]="distrito()" [class.mal]="fueraDePeru()">
+                    @if (ubicando()) {
+                      <mat-spinner diameter="22" /><span>Ubicando…</span>
+                    } @else if (distrito(); as d) {
+                      <mat-icon>check_circle</mat-icon><span><b>{{ d.nombre }}</b><small>{{ d.provNombre }}, {{ d.depNombre }}</small></span>
+                    } @else if (fueraDePeru()) {
+                      <mat-icon>wrong_location</mat-icon><span>Ese punto está fuera del Perú. Elige otro.</span>
+                    } @else {
+                      <mat-icon>touch_app</mat-icon><span>Aún no marcas un punto en el mapa.</span>
+                    }
                   </div>
-                }
-                <label class="campo"><span class="campo-lbl">Correo</span><input class="input" type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" [class.mal]="invalido('correo', cuenta)" /></label>
-                <label class="campo">
-                  <span class="campo-lbl">Contraseña</span>
-                  <span class="input-pass">
-                    <input class="input" [type]="verPass() ? 'text' : 'password'" formControlName="password" [attr.autocomplete]="modoCuenta() === 'registro' ? 'new-password' : 'current-password'" [class.mal]="invalido('password', cuenta)" />
-                    <button type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'"><span class="ms">{{ verPass() ? 'visibility_off' : 'visibility' }}</span></button>
-                  </span>
-                  @if (modoCuenta() === 'registro') { <span class="campo-ayuda">Mínimo 6 caracteres.</span> }
-                </label>
-                @if (errorCuenta()) { <p class="alerta"><span class="ms">error</span>{{ errorCuenta() }}</p> }
-              </div>
-            }
-          </div>
-        </div>
-      }
 
-      <footer class="reportar-acciones">
-        @if (paso() > 1) { <button type="button" class="btn btn-quiet btn-lg" (click)="atras()"><span class="ms">arrow_back</span>Atrás</button> }
-        <span class="spacer"></span>
-        @if (paso() < 3) {
-          <button type="button" class="btn btn-ink btn-lg" (click)="siguiente()">Continuar<span class="ms">arrow_forward</span></button>
-        } @else {
-          <button type="submit" class="btn btn-signal btn-lg" [disabled]="enviando()">
-            @if (enviando()) { <span class="spinner"></span>Enviando… } @else { <span class="ms">send</span>{{ auth.sesion() ? 'Enviar reporte' : (modoCuenta() === 'registro' ? 'Crear cuenta y enviar' : 'Ingresar y enviar') }} }
-          </button>
-        }
-      </footer>
+                  <mat-form-field class="full">
+                    <mat-label>Dirección o referencia (opcional)</mat-label>
+                    <input matInput formControlName="direccionTextoExtraida" placeholder="Ej.: Av. Próceres 1520, frente al mercado" />
+                  </mat-form-field>
+                  <!-- Foto: solo PNG o JPG; se comprime en el navegador antes de enviarla -->
+                  <div class="foto">
+                    <span class="lbl">Foto del problema <span class="muted">(opcional · PNG o JPG)</span></span>
+                    <input #archivo type="file" accept="image/png, image/jpeg" hidden (change)="elegirFoto($event)" />
+                    @if (valor().fotoUrl) {
+                      <div class="foto-prev">
+                        <img [src]="valor().fotoUrl" alt="Vista previa de la foto" />
+                        <div class="foto-acts">
+                          <button matButton type="button" (click)="archivo.click()"><mat-icon>sync</mat-icon>Cambiar</button>
+                          <button matButton type="button" (click)="quitarFoto(archivo)"><mat-icon>delete</mat-icon>Quitar</button>
+                        </div>
+                      </div>
+                    } @else {
+                      <button matButton="outlined" type="button" class="foto-btn" (click)="archivo.click()" [disabled]="procesandoFoto()">
+                        @if (procesandoFoto()) { <mat-spinner diameter="18" />Procesando… } @else { <mat-icon>upload</mat-icon>Subir foto }
+                      </button>
+                    }
+                    @if (errorFoto()) { <p class="campo-error">{{ errorFoto() }}</p> }
+                  </div>
+                </div>
+
+                <div class="donde-mapa">
+                  <app-mapapickercomponent [lat]="valor().latitud" [lng]="valor().longitud" [editable]="true" [encuadre]="encuadre()" (punto)="marcar($event)" />
+                </div>
+              </div>
+            </ng-template>
+          </mat-step>
+
+          <!-- ===== Paso 3: revisar y enviar ===== -->
+          <mat-step label="Enviar">
+            <ng-template matStepContent>
+              <div class="paso-enviar">
+                <div>
+                  <h1 class="paso-titulo">Revisión y envío</h1>
+                  <p class="paso-sub">Así se verá tu reporte. Será público para que todos puedan seguirlo.</p>
+
+                  <mat-card appearance="outlined" class="resumen">
+                    <div class="resumen-fila">
+                      <mat-chip class="cat-tag" disableRipple><mat-icon matChipAvatar [style.color]="colorCategoria(catSel()?.nombreCategoria)">{{ iconoCategoria(catSel()?.nombreCategoria) }}</mat-icon>{{ catSel()?.nombreCategoria }}</mat-chip>
+                      <button matButton type="button" (click)="irAPaso(1)">Editar</button>
+                    </div>
+                    <p class="resumen-txt">“{{ valor().descripcionTexto }}”</p>
+                    <div class="resumen-fila">
+                      <span class="lugar"><mat-icon>location_on</mat-icon>{{ valor().direccionTextoExtraida ? valor().direccionTextoExtraida + ' · ' : '' }}{{ distrito()?.nombre }}, {{ distrito()?.provNombre }}, {{ distrito()?.depNombre }}</span>
+                      <button matButton type="button" (click)="irAPaso(2)">Editar</button>
+                    </div>
+                    @if (valor().fotoUrl) { <img class="resumen-foto" [src]="valor().fotoUrl" alt="Vista previa de la foto" /> }
+                  </mat-card>
+                </div>
+
+                <mat-card appearance="outlined" class="enviar-col">
+                  @if (auth.sesion(); as s) {
+                    <mat-card-header class="quien">
+                      <div mat-card-avatar class="avatar avatar-lg">{{ auth.iniciales() }}</div>
+                      <mat-card-subtitle>Reportas como</mat-card-subtitle>
+                      <mat-card-title>{{ s.nombres }} {{ s.apellidos }}</mat-card-title>
+                      <mat-card-subtitle>{{ s.correo }}</mat-card-subtitle>
+                    </mat-card-header>
+                  } @else {
+                    <div class="cuenta-inline" [formGroup]="cuenta">
+                      <h2>Un último paso</h2>
+                      <p class="muted">Necesitamos saber quién reporta para avisarte cómo avanza. Lo que escribiste no se pierde.</p>
+                      <mat-button-toggle-group class="modo" [value]="modoCuenta()" (change)="cambiarModo($event.value)" hideSingleSelectionIndicator>
+                        <mat-button-toggle value="registro">Soy nuevo</mat-button-toggle>
+                        <mat-button-toggle value="ingreso">Ya tengo cuenta</mat-button-toggle>
+                      </mat-button-toggle-group>
+                      @if (modoCuenta() === 'registro') {
+                        <div class="fila-2">
+                          <mat-form-field><mat-label>Nombres</mat-label><input matInput formControlName="nombres" autocomplete="given-name" /></mat-form-field>
+                          <mat-form-field><mat-label>Apellidos</mat-label><input matInput formControlName="apellidos" autocomplete="family-name" /></mat-form-field>
+                        </div>
+                      }
+                      <mat-form-field class="full">
+                        <mat-label>Correo</mat-label>
+                        <input matInput type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" />
+                        <mat-error>Ingresa un correo válido.</mat-error>
+                      </mat-form-field>
+                      <mat-form-field class="full">
+                        <mat-label>Contraseña</mat-label>
+                        <input matInput [type]="verPass() ? 'text' : 'password'" formControlName="password" [attr.autocomplete]="modoCuenta() === 'registro' ? 'new-password' : 'current-password'" />
+                        <button matIconButton matSuffix type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                          <mat-icon>{{ verPass() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        </button>
+                        @if (modoCuenta() === 'registro') { <mat-hint>Mínimo 6 caracteres.</mat-hint> }
+                      </mat-form-field>
+                      @if (errorCuenta()) { <p class="alerta"><mat-icon>error</mat-icon>{{ errorCuenta() }}</p> }
+                    </div>
+                  }
+                </mat-card>
+              </div>
+            </ng-template>
+          </mat-step>
+        </mat-stepper>
+
+        <mat-card-actions class="reportar-acciones">
+          @if (paso() > 1) { <button matButton type="button" (click)="atras()"><mat-icon>arrow_back</mat-icon>Atrás</button> }
+          <span class="spacer"></span>
+          @if (paso() < 3) {
+            <button matButton="filled" class="oscuro" type="button" (click)="siguiente()">Continuar<mat-icon iconPositionEnd>arrow_forward</mat-icon></button>
+          } @else {
+            <button matButton="filled" type="submit" [disabled]="enviando()">
+              @if (enviando()) { <mat-spinner diameter="18" />Enviando… } @else { <mat-icon>send</mat-icon>{{ auth.sesion() ? 'Enviar reporte' : (modoCuenta() === 'registro' ? 'Crear cuenta y enviar' : 'Ingresar y enviar') }} }
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
     </form>
   </section>
 }

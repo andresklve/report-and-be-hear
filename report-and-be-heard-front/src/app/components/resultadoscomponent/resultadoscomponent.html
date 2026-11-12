@@ -1,0 +1,39 @@
+<!-- Encabezado comun a todas las paginas de resultados -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">Transparencia</p>
+        <h1>Resultados de la gestión de reclamos</h1>
+        <p class="lead">Indicadores públicos sobre los reclamos ciudadanos{{ r.departamento() ? ' en ' + r.departamento() : ' a nivel nacional' }}.</p>
+      </div>
+      <mat-form-field class="dep">
+        <mat-label>Departamento</mat-label>
+        <mat-icon matPrefix>location_on</mat-icon>
+        <mat-select [value]="r.departamento()" (selectionChange)="r.departamento.set($event.value)">
+          <mat-option value="">Todo el Perú</mat-option>
+          @for (d of r.departamentos(); track d) { <mat-option [value]="d">{{ d }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </div>
+
+  <!-- Una pestaña por pagina (cada una tiene su propia URL) -->
+  <nav mat-tab-nav-bar [tabPanel]="panelResultados" mat-stretch-tabs="false" class="wrap tabs">
+    @for (p of paginas; track p.ruta) {
+      <a mat-tab-link [routerLink]="p.ruta" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+        <mat-icon>{{ p.icono }}</mat-icon>{{ p.titulo }}
+      </a>
+    }
+  </nav>
+</section>
+
+<mat-tab-nav-panel #panelResultados>
+  <div class="wrap pagina">
+    @if (!r.datos() && !r.error()) { <mat-progress-bar mode="indeterminate" /> }
+    @if (r.error()) { <div class="vacio"><mat-icon>cloud_off</mat-icon><p>No pudimos conectar con el servidor.</p></div> }
+    @if (r.datos()) { <router-outlet /> }
+  </div>
+</mat-tab-nav-panel>
+

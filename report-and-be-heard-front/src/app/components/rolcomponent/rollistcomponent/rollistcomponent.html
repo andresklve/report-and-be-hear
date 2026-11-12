@@ -4,42 +4,55 @@
     <h1>Roles</h1>
     <p class="muted">Perfiles de acceso. El sistema usa ADMINISTRADOR, MUNICIPALIDAD y CIUDADANO.</p>
   </div>
-  <a routerLink="/panel/roles/nuevo" class="btn btn-signal"><span class="ms">add</span>Nuevo rol</a>
+  <a matButton="filled" routerLink="/panel/roles/insertar"><mat-icon>add</mat-icon>Nuevo rol</a>
 </header>
 
 <div class="toolbar">
-  <label class="buscador buscador-sm">
-    <span class="ms">search</span>
-    <input type="search" placeholder="Buscar…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
-  </label>
-  <span class="muted">{{ filtrados().length }} de {{ dataSource().length }}</span>
+  <mat-form-field class="buscar">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput type="search" placeholder="Buscar…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </mat-form-field>
+  <span class="muted">{{ filtrados().length }} de {{ lista().length }}</span>
 </div>
 
-<div class="card card-flush">
-  <table class="tabla">
-    <thead><tr><th class="t-id">ID</th><th>Rol</th><th>Descripción</th><th class="t-acc"></th></tr></thead>
-    <tbody>
-      @if (cargando()) {
-        @for (i of [0,1,2]; track i) { <tr><td colspan="4"><div class="skeleton sk-line"></div></td></tr> }
-      } @else if (error()) {
-        <tr><td colspan="4"><div class="vacio"><span class="ms">cloud_off</span><p>No se pudo conectar con el servidor.</p></div></td></tr>
-      } @else {
-        @for (x of filtrados(); track x.idRol) {
-          <tr>
-            <td class="t-id mono muted">{{ x.idRol }}</td>
-            <td><span class="mono">{{ x.nombreRol }}</span></td><td class="muted">{{ x.descripcionRol || '—' }}</td>
-            <td class="t-acc">
-              <button class="icon-btn" [class.peligro]="confirmando() === x.idRol" (click)="eliminar(x.idRol)"
-                      [title]="confirmando() === x.idRol ? 'Clic otra vez para eliminar' : 'Eliminar'">
-                <span class="ms">{{ confirmando() === x.idRol ? 'delete_forever' : 'delete' }}</span>
-                @if (confirmando() === x.idRol) { <span class="confirmar">¿Eliminar?</span> }
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="4"><div class="vacio"><span class="ms">badge</span><p>No hay registros.</p></div></td></tr>
-        }
-      }
-    </tbody>
-  </table>
-</div>
+<mat-card appearance="outlined" class="tabla-card">
+  <div class="cargando-barra">@if (cargando()) { <mat-progress-bar mode="indeterminate" /> }</div>
+  <div class="tabla-scroll">
+    <table mat-table [dataSource]="tabla">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef class="t-id">ID</th>
+        <td mat-cell *matCellDef="let x" class="t-id mono muted">{{ x.idRol }}</td>
+      </ng-container>
+      <ng-container matColumnDef="rol">
+        <th mat-header-cell *matHeaderCellDef>Rol</th>
+        <td mat-cell *matCellDef="let x"><span class="mono">{{ x.nombreRol }}</span></td>
+      </ng-container>
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let x" class="muted">{{ x.descripcionRol || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="t-acc"></th>
+        <td mat-cell *matCellDef="let x" class="t-acc">
+          <a matIconButton [routerLink]="['/panel/roles/ediciones', x.idRol]" matTooltip="Editar"><mat-icon>edit</mat-icon></a>
+          <button matIconButton [class.peligro]="confirmando() === x.idRol" (click)="eliminar(x.idRol)"
+                  [matTooltip]="confirmando() === x.idRol ? 'Clic otra vez para eliminar' : 'Eliminar'">
+            <mat-icon>{{ confirmando() === x.idRol ? 'delete_forever' : 'delete' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="columnas.length">
+          @if (error()) {
+            <div class="vacio"><mat-icon>cloud_off</mat-icon><p>No se pudo conectar con el servidor.</p></div>
+          } @else if (!cargando()) {
+            <div class="vacio"><mat-icon>badge</mat-icon><p>No hay registros.</p></div>
+          }
+        </td>
+      </tr>
+    </table>
+  </div>
+  <mat-paginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="10" showFirstLastButtons />
+</mat-card>

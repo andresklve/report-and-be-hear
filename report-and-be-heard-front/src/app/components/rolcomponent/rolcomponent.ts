@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-rolcomponent',
   imports: [RouterOutlet],
-  template: '<router-outlet />',
+  templateUrl: './rolcomponent.html',
+  styleUrl: './rolcomponent.css',
 })
 export class Rolcomponent {}

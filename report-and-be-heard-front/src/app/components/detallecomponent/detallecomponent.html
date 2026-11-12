@@ -1,66 +1,101 @@
 <section class="wrap detalle">
-  <a routerLink="/" class="volver"><span class="ms">arrow_back</span>Volver al mapa</a>
+  <button matButton type="button" class="volver" (click)="volver()"><mat-icon>arrow_back</mat-icon>Volver</button>
 
   @if (t(); as t) {
     <div class="detalle-grid">
-      <article class="detalle-main">
+      <mat-card appearance="outlined" class="detalle-main">
         <div class="detalle-meta">
-          <span class="cat-tag cat-tag-lg"><span class="ms">{{ icono() }}</span>{{ categoria()?.nombreCategoria }}</span>
+          <mat-chip class="cat-tag" disableRipple><mat-icon matChipAvatar [style.color]="colorCategoria(categoria()?.nombreCategoria)">{{ icono() }}</mat-icon>{{ categoria()?.nombreCategoria }}</mat-chip>
           <span class="mono muted">{{ ref() }}</span>
-          @if (esMio()) { <span class="pill pill-neutral">Tu reporte</span> }
+          @if (esMio()) { <mat-chip class="pill">Tu reporte</mat-chip> }
         </div>
         <h1 class="detalle-txt">“{{ t.descripcionTexto }}”</h1>
-        <p class="detalle-lugar"><span class="ms">location_on</span>
+        <p class="detalle-lugar"><mat-icon>location_on</mat-icon>
           {{ t.direccionTextoExtraida ? t.direccionTextoExtraida + ' · ' : '' }}{{ zona()?.nombreZona }}, {{ zona()?.departamentoZona }}
         </p>
+
+        <!-- Apoyo de la ciudadania -->
+        <div class="apoyo">
+          <button [matButton]="apoyo()?.apoyadoPorUsuario ? 'filled' : 'outlined'" type="button" class="apoyo-btn"
+                  [class.on]="apoyo()?.apoyadoPorUsuario" [disabled]="apoyando() || esMio() || auth.esEquipo()"
+                  (click)="alternarApoyo()">
+            <mat-icon>{{ apoyo()?.apoyadoPorUsuario ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+            {{ apoyo()?.apoyadoPorUsuario ? 'Apoyado' : 'Apoyar' }}
+          </button>
+          <span class="apoyo-txt">
+            <b>{{ (apoyo()?.totalApoyos ?? 0).toLocaleString('es-PE') }}</b>
+            {{ apoyo()?.totalApoyos === 1 ? 'persona apoya' : 'personas apoyan' }} este reporte
+            @if (esMio()) { <small>· no puedes apoyar tu propio reporte</small> }
+            @else if (!auth.sesion()) { <small>· <a routerLink="/ingresar">ingrese</a> para apoyarlo</small> }
+          </span>
+        </div>
 
         @if (t.fotoUrl) {
           <figure class="detalle-foto"><img [src]="t.fotoUrl" alt="Foto adjunta al reporte" loading="lazy" /></figure>
         }
 
         <div class="detalle-estado">
-          <app-estado-track [estado]="t.estado" />
+          <app-estadotrackcomponent [estado]="t.estado" />
         </div>
 
         <h2 class="h-sec">Historial</h2>
-        <ol class="timeline">
-          <li class="tl-item">
-            <span class="tl-dot"></span>
-            <div><strong>Reporte recibido</strong><p class="muted">La ciudadanía registró el problema con la referencia {{ ref() }}.</p></div>
-          </li>
+        <mat-list class="historial">
+          <mat-list-item lines="3">
+            <mat-icon matListItemIcon class="h-recibido">inbox</mat-icon>
+            <span matListItemTitle>Reporte recibido</span>
+            <span matListItemLine>La ciudadanía registró el problema con la referencia {{ ref() }}.</span>
+          </mat-list-item>
           @for (m of historial(); track m.idModeracion) {
-            <li class="tl-item" [class]="'tl-item tl-' + estadoInfo(m.accion).tono">
-              <span class="tl-dot"></span>
-              <div>
-                <strong>{{ estadoInfo(m.accion).label }}</strong>
-                @if (m.fechaAccion) { <span class="tl-fecha mono">{{ m.fechaAccion | date:'d MMM y, HH:mm' }}</span> }
-                @if (m.motivo) { <p>{{ m.motivo }}</p> }
-                @if (m.costo) { <p class="tl-costo">Inversión: <b>{{ soles(m.costo) }}</b></p> }
-              </div>
-            </li>
+            <mat-list-item lines="3">
+              <mat-icon matListItemIcon [class]="'h-' + estadoInfo(m.accion).tono">{{ estadoInfo(m.accion).icono }}</mat-icon>
+              <span matListItemTitle>{{ estadoInfo(m.accion).label }}@if (m.fechaAccion) { <small class="h-fecha mono">{{ m.fechaAccion | date:'d MMM y, HH:mm' }}</small> }</span>
+              @if (m.motivo) { <span matListItemLine>{{ m.motivo }}</span> }
+              @if (m.costo) { <span matListItemLine>Inversión: <b>{{ soles(m.costo) }}</b></span> }
+            </mat-list-item>
           } @empty {
-            <li class="tl-item tl-espera">
-              <span class="tl-dot"></span>
-              <div><strong>Esperando revisión</strong><p class="muted">La municipalidad todavía no registró acciones sobre este reporte.</p></div>
-            </li>
+            <mat-list-item lines="2">
+              <mat-icon matListItemIcon class="h-espera">hourglass_empty</mat-icon>
+              <span matListItemTitle>Esperando revisión</span>
+              <span matListItemLine>La municipalidad todavía no registró acciones sobre este reporte.</span>
+            </mat-list-item>
           }
-        </ol>
-      </article>
+        </mat-list>
+
+        <app-comentarioscomponent [idTestimonio]="t.idTestimonio" [idAutorReporte]="t.idUsuario" />
+      </mat-card>
 
       <aside class="detalle-side">
-        <div class="card card-flush detalle-mapa"><app-mapa-picker [lat]="t.latitud" [lng]="t.longitud" /></div>
-        <dl class="datos-lista">
-          <div><dt>Estado</dt><dd><span class="pill" [class]="'pill pill-' + estadoInfo(t.estado).tono">{{ estadoInfo(t.estado).label }}</span></dd></div>
-          <div><dt>Zona</dt><dd>{{ zona()?.nombreZona }}</dd></div>
-          <div><dt>Provincia</dt><dd>{{ zona()?.provinciaZona }}</dd></div>
-          <div><dt>Coordenadas</dt><dd class="mono">{{ t.latitud }}, {{ t.longitud }}</dd></div>
-        </dl>
-        <a routerLink="/reportar" class="btn btn-line btn-block"><span class="ms">add_comment</span>Reportar otro problema</a>
+        <mat-card appearance="outlined" class="detalle-mapa"><app-mapapickercomponent [lat]="t.latitud" [lng]="t.longitud" /></mat-card>
+        <mat-card appearance="outlined">
+          <mat-list class="datos-lista">
+            <mat-list-item><span matListItemTitle>Estado</span><span matListItemMeta><app-estadochipcomponent [estado]="t.estado" /></span></mat-list-item>
+            <mat-divider />
+            <mat-list-item><span matListItemTitle>Zona</span><span matListItemMeta>{{ zona()?.nombreZona }}</span></mat-list-item>
+            <mat-divider />
+            <mat-list-item><span matListItemTitle>Provincia</span><span matListItemMeta>{{ zona()?.provinciaZona }}</span></mat-list-item>
+            <mat-divider />
+            <mat-list-item><span matListItemTitle>Coordenadas</span><span matListItemMeta class="mono">{{ t.latitud }}, {{ t.longitud }}</span></mat-list-item>
+          </mat-list>
+        </mat-card>
+        @if (auth.esEquipo() && !esMio()) {
+          <mat-card appearance="outlined" class="moderar">
+            <mat-card-subtitle class="moderar-tit">Moderación</mat-card-subtitle>
+            @if (!falso()) {
+              <p class="muted">Si el reporte es falso, se descarta y se suspende la cuenta de quien lo hizo.</p>
+              <button matButton="outlined" type="button" class="bloque peligro" (click)="falso.set(true)"><mat-icon>report</mat-icon>Marcar como reporte falso</button>
+            } @else {
+              <app-suspendercomponent [idUsuario]="t.idUsuario" motivoInicial="REPORTE_FALSO"
+                             [detalleInicial]="'Reporte ' + ref() + ': “' + t.descripcionTexto + '”'"
+                             (listo)="descartarFalso()" (cancelar)="falso.set(false)" />
+            }
+          </mat-card>
+        }
+        <a matButton="outlined" routerLink="/reportar" class="bloque"><mat-icon>add_comment</mat-icon>Reportar otro problema</a>
       </aside>
     </div>
   } @else if (noExiste()) {
-    <div class="vacio vacio-grande"><span class="ms">find_in_page</span><h3>Este reporte no existe</h3><p>Puede que haya sido eliminado.</p><a routerLink="/" class="btn btn-line">Volver al mapa</a></div>
+    <div class="vacio"><mat-icon>find_in_page</mat-icon><h3>Este reporte no existe</h3><p>Puede que haya sido eliminado.</p><a matButton="outlined" routerLink="/mapa">Ir al mapa</a></div>
   } @else {
-    <div class="skeleton sk-hero"></div>
+    <mat-progress-bar mode="indeterminate" />
   }
 </section>

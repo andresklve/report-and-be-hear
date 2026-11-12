@@ -1,31 +1,55 @@
-<a routerLink="/panel/usuarios" class="volver"><span class="ms">arrow_back</span>Usuarios</a>
-<div class="form-panel card">
-  <header>
-    <span class="form-ico"><span class="ms">person_add</span></span>
-    <div><h1>Nuevo usuario</h1><p class="muted">Crea cuentas para el equipo municipal o para ciudadanos que lo soliciten.</p></div>
-  </header>
-  <form [formGroup]="form" (ngSubmit)="registrar()" class="form-grid" novalidate>
-    <label class="campo"><span class="campo-lbl">Nombres</span><input class="input" formControlName="nombres" [class.mal]="mal('nombres')" /></label>
-    <label class="campo"><span class="campo-lbl">Apellidos</span><input class="input" formControlName="apellidos" [class.mal]="mal('apellidos')" /></label>
-    <label class="campo campo-full"><span class="campo-lbl">Correo</span><input class="input" type="email" formControlName="correo" [class.mal]="mal('correo')" placeholder="persona@municipalidad.gob.pe" /></label>
-    <label class="campo campo-full"><span class="campo-lbl">Contraseña inicial</span><input class="input" type="text" formControlName="passwordHash" [class.mal]="mal('passwordHash')" /><span class="campo-ayuda">Mínimo 6 caracteres. Compártela de forma segura.</span></label>
-    <fieldset class="campo campo-full">
-      <legend class="campo-lbl">Rol</legend>
-      <div class="rol-opciones">
-        @for (r of roles(); track r.idRol) {
-          <label class="rol-op" [class.on]="form.value.idRol === r.idRol">
-            <input type="radio" formControlName="idRol" [value]="r.idRol" />
-            <strong>{{ r.nombreRol }}</strong>
-            <small>{{ r.descripcionRol }}</small>
-          </label>
-        }
+<a matButton routerLink="/panel/usuarios" class="volver"><mat-icon>arrow_back</mat-icon>Usuarios</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>{{ edicion ? 'manage_accounts' : 'person_add' }}</mat-icon></div>
+    <mat-card-title>{{ edicion ? 'Editar usuario' : 'Nuevo usuario' }}</mat-card-title>
+    <mat-card-subtitle>Crea cuentas para el equipo municipal o para ciudadanos que lo soliciten.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+    <mat-card-content class="form-grid">
+      <mat-form-field>
+        <mat-label>Nombres</mat-label>
+        <input matInput formControlName="nombres" />
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Apellidos</mat-label>
+        <input matInput formControlName="apellidos" />
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Correo</mat-label>
+        <input matInput type="email" formControlName="correo" placeholder="persona@municipalidad.gob.pe" />
+        <mat-error>Ingresa un correo válido.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>{{ edicion ? 'Nueva contraseña (opcional)' : 'Contraseña inicial' }}</mat-label>
+        <input matInput type="text" formControlName="passwordHash" />
+        <mat-hint>{{ edicion ? 'Déjala vacía para mantener la contraseña actual.' : 'Mínimo 6 caracteres. Compártela de forma segura.' }}</mat-hint>
+        <mat-error>Mínimo 6 caracteres.</mat-error>
+      </mat-form-field>
+      <div class="campo-full rol-campo">
+        <span class="rol-lbl">Rol</span>
+        <mat-radio-group formControlName="idRol" class="rol-opciones">
+          @for (r of roles(); track r.idRol) {
+            <mat-radio-button [value]="r.idRol" class="rol-op" [class.on]="form.value.idRol === r.idRol">
+              <strong>{{ r.nombreRol }}</strong>
+              <small>{{ r.descripcionRol }}</small>
+            </mat-radio-button>
+          }
+        </mat-radio-group>
       </div>
-    </fieldset>
-    @if (error()) { <p class="alerta campo-full"><span class="ms">error</span>{{ error() }}</p> }
-    <footer class="form-acciones campo-full">
-      <a routerLink="/panel/usuarios" class="btn btn-quiet">Cancelar</a>
+      @if (edicion) {
+        <mat-slide-toggle class="campo-full activo" formControlName="activo">Cuenta activa</mat-slide-toggle>
+      }
+      @if (error()) { <p class="alerta campo-full"><mat-icon>error</mat-icon>{{ error() }}</p> }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/usuarios">Cancelar</a>
       <span class="spacer"></span>
-      <button type="submit" class="btn btn-ink" [disabled]="guardando()">@if (guardando()) { <span class="spinner"></span> } Crear usuario</button>
-    </footer>
+      <button matButton="filled" type="submit" [disabled]="guardando()">
+        @if (guardando()) { <mat-spinner diameter="18" /> } {{ edicion ? 'Guardar cambios' : 'Crear usuario' }}
+      </button>
+    </mat-card-actions>
   </form>
-</div>
+</mat-card>

@@ -1,0 +1,62 @@
+<header class="p-head">
+  <div>
+    <p class="eyebrow">Gestión</p>
+    <h1>Suspensiones</h1>
+    <p class="muted">Cuentas suspendidas por comentarios ofensivos o reportes falsos. Para suspender una cuenta, hágalo desde el comentario o el reporte.</p>
+  </div>
+</header>
+
+<div class="toolbar">
+  <mat-button-toggle-group [value]="filtro()" (change)="filtro.set($event.value)" hideSingleSelectionIndicator aria-label="Filtrar suspensiones">
+    <mat-button-toggle value="VIGENTES">Vigentes <span class="n">{{ vigentes() }}</span></mat-button-toggle>
+    <mat-button-toggle value="TODAS">Todas <span class="n">{{ suspensiones().length }}</span></mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+
+<mat-card appearance="outlined" class="tabla-card">
+  <div class="cargando-barra">@if (cargando()) { <mat-progress-bar mode="indeterminate" /> }</div>
+  <div class="tabla-scroll">
+    <table mat-table [dataSource]="filtradas()">
+      <ng-container matColumnDef="usuario">
+        <th mat-header-cell *matHeaderCellDef>Cuenta</th>
+        <td mat-cell *matCellDef="let s"><div class="persona"><strong>{{ s.nombreUsuario }}</strong><span class="muted">{{ s.correoUsuario }}</span></div></td>
+      </ng-container>
+      <ng-container matColumnDef="motivo">
+        <th mat-header-cell *matHeaderCellDef>Motivo</th>
+        <td mat-cell *matCellDef="let s">
+          <b>{{ motivoLabel(s.motivo) }}</b>
+          @if (s.detalle) { <p class="detalle muted">{{ s.detalle }}</p> }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="desde">
+        <th mat-header-cell *matHeaderCellDef>Desde</th>
+        <td mat-cell *matCellDef="let s" class="mono muted">{{ s.fechaInicio | date:'dd/MM/yy HH:mm' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="hasta">
+        <th mat-header-cell *matHeaderCellDef>Hasta</th>
+        <td mat-cell *matCellDef="let s" class="mono muted">{{ s.fechaFin ? (s.fechaFin | date:'dd/MM/yy HH:mm') : 'Indefinida' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let s"><mat-chip [class]="estado(s).clase">{{ estado(s).label }}</mat-chip></td>
+      </ng-container>
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="t-acc"></th>
+        <td mat-cell *matCellDef="let s" class="t-acc">
+          @if (s.vigente) {
+            <button matButton type="button" [class.peligro]="confirmando() === s.idSuspension" (click)="levantar(s)">
+              <mat-icon>lock_open</mat-icon>{{ confirmando() === s.idSuspension ? 'Confirmar' : 'Levantar' }}
+            </button>
+          }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="columnas.length">
+          @if (!cargando()) { <div class="vacio"><mat-icon>verified_user</mat-icon><p>{{ filtro() === 'VIGENTES' ? 'No hay cuentas suspendidas.' : 'Todavía no se ha suspendido ninguna cuenta.' }}</p></div> }
+        </td>
+      </tr>
+    </table>
+  </div>
+</mat-card>

@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-categoriacomponent',
   imports: [RouterOutlet],
-  template: '<router-outlet />',
+  templateUrl: './categoriacomponent.html',
+  styleUrl: './categoriacomponent.css',
 })
 export class Categoriacomponent {}

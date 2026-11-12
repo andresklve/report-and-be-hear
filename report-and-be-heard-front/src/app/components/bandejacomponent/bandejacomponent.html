@@ -3,94 +3,116 @@
     <p class="eyebrow">Bandeja</p>
     <h1>Reportes ciudadanos</h1>
   </div>
-  <label class="buscador buscador-sm">
-    <span class="ms">search</span>
-    <input type="search" placeholder="Buscar texto o RYA-…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
-  </label>
+  <div class="filtros">
+  <app-rangofechascomponent [(desde)]="desde" [(hasta)]="hasta" />
+  <mat-form-field class="buscar">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput type="search" placeholder="Buscar texto o RYA-…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </mat-form-field>
+  </div>
 </header>
 
-<div class="tabs" role="tablist">
+<nav mat-tab-nav-bar [tabPanel]="panelBandeja" mat-stretch-tabs="false" mat-align-tabs="start" class="tabs">
   @for (e of estados; track e.key) {
-    <button role="tab" [class.on]="filtro() === e.key" (click)="filtro.set(e.key)">
-      <span class="dot" [class]="'dot dot-' + e.tono"></span>{{ e.label }} <i>{{ conteo().get(e.key) ?? 0 }}</i>
-    </button>
+    <a mat-tab-link [active]="filtro() === e.key" (click)="filtro.set(e.key)">
+      <span class="dot" [class]="'dot dot-' + e.tono"></span>{{ e.label }}
+      <span class="n">{{ conteo().get(e.key) ?? 0 }}</span>
+    </a>
   }
-  <button role="tab" [class.on]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos <i>{{ datos()?.testimonios?.length ?? 0 }}</i></button>
-</div>
+  <a mat-tab-link [active]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos <span class="n">{{ datos()?.testimonios?.length ?? 0 }}</span></a>
+</nav>
 
-<div class="card card-flush">
-  <table class="tabla tabla-bandeja">
-    <thead>
-      <tr><th>Ref.</th><th>Reporte</th><th>Zona</th><th>Estado</th><th class="t-acc"></th></tr>
-    </thead>
-    <tbody>
-      @if (datos(); as d) {
-        @for (t of lista(); track t.idTestimonio) {
-          <tr>
-            <td class="mono muted">{{ referencia(t.idTestimonio) }}</td>
-            <td>
-              <div class="t-rep">
-                <span class="t-ico"><span class="ms">{{ iconoCategoria(d.cat.get(t.idCategoria)?.nombreCategoria) }}</span></span>
-                <div><strong>{{ d.cat.get(t.idCategoria)?.nombreCategoria }}</strong><p class="clamp">{{ t.descripcionTexto }}</p></div>
-              </div>
-            </td>
-            <td>{{ d.zona.get(t.idZona)?.nombreZona }}</td>
-            <td><span class="pill" [class]="'pill pill-' + estadoInfo(t.estado).tono">{{ estadoInfo(t.estado).label }}</span></td>
-            <td class="t-acc">
-              <button class="btn btn-sm btn-ink" (click)="atender(t)">Atender</button>
-              <a class="icon-btn" [routerLink]="['/reporte', t.idTestimonio]" title="Ver público"><span class="ms">open_in_new</span></a>
-              <button class="icon-btn" [class.peligro]="confirmando() === t.idTestimonio" (click)="eliminar(t)"
-                      [title]="confirmando() === t.idTestimonio ? 'Clic otra vez para eliminar' : 'Eliminar'">
-                <span class="ms">{{ confirmando() === t.idTestimonio ? 'delete_forever' : 'delete' }}</span>
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="5"><div class="vacio"><span class="ms">done_all</span><p>Nada por aquí. ¡Bandeja al día!</p></div></td></tr>
-        }
-      } @else {
-        @for (i of [0,1,2,3]; track i) { <tr><td colspan="5"><div class="skeleton sk-line"></div></td></tr> }
-      }
-    </tbody>
-  </table>
-</div>
+<mat-tab-nav-panel #panelBandeja>
+  <mat-card appearance="outlined" class="tabla-card">
+    <div class="cargando-barra">@if (!datos()) { <mat-progress-bar mode="indeterminate" /> }</div>
+    <div class="tabla-scroll">
+      <table mat-table [dataSource]="tabla" class="tabla-bandeja">
+        <ng-container matColumnDef="ref">
+          <th mat-header-cell *matHeaderCellDef>Ref.</th>
+          <td mat-cell *matCellDef="let t" class="mono muted">{{ referencia(t.idTestimonio) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="reporte">
+          <th mat-header-cell *matHeaderCellDef>Reporte</th>
+          <td mat-cell *matCellDef="let t">
+            <div class="t-rep">
+              <span class="t-ico cat-ico" [style.color]="colorCategoria(categoria(t))"><mat-icon>{{ iconoCategoria(categoria(t)) }}</mat-icon></span>
+              <div><strong>{{ categoria(t) }}</strong><p class="clamp">{{ t.descripcionTexto }}</p></div>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let t" class="mono muted">{{ t.fechaCreacion | date:'dd/MM/yy' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="zona">
+          <th mat-header-cell *matHeaderCellDef>Zona</th>
+          <td mat-cell *matCellDef="let t">{{ datos()?.zona?.get(t.idZona)?.nombreZona }}</td>
+        </ng-container>
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let t"><app-estadochipcomponent [estado]="t.estado" /></td>
+        </ng-container>
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="t-acc"></th>
+          <td mat-cell *matCellDef="let t" class="t-acc">
+            <button matButton="tonal" (click)="atender(t)">Atender</button>
+            <a matIconButton [routerLink]="['/reporte', t.idTestimonio]" matTooltip="Ver página pública"><mat-icon>open_in_new</mat-icon></a>
+            <button matIconButton [class.peligro]="confirmando() === t.idTestimonio" (click)="eliminar(t)"
+                    [matTooltip]="confirmando() === t.idTestimonio ? 'Clic otra vez para eliminar' : 'Eliminar'">
+              <mat-icon>{{ confirmando() === t.idTestimonio ? 'delete_forever' : 'delete' }}</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="columnas.length">
+            @if (datos()) { <div class="vacio"><mat-icon>done_all</mat-icon><p>Nada por aquí. ¡Bandeja al día!</p></div> }
+          </td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="10" showFirstLastButtons />
+  </mat-card>
+</mat-tab-nav-panel>
 
-@if (abierto(); as t) {
-  <div class="drawer-scrim" (click)="abierto.set(null)"></div>
-  <aside class="drawer" role="dialog" aria-label="Atender reporte">
-    <header class="drawer-head">
-      <div><span class="mono muted">{{ referencia(t.idTestimonio) }}</span><h2>Atender reporte</h2></div>
-      <button class="icon-btn" (click)="abierto.set(null)" aria-label="Cerrar"><span class="ms">close</span></button>
-    </header>
-    <blockquote class="drawer-cita">“{{ t.descripcionTexto }}”</blockquote>
-    <form [formGroup]="form" (ngSubmit)="guardar()" class="drawer-body" novalidate>
-      <div class="campo">
-        <span class="campo-lbl">Nuevo estado</span>
-        <div class="estado-opciones">
+<!-- Dialogo para atender un reporte -->
+<ng-template #dialogoAtender>
+  @if (abierto(); as t) {
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <h2 mat-dialog-title>
+        <span class="mono muted dlg-ref">{{ referencia(t.idTestimonio) }}</span>
+        Atender reporte
+      </h2>
+      <mat-dialog-content>
+        <blockquote class="cita">“{{ t.descripcionTexto }}”</blockquote>
+
+        <span class="lbl">Nuevo estado</span>
+        <mat-button-toggle-group formControlName="accion" class="estados" hideSingleSelectionIndicator>
           @for (e of estados; track e.key) {
-            <label class="estado-op" [class]="'estado-op estado-' + e.tono" [class.on]="form.value.accion === e.key">
-              <input type="radio" formControlName="accion" [value]="e.key" />
-              <span class="ms">{{ e.icono }}</span>{{ e.label }}
-            </label>
+            <mat-button-toggle [value]="e.key" [class]="'estado-' + e.tono"><mat-icon>{{ e.icono }}</mat-icon>{{ e.label }}</mat-button-toggle>
           }
-        </div>
-      </div>
-      <label class="campo">
-        <span class="campo-lbl">Nota para la ciudadanía</span>
-        <textarea class="input input-area" rows="3" formControlName="motivo" placeholder="Ej.: Se programó la cuadrilla para el jueves."
-                  [class.mal]="form.controls.motivo.invalid && form.controls.motivo.touched"></textarea>
-        <span class="campo-ayuda">Se mostrará en el historial público del reporte.</span>
-      </label>
-      <label class="campo">
-        <span class="campo-lbl">Costo de la intervención <span class="opc">opcional</span></span>
-        <span class="input-prefijo"><i>S/</i><input class="input" type="number" min="0" step="0.01" formControlName="costo" placeholder="0.00" /></span>
-      </label>
-      <footer class="drawer-foot">
-        <button type="button" class="btn btn-quiet" (click)="abierto.set(null)">Cancelar</button>
-        <button type="submit" class="btn btn-signal" [disabled]="guardando()">
-          @if (guardando()) { <span class="spinner"></span>Guardando… } @else { Guardar acción }
+        </mat-button-toggle-group>
+
+        <mat-form-field class="full">
+          <mat-label>Nota para la ciudadanía</mat-label>
+          <textarea matInput rows="3" formControlName="motivo" placeholder="Ej.: Se programó la cuadrilla para el jueves."></textarea>
+          <mat-hint>Se mostrará en el historial público del reporte.</mat-hint>
+          <mat-error>Escribe una nota (máximo 255 caracteres).</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="full">
+          <mat-label>Costo de la intervención en S/ (opcional)</mat-label>
+          <mat-icon matPrefix>payments</mat-icon>
+          <input matInput type="number" min="0" step="0.01" formControlName="costo" placeholder="0.00" />
+        </mat-form-field>
+      </mat-dialog-content>
+      <mat-dialog-actions align="end">
+        <button matButton type="button" mat-dialog-close>Cancelar</button>
+        <button matButton="filled" type="submit" [disabled]="guardando()">
+          @if (guardando()) { <mat-spinner diameter="18" />Guardando… } @else { Guardar acción }
         </button>
-      </footer>
+      </mat-dialog-actions>
     </form>
-  </aside>
-}
+  }
+</ng-template>

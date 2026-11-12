@@ -1,0 +1,23 @@
+<mat-card appearance="outlined" class="u-card" [class.inactivo]="!usuario().activo">
+  <mat-card-header>
+    <div mat-card-avatar class="avatar avatar-lg">{{ iniciales() }}</div>
+    <mat-card-title>{{ usuario().nombres }} {{ usuario().apellidos }}</mat-card-title>
+    <mat-card-subtitle class="u-correo">{{ usuario().correo }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-chip-set>
+      <mat-chip [class]="tonoRol()"><mat-icon matChipAvatar>{{ iconoRol() }}</mat-icon>{{ rol() }}</mat-chip>
+      <mat-chip [class]="usuario().activo ? 'pill pill-ok' : 'pill'">{{ usuario().activo ? 'Activo' : 'Inactivo' }}</mat-chip>
+    </mat-chip-set>
+    <p class="u-dato"><mat-icon>calendar_today</mat-icon>Registrado el {{ usuario().fechaRegistro | date:'d MMM y' }}</p>
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <a matButton [routerLink]="['/panel/usuarios/ediciones', usuario().idUsuario]"><mat-icon>edit</mat-icon>Editar</a>
+    <button matButton [class.peligro]="confirmando()" (click)="eliminar.emit(usuario())"
+            [matTooltip]="confirmando() ? 'Clic otra vez para eliminar' : 'Eliminar usuario'">
+      <mat-icon>{{ confirmando() ? 'delete_forever' : 'delete' }}</mat-icon>{{ confirmando() ? '¿Eliminar?' : 'Eliminar' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,19 @@
+.com { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+.h-sec { font-size: 1.05rem; margin-bottom: 14px; display: flex; gap: 8px; align-items: baseline; }
+.h-sec .muted { font-size: .9rem; font-weight: 500; }
+.com-lista { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.com mat-card-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .95rem; }
+.com mat-card-subtitle { font-size: .78rem; }
+.com-tag { --mat-chip-container-height: 22px; --mat-chip-label-text-size: .7rem; --mat-chip-label-text-weight: 700; --mat-chip-elevated-container-color: var(--info-soft); --mat-chip-label-text-color: var(--info); }
+.com mat-card-content p { color: var(--ink-2); line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.peligro { color: var(--signal); }
+.com-vacio { margin-bottom: 16px; }
+.com-form { display: flex; gap: 10px; align-items: flex-start; }
+.com-campo { flex: 1; }
+.com-form button { margin-top: 8px; }
+.com-login { color: var(--ink-3); }
+.com-login a { color: var(--info); font-weight: 600; }
+
+@media (max-width: 560px) {
+  .com-form { flex-direction: column; align-items: stretch; }
+}

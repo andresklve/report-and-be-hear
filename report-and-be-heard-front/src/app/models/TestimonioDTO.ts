@@ -11,4 +11,5 @@ export class TestimonioDTO {
   estado: string = 'PENDIENTE';
   confianzaIA: number | null = null;
   modeloIA: string | null = null;
+  fechaCreacion?: string | null = null;
 }

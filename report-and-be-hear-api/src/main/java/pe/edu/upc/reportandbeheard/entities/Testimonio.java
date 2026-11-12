@@ -28,7 +28,8 @@ public class Testimonio {
     @Column(name = "descripcion_texto", columnDefinition = "TEXT", nullable = false)
     private String descripcionTexto;
 
-    @Column(name = "foto_url", length = 500)
+    // Imagen subida (PNG/JPG) guardada como data URL en base64, o un enlace
+    @Column(name = "foto_url", columnDefinition = "TEXT")
     private String fotoUrl;
 
     @Column(name = "direccion_texto_extraida", length = 255)

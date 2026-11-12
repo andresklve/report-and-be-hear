@@ -1,0 +1,56 @@
+/* Estilos comunes de la seccion */
+/* Estilos comunes de las paginas de resultados (titulo de pagina, tarjeta y nota) */
+.pag-head { margin-bottom: 20px; }
+.pag-head h2 { font-size: 1.4rem; }
+.pag-head p { color: var(--ink-3); margin-top: 4px; max-width: 72ch; }
+
+.tarjeta { padding: 24px; }
+.tarjeta h3 { font-size: 1rem; margin-bottom: 4px; }
+.tarjeta .sub { color: var(--ink-3); font-size: .84rem; margin-bottom: 16px; }
+.dos { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center; }
+.columnas2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.nota { padding: 18px 20px; border-left: 3px solid var(--warn-chart); background: var(--surface-2); border-radius: 0 var(--r-lg) var(--r-lg) 0; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
+.nota-tit { font-size: .74rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+
+@media (max-width: 980px) {
+  .dos, .columnas2 { grid-template-columns: 1fr; }
+}
+
+.abajo { margin-top: 16px; }
+
+.casos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.caso { overflow: hidden; }
+.caso a { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; height: 100%; }
+.caso a:hover { background: var(--surface-2); }
+.caso-top { display: flex; gap: 10px; align-items: center; }
+.caso-top div { display: flex; flex-direction: column; min-width: 0; }
+.caso-top small { color: var(--ink-3); font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.h-ico { flex: none; width: 36px; height: 36px; border-radius: var(--r); display: grid; place-items: center; background: color-mix(in srgb, currentColor 12%, white); }
+.caso-txt { font-size: .88rem; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.caso-nota { display: flex; gap: 6px; align-items: flex-start; font-size: .84rem; color: var(--ok); background: var(--ok-soft); padding: 8px 10px; border-radius: var(--r); }
+.caso-nota .mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.caso-fecha { color: var(--ink-3); font-size: .78rem; margin-top: auto; }
+mat-paginator { margin-top: 12px; background: transparent; }
+
+@media (max-width: 980px) { .casos { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .casos { grid-template-columns: 1fr; } }
+
+/* Buscador */
+.barra { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.buscar { width: 420px; max-width: 100%; }
+.buscar ::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none; }
+.sin { grid-column: 1 / -1; }
+
+/* Filtros por tipo de problema */
+.tipos { display: block; margin-bottom: 18px; }
+.tipos .n { margin-left: 6px; font-size: .74rem; opacity: .75; }
+.tipos mat-chip-option .mat-icon { color: var(--cat); }
+.tipos mat-chip-option.mat-mdc-chip-selected {
+  --mat-chip-elevated-selected-container-color: var(--ink);
+  --mat-chip-flat-selected-container-color: var(--ink);
+  --mat-chip-selected-label-text-color: #fff;
+  --mat-chip-selected-trailing-icon-color: #fff;
+  --mat-chip-with-icon-selected-icon-color: #fff;
+}
+.tipos mat-chip-option.mat-mdc-chip-selected .mat-icon { color: #fff; }

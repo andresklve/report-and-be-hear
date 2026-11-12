@@ -88,6 +88,7 @@ export class Authservice {
 
   static mensajeError(err: any): string {
     if (err?.status === 0) return 'No pudimos conectar con el servidor. Intenta de nuevo en un momento.'
+    if (/suspendida/i.test(err?.error?.message ?? '')) return err.error.message
     if (err?.status === 401 || err?.status === 403) return 'Correo o contraseña incorrectos.'
     const msg: string = err?.error?.message ?? ''
     if (/correo|unique|duplicad|llave duplicada/i.test(msg)) return 'Ese correo ya está registrado. Prueba iniciando sesión.'

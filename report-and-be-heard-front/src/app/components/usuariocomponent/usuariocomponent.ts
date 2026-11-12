@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-usuariocomponent',
   imports: [RouterOutlet],
-  template: '<router-outlet />',
+  templateUrl: './usuariocomponent.html',
+  styleUrl: './usuariocomponent.css',
 })
 export class Usuariocomponent {}

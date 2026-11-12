@@ -1,78 +1,117 @@
 <header class="p-head">
   <div>
     <p class="eyebrow">Resumen</p>
-    <h1>¿Cómo va la ciudad hoy?</h1>
+    <h1>Resumen de gestión</h1>
+    <p class="muted">Indicadores de los reclamos ciudadanos (US08 – US14).</p>
   </div>
-  <a routerLink="/panel/bandeja" class="btn btn-ink"><span class="ms">inbox</span>Atender pendientes
-    @if (kpis().pendientes) { <span class="badge">{{ kpis().pendientes }}</span> }
+  <a matButton="filled" class="oscuro" routerLink="/panel/bandeja"
+     [matBadge]="kpis().pendientes || null" matBadgeColor="primary" matBadgeOverlap="true">
+    <mat-icon>inbox</mat-icon>Atender pendientes
   </a>
 </header>
 
 <div class="kpis">
-  <div class="kpi"><span class="kpi-lbl">Reportes</span><b>{{ kpis().total }}</b><span class="kpi-sub">en total</span></div>
-  <div class="kpi kpi-warn"><span class="kpi-lbl">Por atender</span><b>{{ kpis().pendientes }}</b><span class="kpi-sub">recibidos sin acción</span></div>
-  <div class="kpi kpi-info"><span class="kpi-lbl">En atención</span><b>{{ kpis().proceso }}</b><span class="kpi-sub">con cuadrilla asignada</span></div>
-  <div class="kpi kpi-ok"><span class="kpi-lbl">Resueltos</span><b>{{ kpis().resueltos }}</b><span class="kpi-sub">{{ kpis().pct }}% del total</span></div>
-  <div class="kpi"><span class="kpi-lbl">Tiempo de atención</span><b class="kpi-txt">{{ kpis().tiempo }}</b><span class="kpi-sub">promedio · US13</span></div>
-  <div class="kpi"><span class="kpi-lbl">Inversión</span><b class="kpi-txt">{{ kpis().inversion }}</b><span class="kpi-sub">acumulada · US11</span></div>
+  <mat-card appearance="outlined" class="kpi"><span class="kpi-lbl">Reportes</span><b>{{ kpis().total }}</b><span class="kpi-sub">en total</span></mat-card>
+  <mat-card appearance="outlined" class="kpi kpi-warn"><span class="kpi-lbl"><i class="dot dot-warn"></i>Por atender</span><b>{{ kpis().pendientes }}</b><span class="kpi-sub">recibidos sin acción</span></mat-card>
+  <mat-card appearance="outlined" class="kpi kpi-info"><span class="kpi-lbl"><i class="dot dot-info"></i>En atención</span><b>{{ kpis().proceso }}</b><span class="kpi-sub">con cuadrilla asignada</span></mat-card>
+  <mat-card appearance="outlined" class="kpi kpi-ok"><span class="kpi-lbl"><i class="dot dot-ok"></i>Resueltos</span><b>{{ kpis().resueltos }}</b><span class="kpi-sub">{{ kpis().pct }}% del total</span></mat-card>
+  <mat-card appearance="outlined" class="kpi"><span class="kpi-lbl">Tiempo de atención</span><b class="kpi-txt">{{ kpis().tiempo }}</b><span class="kpi-sub">promedio · US13</span></mat-card>
+  <mat-card appearance="outlined" class="kpi kpi-dinero"><span class="kpi-lbl">Inversión</span><b class="kpi-txt">{{ kpis().inversion }}</b><span class="kpi-sub">acumulada · US11</span></mat-card>
 </div>
 
 <div class="p-grid">
-  <section class="card p-card p-span2">
+  <!-- Estado: dona con el % resuelto al centro -->
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head"><div><h2>Estado de los reportes</h2><span class="muted">Distribución por estado de atención</span></div></header>
+    <app-donacomponent [items]="donaEstados()" [centroValor]="kpis().pct + '%'" centroEtiqueta="resueltos" />
+    @if (lecturas().estado; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
+
+  <!-- Categorias: dona con el total al centro -->
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head"><div><h2>Reclamos por categoría</h2><span class="muted">US08 · Distribución por tipo de problema</span></div></header>
+    <app-donacomponent [items]="donaCategorias()" [centroValor]="kpis().total.toLocaleString('es-PE')" centroEtiqueta="reclamos" />
+    @if (lecturas().categoria; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
+
+  <mat-card appearance="outlined" class="p-card p-span2">
     <header class="p-card-head">
-      <div><h2>Tendencia de reportes</h2><span class="muted">US09</span></div>
-      <div class="segmented segmented-sm">
-        <button [class.on]="agrupacion() === 'dia'" (click)="cargarTendencia('dia')">Por día</button>
-        <button [class.on]="agrupacion() === 'mes'" (click)="cargarTendencia('mes')">Por mes</button>
-      </div>
+      <div><h2>Tendencia de reportes</h2><span class="muted">US09 · {{ agrupacion() === 'dia' ? 'últimos 30 días' : 'por mes' }}</span></div>
+      <mat-button-toggle-group [value]="agrupacion()" (change)="cargarTendencia($event.value)" hideSingleSelectionIndicator aria-label="Agrupar por">
+        <mat-button-toggle value="dia">Por día</mat-button-toggle>
+        <mat-button-toggle value="mes">Por mes</mat-button-toggle>
+      </mat-button-toggle-group>
     </header>
     <div class="columnas">
       @for (c of columnas(); track c.periodo) {
-        <div class="col">
+        <div class="col" [class.mes]="agrupacion() === 'mes'" [class.pico]="c.pico" [matTooltip]="c.etiqueta + ': ' + c.totalTestimonios + ' reportes'">
           <span class="col-val">{{ c.totalTestimonios }}</span>
           <span class="col-bar"><i [style.height.%]="c.pct"></i></span>
-          <span class="col-lbl mono">{{ c.periodo }}</span>
+          <span class="col-lbl">{{ c.etiqueta }}</span>
         </div>
       } @empty { <p class="muted">Sin datos.</p> }
     </div>
-  </section>
+    @if (lecturas().tendencia; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
 
-  <section class="card p-card">
-    <header class="p-card-head"><div><h2>Por categoría</h2><span class="muted">US08</span></div></header>
-    <app-barras [items]="barrasCategoria()" />
-  </section>
+  <!-- Costo: dona del gasto por categoria -->
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head"><div><h2>Costo por categoría</h2><span class="muted">US12 · Distribución del gasto en intervenciones</span></div></header>
+    <app-donacomponent [items]="donaCosto()" [centroValor]="totalCostoCorto()" centroEtiqueta="invertidos" vacio="Aún no hay costos registrados" />
+    @if (lecturas().costo; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
 
-  <section class="card p-card">
-    <header class="p-card-head"><div><h2>Zonas más activas</h2><span class="muted">US10</span></div></header>
-    <app-barras [items]="barrasRanking()" tono="ink" />
-  </section>
+  <!-- Nuevo: costo promedio por reclamo atendido -->
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head"><div><h2>Costo promedio por reclamo atendido</h2><span class="muted">US12 · Costo total entre reclamos atendidos</span></div></header>
+    <app-barrascomponent [items]="barrasPromedio()" vacio="Aún no hay costos registrados" />
+    @if (lecturas().promedio; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
 
-  <section class="card p-card">
-    <header class="p-card-head"><div><h2>Inversión por departamento</h2><span class="muted">US11</span></div></header>
-    <app-barras [items]="barrasInversion()" tono="ok" vacio="Aún no hay inversión registrada" />
-  </section>
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head">
+      <div><h2>Inversión por departamento</h2><span class="muted">US11 · de mayor a menor</span></div>
+      @if (barrasInversion().length > 8) {
+        <button matButton (click)="verTodosDep.set(!verTodosDep())">{{ verTodosDep() ? 'Ver 8' : 'Ver los ' + barrasInversion().length }}</button>
+      }
+    </header>
+    <app-barrascomponent [items]="verTodosDep() ? barrasInversion() : barrasInversion().slice(0, 8)" color="var(--chart-dinero)" vacio="Aún no hay inversión registrada" />
+    @if (lecturas().inversion; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
 
-  <section class="card p-card">
-    <header class="p-card-head"><div><h2>Costo por categoría</h2><span class="muted">US12</span></div></header>
-    <app-barras [items]="barrasCosto()" tono="ok" vacio="Aún no hay costos registrados" />
-  </section>
+  <mat-card appearance="outlined" class="p-card">
+    <header class="p-card-head"><div><h2>Zonas más activas</h2><span class="muted">US10 · distritos con más reclamos</span></div></header>
+    <app-barrascomponent [items]="barrasRanking()" color="var(--chart-ranking)" />
+    @if (lecturas().zonas; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
+  </mat-card>
 
-  <section class="card p-card p-span2">
+  <mat-card appearance="outlined" class="p-card p-span2">
     <header class="p-card-head"><div><h2>Desempeño de la IA</h2><span class="muted">US14 · solo administrador</span></div></header>
     @if (ia().length) {
-      <table class="tabla">
-        <thead><tr><th>Categoría</th><th>Modelo</th><th>Confianza promedio</th></tr></thead>
-        <tbody>
-          @for (r of ia(); track r.nombreCategoria + r.modeloIA) {
-            <tr><td>{{ r.nombreCategoria }}</td><td class="mono">{{ r.modeloIA }}</td><td>{{ r.confianzaPromedio * 100 | number:'1.0-1' }}%</td></tr>
-          }
-        </tbody>
+      <table mat-table [dataSource]="tablaIA">
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef>Categoría</th>
+          <td mat-cell *matCellDef="let r"><mat-chip class="cat-tag" disableRipple><i matChipAvatar class="sw" [style.background]="colorCategoria(r.nombreCategoria)"></i>{{ r.nombreCategoria }}</mat-chip></td>
+        </ng-container>
+        <ng-container matColumnDef="modelo">
+          <th mat-header-cell *matHeaderCellDef>Modelo</th>
+          <td mat-cell *matCellDef="let r" class="mono">{{ r.modeloIA }}</td>
+        </ng-container>
+        <ng-container matColumnDef="confianza">
+          <th mat-header-cell *matHeaderCellDef>Confianza promedio</th>
+          <td mat-cell *matCellDef="let r">
+            <div class="conf"><mat-progress-bar mode="determinate" [value]="r.confianzaPromedio * 100" /><span>{{ r.confianzaPromedio * 100 | number:'1.0-1' }}%</span></div>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnasIA"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasIA"></tr>
       </table>
+      <mat-paginator [pageSizeOptions]="[5, 10]" [pageSize]="5" />
     } @else {
-      <div class="proximo proximo-panel">
-        <span class="ms">auto_awesome</span>
+      <div class="proximo">
+        <mat-icon>auto_awesome</mat-icon>
         <div><strong>Se activa con la API de IA</strong><p>Cuando los reportes se clasifiquen automáticamente, aquí verás qué tan segura está la IA en cada categoría.</p></div>
       </div>
     }
-  </section>
+  </mat-card>
 </div>

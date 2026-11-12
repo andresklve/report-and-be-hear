@@ -1,0 +1,7 @@
+.barras { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.barras li { display: grid; grid-template-columns: minmax(90px, 36%) 1fr auto; gap: 10px; align-items: center; }
+.b-lbl { display: flex; align-items: center; gap: 6px; font-size: .86rem; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.b-sw { flex: none; width: 10px; height: 10px; border-radius: 2px; }
+.b-track { --mat-progress-bar-track-height: 10px; --mat-progress-bar-active-indicator-height: 10px; --mat-progress-bar-track-shape: 5px; --mat-progress-bar-track-color: var(--neutral-soft); border-radius: 5px; overflow: hidden; }
+.b-val { font-size: .86rem; font-variant-numeric: tabular-nums; min-width: 24px; text-align: right; }
+.barras li.b-vacio { display: block; color: var(--ink-3); font-size: .88rem; }

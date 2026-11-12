@@ -1,0 +1,6 @@
+.logo { display: inline-flex; align-items: center; gap: 8px; }
+.logo svg { flex: none; }
+.logo-txt { font-weight: 800; font-size: 1.02rem; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+.logo-txt b { color: var(--signal); font-weight: 800; }
+.logo.claro .logo-txt { color: #fff; }
+.logo.claro .logo-txt b { color: #FF5A6E; }

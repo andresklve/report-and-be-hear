@@ -1,0 +1,17 @@
+@if (items().length) {
+  <div class="cols" [class.muchas]="muchas()" [style.--alto.px]="alto()" role="img" aria-label="Gráfico de barras">
+    @for (b of items(); track b.label) {
+      <div class="col" [matTooltip]="tip(b)" matTooltipPosition="above">
+        <span class="barra">
+          <span class="pila" [style.height.%]="(b.valor / max()) * 100">
+            <span class="val">{{ b.texto ?? b.valor }}</span>
+            <i [style.background]="b.color ?? color()"></i>
+          </span>
+        </span>
+        <span class="lbl">{{ b.label }}</span>
+      </div>
+    }
+  </div>
+} @else {
+  <p class="vacio-txt">{{ vacio() }}</p>
+}

@@ -1,0 +1,33 @@
+@if (total() > 0) {
+  <div class="dona">
+    <svg viewBox="0 0 200 200" role="img" [attr.aria-label]="'Gráfico circular: ' + centroEtiqueta()">
+      <!-- empieza arriba (12 en punto) y avanza en sentido horario -->
+      <g transform="rotate(-90 100 100)">
+        @for (s of segmentos(); track s.label) {
+          <circle cx="100" cy="100" [attr.r]="r" fill="none" [attr.stroke]="s.color" stroke-width="24"
+                  [attr.stroke-dasharray]="s.dash" [attr.stroke-dashoffset]="s.offset"
+                  [class.atenuado]="activo() !== null && activo() !== s.i"
+                  [class.on]="activo() === s.i"
+                  (mouseenter)="activo.set(s.i)" (mouseleave)="activo.set(null)">
+            <title>{{ s.label }}: {{ s.texto ?? s.valor }} ({{ s.pct | number:'1.0-1' }}%)</title>
+          </circle>
+        }
+      </g>
+      <text x="100" y="96" text-anchor="middle" class="c-valor">{{ centro().valor }}</text>
+      <text x="100" y="116" text-anchor="middle" class="c-etq">{{ centro().pct !== null ? (centro().pct | number:'1.0-1') + '% · ' : '' }}{{ centro().etiqueta }}</text>
+    </svg>
+
+    <ul class="leyenda">
+      @for (s of segmentos(); track s.label) {
+        <li [class.on]="activo() === s.i" (mouseenter)="activo.set(s.i)" (mouseleave)="activo.set(null)">
+          <i [style.background]="s.color"></i>
+          <span class="l-n">{{ s.label }}</span>
+          <b>{{ s.texto ?? (s.valor | number) }}</b>
+          <span class="l-p">{{ s.pct | number:'1.0-0' }}%</span>
+        </li>
+      }
+    </ul>
+  </div>
+} @else {
+  <p class="vacio-txt">{{ vacio() }}</p>
+}

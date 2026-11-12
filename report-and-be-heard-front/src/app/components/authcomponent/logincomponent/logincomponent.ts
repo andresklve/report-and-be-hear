@@ -1,13 +1,21 @@
+import { MatCardModule } from '@angular/material/card';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Authservice } from '../../../services/authservice';
 import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-logincomponent',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [MatCardModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatChipsModule],
   templateUrl: './logincomponent.html',
+  styleUrl: './logincomponent.css',
 })
 export class Logincomponent {
   private auth = inject(Authservice)

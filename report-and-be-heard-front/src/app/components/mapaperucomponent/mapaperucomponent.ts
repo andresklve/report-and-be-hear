@@ -1,13 +1,25 @@
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Component, ElementRef, OnDestroy, ViewChild, afterNextRender, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRippleModule } from '@angular/material/core';
+import { Estadochipcomponent } from '../estadochipcomponent/estadochipcomponent';
 import type * as Leaflet from 'leaflet';
 import { Datos, Datosservice } from '../../services/datosservice';
 import { COLOR, Geoservice, NivelQueja, escala } from '../../services/geoservice';
 import { GeoColeccion, GeoFeature, GeoIndice, Nivel } from '../../models/GeoDTO';
 import { TestimonioDTO } from '../../models/TestimonioDTO';
-import { ESTADOS, estadoInfo, iconoCategoria, referencia } from '../../shared/ui';
+import { ESTADOS, colorCategoria, colorEstado, estadoInfo, iconoCategoria, referencia } from '../../shared/ui';
 
 interface Seleccion {
   nivel: Nivel;
@@ -29,8 +41,10 @@ const LIMITES: Leaflet.LatLngBoundsExpression = [[-18.45, -81.4], [-0.03, -68.65
 // Departamentos -> provincias -> distritos segun el zoom; color segun cantidad de quejas.
 @Component({
   selector: 'app-mapaperucomponent',
-  imports: [RouterLink, DecimalPipe],
+  imports: [MatProgressBarModule, RouterLink, DecimalPipe, Estadochipcomponent, MatCardModule, MatButtonModule, MatIconModule, MatFormFieldModule,
+    MatInputModule, MatAutocompleteModule, MatListModule, MatTooltipModule, MatProgressSpinnerModule, MatRippleModule],
   templateUrl: './mapaperucomponent.html',
+  styleUrl: './mapaperucomponent.css',
 })
 export class Mapaperucomponent implements OnDestroy {
   @ViewChild('lienzo', { static: true }) lienzo!: ElementRef<HTMLDivElement>
@@ -53,6 +67,8 @@ export class Mapaperucomponent implements OnDestroy {
 
   estadoInfo = estadoInfo
   iconoCategoria = iconoCategoria
+  colorCategoria = colorCategoria
+  colorEstado = colorEstado
   referencia = referencia
   colores = COLOR
 
@@ -435,14 +451,8 @@ export class Mapaperucomponent implements OnDestroy {
     this.activo.set(0)
   }
 
-  teclado(ev: KeyboardEvent) {
-    const n = this.resultados().length
-    if (!n) return
-    if (ev.key === 'ArrowDown') { this.activo.set((this.activo() + 1) % n); ev.preventDefault() }
-    if (ev.key === 'ArrowUp') { this.activo.set((this.activo() - 1 + n) % n); ev.preventDefault() }
-    if (ev.key === 'Enter') { this.irA(this.resultados()[this.activo()]); ev.preventDefault() }
-    if (ev.key === 'Escape') { this.resultados.set([]) }
-  }
+
+  nombreLugar = (e: GeoIndice | string | null) => typeof e === 'string' ? e : e?.n ?? ''
 
   irA(e: GeoIndice) {
     this.busqueda.set(e.n)

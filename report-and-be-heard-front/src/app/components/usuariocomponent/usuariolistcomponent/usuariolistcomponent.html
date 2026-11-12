@@ -4,51 +4,84 @@
     <h1>Usuarios</h1>
     <p class="muted">Ciudadanía registrada y cuentas del equipo municipal.</p>
   </div>
-  <a routerLink="/panel/usuarios/nuevo" class="btn btn-signal"><span class="ms">person_add</span>Nuevo usuario</a>
+  <a matButton="filled" routerLink="/panel/usuarios/insertar"><mat-icon>person_add</mat-icon>Nuevo usuario</a>
 </header>
 
 <div class="toolbar">
-  <label class="buscador buscador-sm">
-    <span class="ms">search</span>
-    <input type="search" placeholder="Nombre o correo…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
-  </label>
-  <div class="segmented segmented-sm">
-    <button [class.on]="rolFiltro() === null" (click)="rolFiltro.set(null)">Todos <i>{{ usuarios().length }}</i></button>
+  <mat-form-field class="buscar">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput type="search" placeholder="Nombre o correo…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+  </mat-form-field>
+  <mat-button-toggle-group [value]="rolFiltro()" (change)="rolFiltro.set($event.value)" aria-label="Filtrar por rol" hideSingleSelectionIndicator>
+    <mat-button-toggle [value]="null">Todos <span class="n">{{ usuarios().length }}</span></mat-button-toggle>
     @for (r of roles(); track r.idRol) {
-      <button [class.on]="rolFiltro() === r.idRol" (click)="rolFiltro.set(r.idRol)">{{ r.nombreRol | slice:0:1 }}{{ r.nombreRol.slice(1).toLowerCase() }} <i>{{ conteoRol().get(r.idRol) ?? 0 }}</i></button>
+      <mat-button-toggle [value]="r.idRol">{{ r.nombreRol | titlecase }} <span class="n">{{ conteoRol().get(r.idRol) ?? 0 }}</span></mat-button-toggle>
     }
-  </div>
+  </mat-button-toggle-group>
+  <app-rangofechascomponent [(desde)]="desde" [(hasta)]="hasta" />
+  <mat-button-toggle-group [value]="vista()" (change)="vista.set($event.value)" aria-label="Vista" hideSingleSelectionIndicator>
+    <mat-button-toggle value="tarjetas" matTooltip="Ver como tarjetas"><mat-icon>grid_view</mat-icon></mat-button-toggle>
+    <mat-button-toggle value="tabla" matTooltip="Ver como tabla"><mat-icon>table_rows</mat-icon></mat-button-toggle>
+  </mat-button-toggle-group>
 </div>
 
-<div class="card card-flush">
-  <table class="tabla">
-    <thead><tr><th>Persona</th><th>Rol</th><th>Registro</th><th>Estado</th><th class="t-acc"></th></tr></thead>
-    <tbody>
-      @if (cargando()) {
-        @for (i of [0,1,2]; track i) { <tr><td colspan="5"><div class="skeleton sk-line"></div></td></tr> }
-      } @else {
-        @for (u of filtrados(); track u.idUsuario) {
-          <tr>
-            <td>
-              <div class="t-persona">
-                <span class="avatar avatar-sm">{{ iniciales(u) }}</span>
-                <div><strong>{{ u.nombres }} {{ u.apellidos }}</strong><span class="muted">{{ u.correo }}</span></div>
-              </div>
-            </td>
-            <td><span class="pill" [class]="'pill ' + tonoRol(u.idRol)">{{ rolNombre().get(u.idRol) }}</span></td>
-            <td class="muted">{{ u.fechaRegistro | date:'d MMM y' }}</td>
-            <td><span class="pill" [class]="u.activo ? 'pill pill-ok' : 'pill pill-neutral'">{{ u.activo ? 'Activo' : 'Inactivo' }}</span></td>
-            <td class="t-acc">
-              <button class="icon-btn" [class.peligro]="confirmando() === u.idUsuario" (click)="eliminar(u)" title="Eliminar">
-                <span class="ms">{{ confirmando() === u.idUsuario ? 'delete_forever' : 'delete' }}</span>
-                @if (confirmando() === u.idUsuario) { <span class="confirmar">¿Eliminar?</span> }
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="5"><div class="vacio"><span class="ms">group</span><p>No hay usuarios con ese filtro.</p></div></td></tr>
-        }
+<mat-card appearance="outlined" class="tabla-card">
+  <div class="cargando-barra">@if (cargando()) { <mat-progress-bar mode="indeterminate" /> }</div>
+
+  @if (vista() === 'tabla') {
+    <div class="tabla-scroll">
+      <table mat-table [dataSource]="pagina()">
+        <ng-container matColumnDef="persona">
+          <th mat-header-cell *matHeaderCellDef>Persona</th>
+          <td mat-cell *matCellDef="let u">
+            <div class="t-persona">
+              <span class="avatar avatar-sm">{{ iniciales(u) }}</span>
+              <div><strong>{{ u.nombres }} {{ u.apellidos }}</strong><span class="muted">{{ u.correo }}</span></div>
+            </div>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="rol">
+          <th mat-header-cell *matHeaderCellDef>Rol</th>
+          <td mat-cell *matCellDef="let u"><mat-chip [class]="tonoRol(u.idRol)">{{ rolNombre().get(u.idRol) }}</mat-chip></td>
+        </ng-container>
+        <ng-container matColumnDef="registro">
+          <th mat-header-cell *matHeaderCellDef>Registro</th>
+          <td mat-cell *matCellDef="let u" class="muted">{{ u.fechaRegistro | date:'d MMM y' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let u"><mat-chip [class]="u.activo ? 'pill pill-ok' : 'pill'">{{ u.activo ? 'Activo' : 'Inactivo' }}</mat-chip></td>
+        </ng-container>
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="t-acc"></th>
+          <td mat-cell *matCellDef="let u" class="t-acc">
+            <a matIconButton [routerLink]="['/panel/usuarios/ediciones', u.idUsuario]" matTooltip="Editar"><mat-icon>edit</mat-icon></a>
+            <button matIconButton [class.peligro]="confirmando() === u.idUsuario" (click)="eliminar(u)"
+                    [matTooltip]="confirmando() === u.idUsuario ? 'Clic otra vez para eliminar' : 'Eliminar'">
+              <mat-icon>{{ confirmando() === u.idUsuario ? 'delete_forever' : 'delete' }}</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="columnas.length">
+            @if (!cargando()) { <div class="vacio"><mat-icon>group</mat-icon><p>No hay usuarios con ese filtro.</p></div> }
+          </td>
+        </tr>
+      </table>
+    </div>
+  } @else {
+    <div class="u-grid">
+      @for (u of pagina(); track u.idUsuario) {
+        <app-usuariocardcomponent [usuario]="u" [rol]="rolNombre().get(u.idRol) ?? ''"
+                          [confirmando]="confirmando() === u.idUsuario" (eliminar)="eliminar($event)" />
+      } @empty {
+        @if (!cargando()) { <div class="vacio u-vacio"><mat-icon>group</mat-icon><p>No hay usuarios con ese filtro.</p></div> }
       }
-    </tbody>
-  </table>
-</div>
+    </div>
+  }
+
+  <mat-paginator [length]="filtrados().length" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+                 [pageSizeOptions]="[8, 16, 32]" (page)="cambiarPagina($event)" showFirstLastButtons />
+</mat-card>

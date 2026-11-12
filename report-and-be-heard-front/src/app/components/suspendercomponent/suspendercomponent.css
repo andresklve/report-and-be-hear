@@ -1,0 +1,12 @@
+.susp { margin-top: 10px; border: 1px solid color-mix(in srgb, var(--signal) 35%, white); border-radius: var(--r-lg); background: var(--signal-soft); }
+.susp-tit { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--signal-ink, var(--signal)); margin: 0 0 4px; }
+.susp-tit .mat-icon { font-size: 20px; width: 20px; height: 20px; }
+.susp-ayuda { font-size: .82rem; color: var(--ink-2); margin: 0 0 12px; }
+.susp-campos { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-start; }
+.susp-campos mat-form-field { width: 220px; }
+.susp-dur { display: flex; flex-direction: column; gap: 4px; }
+.susp-lbl { font-size: .76rem; color: var(--ink-3); }
+.susp-det { width: 100%; }
+.susp-acc { display: flex; justify-content: flex-end; gap: 8px; }
+.peligro { --mat-button-filled-container-color: var(--signal); }
+.susp mat-card-content { padding: 14px 16px; }

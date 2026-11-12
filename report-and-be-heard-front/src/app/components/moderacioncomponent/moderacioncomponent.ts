@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-moderacioncomponent',
   imports: [RouterOutlet],
-  template: '<router-outlet />',
+  templateUrl: './moderacioncomponent.html',
+  styleUrl: './moderacioncomponent.css',
 })
 export class Moderacioncomponent {}

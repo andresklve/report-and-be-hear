@@ -1,20 +1,39 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { Rangofechascomponent } from '../rangofechascomponent/rangofechascomponent';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { switchMap } from 'rxjs';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Datos, Datosservice } from '../../services/datosservice';
 import { Testimonioservice } from '../../services/testimonioservice';
 import { Moderacionservice } from '../../services/moderacionservice';
 import { Authservice } from '../../services/authservice';
 import { Toastservice } from '../../services/toastservice';
 import { TestimonioDTO } from '../../models/TestimonioDTO';
-import { ESTADOS, estadoInfo, iconoCategoria, referencia } from '../../shared/ui';
+import { Estadochipcomponent } from '../estadochipcomponent/estadochipcomponent';
+import { ESTADOS, enRango, colorCategoria, estadoInfo, iconoCategoria, referencia } from '../../shared/ui';
 
 // Bandeja de la municipalidad: atender = registrar moderacion + actualizar estado del testimonio
 @Component({
   selector: 'app-bandejacomponent',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, DatePipe, Rangofechascomponent, ReactiveFormsModule, Estadochipcomponent, MatTableModule, MatPaginatorModule, MatTabsModule, MatCardModule,
+    MatButtonModule, MatButtonToggleModule, MatIconModule, MatFormFieldModule, MatInputModule, MatTooltipModule,
+    MatProgressBarModule, MatProgressSpinnerModule, MatDialogModule],
   templateUrl: './bandejacomponent.html',
+  styleUrl: './bandejacomponent.css',
 })
 export class Bandejacomponent implements OnInit {
   private dS = inject(Datosservice)
@@ -23,6 +42,7 @@ export class Bandejacomponent implements OnInit {
   private auth = inject(Authservice)
   private toast = inject(Toastservice)
   private fb = inject(FormBuilder)
+  private dialog = inject(MatDialog)
 
   datos = signal<Datos | null>(null)
   filtro = signal<string>('PENDIENTE')
@@ -33,7 +53,17 @@ export class Bandejacomponent implements OnInit {
   estados = ESTADOS
   estadoInfo = estadoInfo
   iconoCategoria = iconoCategoria
+  colorCategoria = colorCategoria
   referencia = referencia
+
+  // Tabla con paginador y dialogo de Angular Material
+  columnas = ['ref', 'fecha', 'reporte', 'zona', 'estado', 'acciones']
+  desde = signal<Date | null>(null)
+  hasta = signal<Date | null>(null)
+  tabla = new MatTableDataSource<TestimonioDTO>([])
+  paginador = viewChild(MatPaginator)
+  dialogoAtender = viewChild.required<TemplateRef<unknown>>('dialogoAtender')
+  private dialogoRef?: MatDialogRef<unknown>
 
   form = this.fb.group({
     accion: ['EN_PROCESO', Validators.required],
@@ -51,13 +81,23 @@ export class Bandejacomponent implements OnInit {
     const d = this.datos()
     if (!d) return []
     const q = this.texto().trim().toLowerCase()
-    return d.testimonios.filter(t =>
+    return [...d.testimonios].sort((a, b) => b.idTestimonio - a.idTestimonio).filter(t =>
       (this.filtro() === 'TODOS' || t.estado === this.filtro()) &&
+      enRango(t.fechaCreacion, this.desde(), this.hasta()) &&
       (!q || t.descripcionTexto.toLowerCase().includes(q) || referencia(t.idTestimonio).toLowerCase().includes(q)))
   })
 
+  constructor() {
+    effect(() => { this.tabla.data = this.lista() })
+    effect(() => { this.tabla.paginator = this.paginador() ?? null })
+  }
+
   ngOnInit(): void {
     this.cargar()
+  }
+
+  categoria(t: TestimonioDTO) {
+    return this.datos()?.cat.get(t.idCategoria)?.nombreCategoria ?? ''
   }
 
   cargar() {
@@ -66,6 +106,8 @@ export class Bandejacomponent implements OnInit {
 
   atender(t: TestimonioDTO) {
     this.abierto.set(t)
+    this.dialogoRef = this.dialog.open(this.dialogoAtender(), { width: '520px', maxWidth: '95vw', autoFocus: 'textarea' })
+    this.dialogoRef.afterClosed().subscribe(() => this.abierto.set(null))
     this.form.reset({ accion: t.estado === 'PENDIENTE' ? 'EN_PROCESO' : t.estado === 'EN_PROCESO' ? 'RESUELTO' : t.estado, motivo: '', costo: null })
   }
 
@@ -84,7 +126,7 @@ export class Bandejacomponent implements OnInit {
     ).subscribe({
       next: () => {
         this.guardando.set(false)
-        this.abierto.set(null)
+        this.dialogoRef?.close()
         this.toast.ok(`${referencia(t.idTestimonio)} marcado como “${estadoInfo(v.accion).label}”`)
         this.cargar()
       },

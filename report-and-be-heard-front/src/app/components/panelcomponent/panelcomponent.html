@@ -1,27 +1,28 @@
 <div class="panel">
   <aside class="panel-side">
-    <div class="panel-quien">
-      <span class="avatar">{{ auth.iniciales() }}</span>
-      <div>
-        <strong>{{ auth.sesion()?.nombres }} {{ auth.sesion()?.apellidos }}</strong>
-        <span>{{ auth.esAdmin() ? 'Administrador' : 'Municipalidad' }}</span>
-      </div>
-    </div>
-    <nav class="panel-nav">
-      <span class="panel-grupo">Gestión</span>
-      <a routerLink="/panel/resumen" routerLinkActive="on"><span class="ms">monitoring</span>Resumen</a>
-      <a routerLink="/panel/bandeja" routerLinkActive="on"><span class="ms">inbox</span>Bandeja de reportes</a>
-      <a routerLink="/panel/moderaciones" routerLinkActive="on"><span class="ms">gavel</span>Moderaciones</a>
-      <span class="panel-grupo">Catálogos</span>
-      <a routerLink="/panel/zonas" routerLinkActive="on"><span class="ms">location_on</span>Zonas</a>
-      <a routerLink="/panel/categorias" routerLinkActive="on"><span class="ms">category</span>Categorías</a>
+    <mat-card appearance="outlined" class="panel-quien">
+      <mat-card-header>
+        <div mat-card-avatar class="avatar">{{ auth.iniciales() }}</div>
+        <mat-card-title>{{ auth.sesion()?.nombres }} {{ auth.sesion()?.apellidos }}</mat-card-title>
+        <mat-card-subtitle>{{ auth.esAdmin() ? 'Administrador' : 'Municipalidad' }}</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+    <mat-nav-list class="panel-nav">
+      <div mat-subheader class="panel-grupo">Gestión</div>
+      <a mat-list-item routerLink="/panel/resumen" routerLinkActive #r1="routerLinkActive" [activated]="r1.isActive"><mat-icon matListItemIcon>monitoring</mat-icon><span matListItemTitle>Resumen</span></a>
+      <a mat-list-item routerLink="/panel/bandeja" routerLinkActive #r2="routerLinkActive" [activated]="r2.isActive"><mat-icon matListItemIcon>inbox</mat-icon><span matListItemTitle>Bandeja de reportes</span></a>
+      <a mat-list-item routerLink="/panel/moderaciones" routerLinkActive #r3="routerLinkActive" [activated]="r3.isActive"><mat-icon matListItemIcon>gavel</mat-icon><span matListItemTitle>Moderaciones</span></a>
+      <a mat-list-item routerLink="/panel/suspensiones" routerLinkActive #r8="routerLinkActive" [activated]="r8.isActive"><mat-icon matListItemIcon>person_off</mat-icon><span matListItemTitle>Suspensiones</span></a>
+      <div mat-subheader class="panel-grupo">Catálogos</div>
+      <a mat-list-item routerLink="/panel/zonas" routerLinkActive #r4="routerLinkActive" [activated]="r4.isActive"><mat-icon matListItemIcon>location_on</mat-icon><span matListItemTitle>Zonas</span></a>
+      <a mat-list-item routerLink="/panel/categorias" routerLinkActive #r5="routerLinkActive" [activated]="r5.isActive"><mat-icon matListItemIcon>category</mat-icon><span matListItemTitle>Categorías</span></a>
       @if (auth.esAdmin()) {
-        <span class="panel-grupo">Administración</span>
-        <a routerLink="/panel/usuarios" routerLinkActive="on"><span class="ms">group</span>Usuarios</a>
-        <a routerLink="/panel/roles" routerLinkActive="on"><span class="ms">badge</span>Roles</a>
+        <div mat-subheader class="panel-grupo">Administración</div>
+        <a mat-list-item routerLink="/panel/usuarios" routerLinkActive #r6="routerLinkActive" [activated]="r6.isActive"><mat-icon matListItemIcon>group</mat-icon><span matListItemTitle>Usuarios</span></a>
+        <a mat-list-item routerLink="/panel/roles" routerLinkActive #r7="routerLinkActive" [activated]="r7.isActive"><mat-icon matListItemIcon>badge</mat-icon><span matListItemTitle>Roles</span></a>
       }
-    </nav>
-    <a routerLink="/" class="panel-salir"><span class="ms">arrow_back</span>Volver al sitio</a>
+    </mat-nav-list>
+    <a matButton routerLink="/" class="panel-salir"><mat-icon>arrow_back</mat-icon>Volver al sitio</a>
   </aside>
   <main class="panel-main">
     <router-outlet />

@@ -1,5 +1,12 @@
+import { MatCardModule } from '@angular/material/card';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Authservice } from '../../../services/authservice';
@@ -7,8 +14,9 @@ import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-registrocomponent',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [MatCardModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatProgressBarModule],
   templateUrl: './registrocomponent.html',
+  styleUrl: './registrocomponent.css',
 })
 export class Registrocomponent {
   private auth = inject(Authservice)

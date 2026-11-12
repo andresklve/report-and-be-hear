@@ -1,5 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ZonaDTO } from '../../../models/ZonaDTO';
 import { Zonaservice } from '../../../services/zonaservice';
@@ -7,14 +13,20 @@ import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-zonainsertcomponent',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule],
   templateUrl: './zonainsertcomponent.html',
+  styleUrl: './zonainsertcomponent.css',
 })
-export class Zonainsertcomponent {
+// Sirve para crear y para editar (ruta /panel/zonas/ediciones/:id)
+export class Zonainsertcomponent implements OnInit {
   private s = inject(Zonaservice)
   private toast = inject(Toastservice)
   private router = inject(Router)
   private fb = inject(FormBuilder)
+  private route = inject(ActivatedRoute)
+
+  id = Number(this.route.snapshot.paramMap.get('id') ?? 0)
+  edicion = this.id > 0
 
   guardando = signal(false)
   error = signal('')
@@ -27,6 +39,15 @@ export class Zonainsertcomponent {
     longitudZona: [null as number | null, [Validators.required]],
   })
 
+  ngOnInit(): void {
+    if (this.edicion) {
+      this.s.listId(this.id).subscribe({
+        next: x => this.form.patchValue(x as any),
+        error: () => this.error.set('No se encontró el registro.'),
+      })
+    }
+  }
+
   mal(c: string): boolean {
     const ctrl = this.form.get(c)
     return !!ctrl && ctrl.invalid && ctrl.touched
@@ -36,7 +57,8 @@ export class Zonainsertcomponent {
     if (this.form.invalid) { this.form.markAllAsTouched(); return }
     const v = this.form.value
     const obj: ZonaDTO = {
-      idZona: 0,
+      // Al crear, el id va vacio para que la base de datos lo genere (con 0 Hibernate busca un registro existente)
+      idZona: this.edicion ? this.id : null as unknown as number,
       nombreZona: v.nombreZona!,
       provinciaZona: v.provinciaZona!,
       departamentoZona: v.departamentoZona!,
@@ -45,11 +67,12 @@ export class Zonainsertcomponent {
     }
     this.guardando.set(true)
     this.error.set('')
-    this.s.insert(obj).subscribe({
+    const peticion = this.edicion ? this.s.update(obj) : this.s.insert(obj)
+    peticion.subscribe({
       next: () => {
         this.guardando.set(false)
-        this.toast.ok('Zona registrada correctamente')
-        if (seguir) this.form.reset({ nombreZona: '', provinciaZona: '', departamentoZona: '', latitudZona: null, longitudZona: null })
+        this.toast.ok(this.edicion ? 'Zona actualizada' : 'Zona registrada correctamente')
+        if (seguir && !this.edicion) this.form.reset({ nombreZona: '', provinciaZona: '', departamentoZona: '', latitudZona: null, longitudZona: null })
         else this.router.navigate(['/panel/zonas'])
       },
       error: err => {

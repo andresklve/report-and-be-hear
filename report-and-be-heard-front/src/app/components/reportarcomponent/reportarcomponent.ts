@@ -1,9 +1,22 @@
-import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { MatChipsModule } from '@angular/material/chips';
+import { Component, OnInit, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, of, switchMap, map } from 'rxjs';
+import { MatStepper, MatStepperModule } from '@angular/material/stepper';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRippleModule } from '@angular/material/core';
 import { Datos, Datosservice } from '../../services/datosservice';
 import { Testimonioservice } from '../../services/testimonioservice';
 import { Zonaservice } from '../../services/zonaservice';
@@ -15,14 +28,17 @@ import { SesionDTO } from '../../models/SesionDTO';
 import { GeoIndice, GeoProps } from '../../models/GeoDTO';
 import { Mapapickercomponent } from '../mapapickercomponent/mapapickercomponent';
 import { Estadotrackcomponent } from '../estadotrackcomponent/estadotrackcomponent';
-import { iconoCategoria, referencia } from '../../shared/ui';
+import { colorCategoria, iconoCategoria, referencia } from '../../shared/ui';
 
 const BORRADOR = 'rbh.borrador';
 
 @Component({
   selector: 'app-reportarcomponent',
-  imports: [RouterLink, ReactiveFormsModule, Mapapickercomponent, Estadotrackcomponent],
+  imports: [MatChipsModule, RouterLink, ReactiveFormsModule, Mapapickercomponent, Estadotrackcomponent, MatStepperModule, MatCardModule, MatButtonModule,
+    MatButtonToggleModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, MatProgressBarModule,
+    MatProgressSpinnerModule, MatRippleModule],
   templateUrl: './reportarcomponent.html',
+  styleUrl: './reportarcomponent.css',
 })
 export class Reportarcomponent implements OnInit {
   private dS = inject(Datosservice)
@@ -34,6 +50,8 @@ export class Reportarcomponent implements OnInit {
   private browser = isPlatformBrowser(inject(PLATFORM_ID))
   auth = inject(Authservice)
   iconoCategoria = iconoCategoria
+  colorCategoria = colorCategoria
+  stepper = viewChild<MatStepper>('stepper')
 
   datos = signal<Datos | null>(null)
   paso = signal(1)
@@ -41,6 +59,8 @@ export class Reportarcomponent implements OnInit {
   creado = signal<TestimonioDTO | null>(null)
   modoCuenta = signal<'registro' | 'ingreso'>('registro')
   errorCuenta = signal('')
+  procesandoFoto = signal(false)
+  errorFoto = signal('')
   verPass = signal(false)
 
   // Ubicacion
@@ -60,7 +80,7 @@ export class Reportarcomponent implements OnInit {
     descripcionTexto: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(5000)]],
     idZona: [null as number | null],
     direccionTextoExtraida: ['', Validators.maxLength(255)],
-    fotoUrl: ['', Validators.pattern(/^$|^https?:\/\/.+/i)],
+    fotoUrl: [''],   // imagen PNG/JPG como data URL (base64)
     latitud: [null as number | null, [Validators.required, Validators.min(-90), Validators.max(90)]],
     longitud: [null as number | null, [Validators.required, Validators.min(-180), Validators.max(180)]],
   })
@@ -73,6 +93,7 @@ export class Reportarcomponent implements OnInit {
 
   valor = toSignal(this.cambios(), { initialValue: {} as any })
   catSel = computed(() => this.datos()?.cat.get(this.valor().idCategoria) ?? null)
+  categoriasActivas = computed(() => (this.datos()?.categorias ?? []).filter(c => c.activo))
   largo = computed(() => (this.valor().descripcionTexto ?? '').length)
 
   ngOnInit(): void {
@@ -130,6 +151,8 @@ export class Reportarcomponent implements OnInit {
     this.resultados.set(this.geo.buscar(texto, this.indice, 6))
   }
 
+  nombreGeo = (e: GeoIndice | string | null) => typeof e === 'string' ? e : e ? e.n + (e.p ? ', ' + e.p : '') : ''
+
   irA(e: GeoIndice) {
     this.busca.set(e.n + (e.p ? ', ' + e.p : ''))
     this.resultados.set([])
@@ -156,7 +179,8 @@ export class Reportarcomponent implements OnInit {
     const z = this.zonaExistente(d)
     if (z) return of(z.idZona)
     return this.zS.insert({
-      idZona: 0, nombreZona: d.nombre, provinciaZona: d.provNombre ?? '', departamentoZona: d.depNombre ?? '',
+      // id vacio: lo genera la base de datos
+      idZona: null as unknown as number, nombreZona: d.nombre, provinciaZona: d.provNombre ?? '', departamentoZona: d.depNombre ?? '',
       latitudZona: d.centro[0], longitudZona: d.centro[1],
     }).pipe(map(nueva => {
       this.datos()?.zonas.push(nueva)
@@ -180,21 +204,78 @@ export class Reportarcomponent implements OnInit {
         return
       }
     } else {
-      this.form.get('fotoUrl')?.markAsTouched()
       if (!this.distrito()) { this.toast.error('Marca en el mapa dónde ocurre el problema.'); return }
-      if (this.form.get('fotoUrl')?.invalid) return
     }
-    this.paso.set(this.paso() + 1)
-    this.arriba()
+    // El paso actual queda completo y el mat-stepper avanza
+    const st = this.stepper()
+    if (!st?.selected) return
+    st.selected.completed = true
+    st.next()
   }
 
   atras() {
-    this.paso.set(Math.max(1, this.paso() - 1))
-    this.arriba()
+    this.stepper()?.previous()
   }
 
   irAPaso(p: number) {
-    if (p < this.paso()) { this.paso.set(p); this.arriba() }
+    const st = this.stepper()
+    if (st && p < this.paso()) st.selectedIndex = p - 1
+  }
+
+  // Cada cambio de paso del mat-stepper (botones o encabezados)
+  cambioPaso(e: StepperSelectionEvent) {
+    this.paso.set(e.selectedIndex + 1)
+    // Al volver atras, los pasos siguientes se deben validar de nuevo
+    this.stepper()?.steps.forEach((s, i) => { if (i >= e.selectedIndex) s.completed = false })
+    this.arriba()
+  }
+
+  // ---------- foto ----------
+
+  // Solo PNG o JPG. Se reduce a 1280 px y se guarda como JPG para que pese poco.
+  elegirFoto(ev: Event) {
+    const input = ev.target as HTMLInputElement
+    const file = input.files?.[0]
+    this.errorFoto.set('')
+    if (!file) return
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      this.errorFoto.set('Solo se permiten imágenes PNG o JPG.')
+      input.value = ''
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      this.errorFoto.set('La imagen pesa más de 10 MB.')
+      input.value = ''
+      return
+    }
+    this.procesandoFoto.set(true)
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      const max = 1280
+      const k = Math.min(1, max / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * k)
+      canvas.height = Math.round(img.height * k)
+      const ctx = canvas.getContext('2d')!
+      ctx.fillStyle = '#fff'   // fondo blanco para PNG con transparencia
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      this.form.patchValue({ fotoUrl: canvas.toDataURL('image/jpeg', 0.8) })
+      URL.revokeObjectURL(url)
+      this.procesandoFoto.set(false)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      this.procesandoFoto.set(false)
+      this.errorFoto.set('No se pudo leer la imagen.')
+    }
+    img.src = url
+  }
+
+  quitarFoto(input: HTMLInputElement) {
+    input.value = ''
+    this.form.patchValue({ fotoUrl: '' })
   }
 
   cambiarModo(m: 'registro' | 'ingreso') {
@@ -208,7 +289,7 @@ export class Reportarcomponent implements OnInit {
   }
 
   enviar() {
-    if (this.form.invalid || !this.distrito()) { this.paso.set(1); return }
+    if (this.form.invalid || !this.distrito()) { this.irAPaso(1); return }
     let sesion$: Observable<SesionDTO>
     const s = this.auth.sesion()
     if (s) {
@@ -266,7 +347,7 @@ export class Reportarcomponent implements OnInit {
 
   private guardarBorrador(v: any) {
     if (!this.browser) return
-    try { sessionStorage.setItem(BORRADOR, JSON.stringify(v)) } catch { }
+    try { sessionStorage.setItem(BORRADOR, JSON.stringify({ ...v, fotoUrl: '' })) } catch { }
   }
 
   private restaurar() {

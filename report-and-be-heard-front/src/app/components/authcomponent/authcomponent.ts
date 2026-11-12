@@ -7,5 +7,6 @@ import { Logocomponent } from '../logocomponent/logocomponent';
   selector: 'app-authcomponent',
   imports: [RouterOutlet, RouterLink, Logocomponent],
   templateUrl: './authcomponent.html',
+  styleUrl: './authcomponent.css',
 })
 export class Authcomponent {}

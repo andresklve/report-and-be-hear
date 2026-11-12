@@ -3,57 +3,55 @@
 
   <!-- Buscador -->
   <div class="mp-buscar" role="search">
-    <div class="mp-buscar-caja">
-      <span class="ms">search</span>
-      <input type="search" placeholder="Busca un departamento, provincia o distrito…" autocomplete="off"
-             [value]="busqueda()" (input)="buscar($any($event.target).value)" (keydown)="teclado($event)"
-             aria-label="Buscar lugar" aria-autocomplete="list" [attr.aria-expanded]="resultados().length > 0" />
+    <mat-form-field class="mp-buscar-campo" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput type="search" placeholder="Busca un departamento, provincia o distrito…" aria-label="Buscar lugar"
+             [value]="busqueda()" (input)="buscar($any($event.target).value)" [matAutocomplete]="autoMapa" />
       @if (busqueda()) {
-        <button class="icon-btn" (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda"><span class="ms">close</span></button>
+        <button matIconButton matSuffix (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda"><mat-icon>close</mat-icon></button>
       }
-    </div>
-    @if (resultados().length) {
-      <ul class="mp-resultados" role="listbox">
-        @for (r of resultados(); track r.t + r.id; let i = $index) {
-          <li role="option" [class.on]="i === activo()" [attr.aria-selected]="i === activo()"
-              (mousedown)="irA(r)" (mouseenter)="activo.set(i)">
-            <span class="ms">{{ r.t === 'x' ? 'location_on' : r.t === 'p' ? 'map' : 'public' }}</span>
-            <span class="mp-r-txt"><b>{{ r.n }}</b><small>{{ tipo(r.t) }}{{ r.p ? ' · ' + r.p : '' }}</small></span>
-          </li>
+      <mat-autocomplete #autoMapa="matAutocomplete" autoActiveFirstOption (optionSelected)="irA($event.option.value)" [displayWith]="nombreLugar">
+        @for (r of resultados(); track r.t + r.id) {
+          <mat-option [value]="r">
+            <mat-icon>{{ r.t === 'x' ? 'location_on' : r.t === 'p' ? 'map' : 'public' }}</mat-icon>
+            <span class="opt"><b>{{ r.n }}</b><small>{{ tipo(r.t) }}{{ r.p ? ' · ' + r.p : '' }}</small></span>
+          </mat-option>
         }
-      </ul>
-    } @else if (escribiendo() && busqueda().length >= 2) {
-      <div class="mp-resultados mp-sin">No encontramos “{{ busqueda() }}” en el Perú.</div>
-    }
+        @if (!resultados().length && escribiendo() && busqueda().length >= 2) {
+          <mat-option disabled>No encontramos “{{ busqueda() }}” en el Perú.</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
   </div>
 
   <!-- Leyenda -->
-  <div class="mp-leyenda">
+  <mat-card appearance="outlined" class="mp-leyenda">
     <span class="mp-ley-titulo">Quejas por {{ nivelVista() === 'departamentos' ? 'departamento' : nivelVista() === 'provincias' ? 'provincia' : 'distrito' }}</span>
     <span><i [style.background]="colores.bajo"></i>Pocas</span>
     <span><i [style.background]="colores.medio"></i>Moderadas</span>
     <span><i [style.background]="colores.alto"></i>Muchas</span>
     <span><i [style.background]="colores.sin" class="borde"></i>Sin quejas</span>
-  </div>
+  </mat-card>
 
   @if (cargando()) {
-    <div class="mp-cargando"><span class="spinner"></span>Cargando mapa del Perú…</div>
+    <mat-card class="mp-cargando"><mat-spinner diameter="20" />Cargando mapa del Perú…</mat-card>
   }
   @if (error()) {
-    <div class="mp-cargando mp-error"><span class="ms">cloud_off</span>No pudimos conectar con el servidor.</div>
+    <mat-card class="mp-cargando mp-error"><mat-icon>cloud_off</mat-icon>No pudimos conectar con el servidor.</mat-card>
   }
 
   <!-- Panel -->
   <aside class="mp-panel" aria-label="Detalle de la zona">
-    <button class="mp-panel-toggle" (click)="panelAbierto.set(!panelAbierto())" [attr.aria-label]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'">
-      <span class="ms">{{ panelAbierto() ? 'chevron_right' : 'chevron_left' }}</span>
+    <button matIconButton class="mp-panel-toggle" (click)="panelAbierto.set(!panelAbierto())"
+            [matTooltip]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'" [attr.aria-label]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'">
+      <mat-icon>{{ panelAbierto() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
     </button>
 
     <div class="mp-panel-in">
       <nav class="migas" aria-label="Ubicación">
-        @for (m of migas(); track m.id; let ultimo = $last) {
-          <button (click)="m.nivel === 'pais' ? volverPeru() : elegir(m, true)">{{ m.nombre }}</button>
-          <span class="ms">chevron_right</span>
+        @for (m of migas(); track m.id) {
+          <button matButton class="miga" (click)="m.nivel === 'pais' ? volverPeru() : elegir(m, true)">{{ m.nombre }}</button>
+          <mat-icon>chevron_right</mat-icon>
         }
         <span class="miga-actual">{{ sel().nombre }}</span>
       </nav>
@@ -72,7 +70,7 @@
         <div class="mp-estados" aria-label="Estado de las quejas">
           <div class="barra-estados">
             @for (e of resumen().estados; track e.key) {
-              <i [class]="'be-' + e.tono" [style.width.%]="e.pct" [title]="e.label + ': ' + e.n"></i>
+              <i [style.width.%]="e.pct" [style.background]="colorEstado(e.key)" [matTooltip]="e.label + ': ' + e.n"></i>
             }
           </div>
           <ul>
@@ -86,9 +84,9 @@
         <ul class="mp-cats">
           @for (c of resumen().categorias; track c.nombre) {
             <li>
-              <span class="ms">{{ iconoCategoria(c.nombre) }}</span>
+              <mat-icon [style.color]="colorCategoria(c.nombre)">{{ iconoCategoria(c.nombre) }}</mat-icon>
               <span class="mp-cat-n">{{ c.nombre }}</span>
-              <span class="mp-cat-bar"><i [style.width.%]="c.pct"></i></span>
+              <mat-progress-bar mode="determinate" class="mp-cat-bar" [value]="c.pct" [style.--mat-progress-bar-active-indicator-color]="colorCategoria(c.nombre)" />
               <b>{{ c.n }}</b>
             </li>
           }
@@ -99,26 +97,27 @@
 
       @if (hijos().length) {
         <h2 class="mp-sec">{{ tituloHijos() }} con más quejas</h2>
-        <ol class="mp-hijos">
+        <mat-action-list class="mp-hijos">
           @for (h of hijos(); track h.f.properties.id) {
-            <li>
-              <button (click)="elegirHijo(h.f)">
+            <button mat-list-item (click)="elegirHijo(h.f)">
+              <span class="mp-hijo">
                 <i class="sw" [style.background]="colores[h.nivel]"></i>
                 <span class="mp-h-n">{{ h.f.properties.nombre }}</span>
                 <b>{{ h.n }}</b>
-              </button>
-            </li>
+              </span>
+            </button>
           }
-        </ol>
+        </mat-action-list>
       }
 
-      @if (resumen().ultimos.length) {
+      <!-- Las ultimas quejas solo aparecen al elegir un departamento, provincia o distrito -->
+      @if (sel().nivel !== 'pais' && resumen().ultimos.length) {
         <h2 class="mp-sec">Últimas quejas</h2>
         <ul class="mp-ultimos">
           @for (u of resumen().ultimos; track u.t.idTestimonio) {
             <li>
-              <a [routerLink]="['/reporte', u.t.idTestimonio]">
-                <span class="mp-u-top"><span>{{ u.categoria }} · {{ u.zona }}</span><span class="pill" [class]="'pill pill-' + estadoInfo(u.t.estado).tono">{{ estadoInfo(u.t.estado).label }}</span></span>
+              <a [routerLink]="['/reporte', u.t.idTestimonio]" matRipple>
+                <span class="mp-u-top"><span>{{ u.categoria }} · {{ u.zona }}</span><app-estadochipcomponent [estado]="u.t.estado" /></span>
                 <span class="mp-u-txt">{{ u.t.descripcionTexto }}</span>
               </a>
             </li>
@@ -128,8 +127,9 @@
     </div>
 
     <footer class="mp-panel-pie">
-      <a routerLink="/reportar" [queryParams]="reportarParams()" class="btn btn-signal btn-block">
-        <span class="ms">add</span>Reportar un problema{{ sel().nivel === 'distrito' ? ' en ' + sel().nombre : '' }}
+      <a matButton routerLink="/resultados" class="bloque ver-res"><mat-icon>insights</mat-icon>Ver resultados de la gestión</a>
+      <a matButton="filled" routerLink="/reportar" [queryParams]="reportarParams()" class="bloque">
+        <mat-icon>add</mat-icon>Reportar un problema{{ sel().nivel === 'distrito' ? ' en ' + sel().nombre : '' }}
       </a>
     </footer>
   </aside>

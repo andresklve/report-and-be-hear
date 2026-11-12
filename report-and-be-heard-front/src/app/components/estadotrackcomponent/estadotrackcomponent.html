@@ -1,14 +1,9 @@
 @if (info().paso === 0) {
-  <div class="track track-descartado" [class.compacto]="compacto()">
-    <span class="ms">block</span> Descartado
-  </div>
+  <mat-chip class="pill pill-bad" disableRipple><mat-icon matChipAvatar>block</mat-icon>Descartado</mat-chip>
 } @else {
-  <ol class="track" [class.compacto]="compacto()" [attr.aria-label]="'Estado: ' + info().label">
+  <mat-stepper class="track" linear [selectedIndex]="info().paso - 1" [attr.aria-label]="'Estado: ' + info().label">
     @for (p of pasos; track p; let i = $index) {
-      <li [class.hecho]="i < info().paso" [class.actual]="i === info().paso - 1">
-        <span class="track-dot"></span>
-        @if (!compacto()) { <span class="track-lbl">{{ p }}</span> }
-      </li>
+      <mat-step [label]="p" [completed]="i < info().paso - 1 || info().paso === 3" [editable]="false" />
     }
-  </ol>
+  </mat-stepper>
 }

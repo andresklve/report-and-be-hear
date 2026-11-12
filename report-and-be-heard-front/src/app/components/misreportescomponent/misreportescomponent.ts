@@ -1,17 +1,25 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRippleModule } from '@angular/material/core';
 import { Datos, Datosservice } from '../../services/datosservice';
 import { Moderacionservice } from '../../services/moderacionservice';
 import { ModeracionDTO } from '../../models/ModeracionDTO';
 import { Authservice } from '../../services/authservice';
 import { Estadotrackcomponent } from '../estadotrackcomponent/estadotrackcomponent';
-import { estadoInfo, iconoCategoria, referencia } from '../../shared/ui';
+import { Estadochipcomponent } from '../estadochipcomponent/estadochipcomponent';
+import { colorCategoria, iconoCategoria, referencia } from '../../shared/ui';
 
 @Component({
   selector: 'app-misreportescomponent',
-  imports: [RouterLink, Estadotrackcomponent],
+  imports: [RouterLink, Estadotrackcomponent, Estadochipcomponent, MatCardModule, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, MatRippleModule],
   templateUrl: './misreportescomponent.html',
+  styleUrl: './misreportescomponent.css',
 })
 export class Misreportescomponent implements OnInit {
   private dS = inject(Datosservice)
@@ -21,8 +29,10 @@ export class Misreportescomponent implements OnInit {
   datos = signal<Datos | null>(null)
   moderaciones = signal<ModeracionDTO[]>([])
   error = signal(false)
-  estadoInfo = estadoInfo
   iconoCategoria = iconoCategoria
+  colorCategoria = colorCategoria
+  pageIndex = signal(0)
+  pageSize = signal(5)
   referencia = referencia
 
   mios = computed(() => {
@@ -34,6 +44,16 @@ export class Misreportescomponent implements OnInit {
       return { t, ultima, categoria: d.cat.get(t.idCategoria)?.nombreCategoria ?? '', zona: d.zona.get(t.idZona)?.nombreZona ?? '' }
     })
   })
+
+  pagina = computed(() => {
+    const ini = this.pageIndex() * this.pageSize()
+    return this.mios().slice(ini, ini + this.pageSize())
+  })
+
+  cambiarPagina(e: PageEvent) {
+    this.pageIndex.set(e.pageIndex)
+    this.pageSize.set(e.pageSize)
+  }
 
   resumen = computed(() => {
     const l = this.mios()

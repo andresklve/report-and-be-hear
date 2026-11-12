@@ -1,38 +1,154 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Tema de Angular Material 3.
+// Base roja (Perú) y tipografía Public Sans; luego se fijan los colores
+// exactos del sistema para que coincidan con la identidad de ReclamaYA.
 @use '@angular/material' as mat;
 
 html {
-  height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
-}
-
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
+  @include mat.theme((
+    color: (
+      primary: mat.$red-palette,
+      tertiary: mat.$blue-palette,
+      theme-type: light,
+    ),
+    typography: (
+      plain-family: ('Public Sans', system-ui, sans-serif),
+      brand-family: ('Public Sans', system-ui, sans-serif),
+      bold-weight: 700,
+      medium-weight: 600,
+      regular-weight: 400,
+    ),
+    density: 0,
+  ));
 
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
-  height: 100%;
+  // Colores exactos de la marca
+  @include mat.theme-overrides((
+    primary: #C8102E,
+    on-primary: #FFFFFF,
+    primary-container: #FCEBED,
+    on-primary-container: #7A0A1C,
+    secondary-container: #EEF0F2,
+    on-secondary-container: #16191D,
+    surface: #FFFFFF,
+    surface-container-lowest: #FFFFFF,
+    surface-container-low: #F8F9FA,
+    surface-container: #F3F4F6,
+    surface-container-high: #EEF0F2,
+    surface-container-highest: #E1E4E8,
+    on-surface: #16191D,
+    on-surface-variant: #41474F,
+    outline: #9AA1AB,
+    outline-variant: #E1E4E8,
+    error: #B3261E,
+    corner-extra-small: 4px,
+    corner-small: 6px,
+    corner-medium: 8px,
+    corner-large: 12px,
+  ));
 }
+
+/* Ajustes globales de los componentes de Angular Material */
+
+// Íconos: Material Symbols Rounded (se registra en app.ts)
+.mat-icon {
+  flex: none;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  overflow: visible;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+// Botones con esquinas como el resto de la app
+html {
+  @include mat.button-overrides((
+    filled-container-shape: 6px,
+    outlined-container-shape: 6px,
+    text-container-shape: 6px,
+    tonal-container-shape: 6px,
+    filled-label-text-weight: 600,
+    outlined-label-text-weight: 600,
+    text-label-text-weight: 600,
+    tonal-label-text-weight: 600,
+    outlined-outline-color: #C9CED5,
+  ));
+  @include mat.card-overrides((
+    outlined-container-shape: 8px,
+    outlined-outline-color: #E1E4E8,
+    elevated-container-shape: 8px,
+  ));
+  @include mat.button-toggle-overrides((
+    shape: 6px,
+    selected-state-background-color: #16191D,
+    selected-state-text-color: #FFFFFF,
+    divider-color: #C9CED5,
+    height: 36px,
+  ));
+  @include mat.table-overrides((
+    header-headline-color: #6B727C,
+    header-headline-weight: 700,
+    header-headline-size: .76rem,
+    row-item-outline-color: #E1E4E8,
+    background-color: #FFFFFF,
+  ));
+  @include mat.paginator-overrides((
+    container-background-color: #FFFFFF,
+  ));
+  @include mat.snack-bar-overrides((
+    container-color: #16191D,
+    supporting-text-color: #FFFFFF,
+    button-color: #FF8A99,
+  ));
+  @include mat.toolbar-overrides((
+    container-background-color: #FFFFFF,
+    standard-height: 64px,
+    mobile-height: 64px,
+  ));
+}
+
+// Botón oscuro para acciones secundarias importantes
+.mat-mdc-unelevated-button.oscuro:not(:disabled) {
+  --mat-button-filled-container-color: var(--ink);
+  --mat-button-filled-label-text-color: #fff;
+}
+
+// Botón de borrar que pide confirmación (primer clic)
+.mat-mdc-icon-button.peligro, .mat-mdc-button.peligro {
+  --mat-icon-button-icon-color: var(--error);
+  --mat-button-text-label-text-color: var(--error);
+  background: var(--error-soft);
+}
+
+// Spinner dentro de botones
+.mat-mdc-button-base .mat-mdc-progress-spinner { margin-right: 8px; --mat-progress-spinner-active-indicator-color: currentColor; }
+
+// Tablas dentro de tarjetas
+.mat-mdc-table .mat-mdc-header-row { background: var(--surface-2); }
+.mat-mdc-table .mat-mdc-row:hover { background: var(--surface-2); }
+.mat-mdc-cell, .mat-mdc-header-cell { padding: 0 12px !important; }
+.mat-mdc-row { height: 56px; }
+
+// Avisos (snackbar) por tipo
+.snack-ok { --mat-snack-bar-button-color: #7BD389; }
+.snack-error { --mat-snack-bar-container-color: #5C0F17; --mat-snack-bar-button-color: #FFB4BE; }
+
+// Campos de formulario a todo el ancho
+.mat-mdc-form-field.full { width: 100%; }
+
+// Chips de estado
+.mat-mdc-chip.pill {
+  --mat-chip-container-height: 24px;
+  --mat-chip-label-text-size: .74rem;
+  --mat-chip-label-text-weight: 600;
+  --mat-chip-outline-width: 0;
+  --mat-chip-container-shape-radius: 4px;
+  --mat-chip-elevated-container-color: var(--neutral-soft);
+  --mat-chip-label-text-color: var(--ink-2);
+  pointer-events: none;
+}
+.mat-mdc-chip.pill-warn { --mat-chip-elevated-container-color: var(--warn-soft); --mat-chip-label-text-color: var(--warn); }
+.mat-mdc-chip.pill-info { --mat-chip-elevated-container-color: var(--info-soft); --mat-chip-label-text-color: var(--info); }
+.mat-mdc-chip.pill-ok   { --mat-chip-elevated-container-color: var(--ok-soft);   --mat-chip-label-text-color: var(--ok); }
+.mat-mdc-chip.pill-bad  { --mat-chip-elevated-container-color: var(--bad-soft);  --mat-chip-label-text-color: var(--bad); }
+.mat-mdc-chip.pill-error { --mat-chip-elevated-container-color: var(--error-soft); --mat-chip-label-text-color: var(--error); }

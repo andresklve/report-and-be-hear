@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
 import pe.edu.upc.reportandbeheard.repositories.IUsuarioRepository;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.ISuspensionService;
 
 import java.util.List;
 
@@ -16,9 +17,11 @@ import java.util.List;
 public class JwtUserDetailsService implements UserDetailsService {
 
     private final IUsuarioRepository usuarioRepository;
+    private final ISuspensionService suspensionService;
 
-    public JwtUserDetailsService(IUsuarioRepository usuarioRepository) {
+    public JwtUserDetailsService(IUsuarioRepository usuarioRepository, ISuspensionService suspensionService) {
         this.usuarioRepository = usuarioRepository;
+        this.suspensionService = suspensionService;
     }
 
     @Override
@@ -41,6 +44,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .password(usuario.getPasswordHash())
                 .authorities(authorities)
                 .disabled(!Boolean.TRUE.equals(usuario.getActivo()))
+                .accountLocked(suspensionService.vigente(usuario.getIdUsuario()).isPresent())
                 .build();
     }
 }

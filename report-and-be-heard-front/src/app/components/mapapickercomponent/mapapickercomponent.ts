@@ -3,8 +3,9 @@ import type * as Leaflet from 'leaflet';
 
 // Mapa pequeño (Leaflet) para marcar el punto exacto de un reporte o mostrarlo en el detalle
 @Component({
-  selector: 'app-mapa-picker',
+  selector: 'app-mapapickercomponent',
   templateUrl: './mapapickercomponent.html',
+  styleUrl: './mapapickercomponent.css',
 })
 export class Mapapickercomponent implements OnDestroy {
   @ViewChild('lienzo', { static: true }) lienzo!: ElementRef<HTMLDivElement>

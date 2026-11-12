@@ -1,0 +1,82 @@
+<mat-toolbar class="nav">
+  <a routerLink="/" class="nav-brand" aria-label="Inicio"><app-logocomponent /></a>
+
+  <nav class="nav-links" aria-label="Principal">
+    <a mat-button routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a mat-button routerLink="/mapa" routerLinkActive="on">Mapa</a>
+    <a mat-button routerLink="/resultados" routerLinkActive="on">Resultados</a>
+    @if (auth.sesion()) {
+      <a mat-button routerLink="/mis-reportes" routerLinkActive="on">Mis reportes</a>
+    }
+    @if (auth.esEquipo()) {
+      <a mat-button routerLink="/panel" routerLinkActive="on">Panel de gestión</a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  <div class="nav-acts">
+    @if (auth.sesion(); as s) {
+      <!-- Notificaciones -->
+      <button matIconButton class="campana" [matMenuTriggerFor]="menuNotif" (menuOpened)="notif.refrescar()"
+              [matBadge]="notif.noLeidas() > 9 ? '9+' : notif.noLeidas()" [matBadgeHidden]="!notif.noLeidas()" matBadgeSize="small" matBadgeOverlap
+              [attr.aria-label]="notif.noLeidas() ? notif.noLeidas() + ' notificaciones sin leer' : 'Notificaciones'">
+        <mat-icon>{{ notif.noLeidas() ? 'notifications_active' : 'notifications' }}</mat-icon>
+      </button>
+      <mat-menu #menuNotif="matMenu" xPosition="before" class="menu-notif">
+        <div class="notif-head" (click)="$event.stopPropagation()">
+          <strong>Notificaciones</strong>
+          @if (notif.noLeidas()) { <button matButton type="button" (click)="notif.marcarTodas()">Marcar todas como leídas</button> }
+        </div>
+        <mat-divider />
+        @for (n of notif.lista().slice(0, 12); track n.idNotificacion) {
+          <button mat-menu-item class="notif-item" [class.nueva]="!n.leida" (click)="abrir(n)">
+            <mat-icon [class]="'ni-' + n.tipo">{{ iconoNotif(n.tipo) }}</mat-icon>
+            <span class="notif-txt">
+              <span>{{ n.mensaje }}</span>
+              <small>{{ n.fechaCreacion | date:'d MMM, HH:mm' }}</small>
+            </span>
+          </button>
+        } @empty {
+          <p class="notif-vacio">No tienes notificaciones. Te avisaremos aquí cuando la municipalidad atienda tus reportes.</p>
+        }
+      </mat-menu>
+
+      <button matButton="outlined" class="cuenta-btn" [matMenuTriggerFor]="menuCuenta" aria-label="Mi cuenta">
+        <span class="avatar avatar-sm">{{ auth.iniciales() }}</span>
+        <span class="cuenta-nombre">{{ s.nombres }}</span>
+        <mat-icon iconPositionEnd>expand_more</mat-icon>
+      </button>
+      <mat-menu #menuCuenta="matMenu" xPosition="before">
+        <div class="cuenta-head">
+          <strong>{{ s.nombres }} {{ s.apellidos }}</strong>
+          <span>{{ s.correo }}</span>
+          <mat-chip class="rol-tag" disableRipple>{{ rolLabel() }}</mat-chip>
+        </div>
+        <mat-divider />
+        <a mat-menu-item routerLink="/mis-reportes"><mat-icon>receipt_long</mat-icon>Mis reportes</a>
+        @if (auth.esEquipo()) {
+          <a mat-menu-item routerLink="/panel"><mat-icon>space_dashboard</mat-icon>Panel de gestión</a>
+        }
+        <button mat-menu-item (click)="salir()"><mat-icon>logout</mat-icon>Cerrar sesión</button>
+      </mat-menu>
+    } @else {
+      <a matButton routerLink="/ingresar" class="nav-ingresar">Ingresar</a>
+      <a matButton="outlined" routerLink="/registro" class="nav-ingresar">Crear cuenta</a>
+    }
+    <a matButton="filled" routerLink="/reportar" class="nav-reportar"><mat-icon>add</mat-icon>Reportar</a>
+  </div>
+</mat-toolbar>
+
+<!-- Navegacion inferior en celular -->
+<nav class="tabbar" aria-label="Navegación móvil">
+  <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }" matRipple><mat-icon>home</mat-icon>Inicio</a>
+  <a routerLink="/mapa" routerLinkActive="on" matRipple><mat-icon>map</mat-icon>Mapa</a>
+  <a routerLink="/resultados" routerLinkActive="on" matRipple><mat-icon>insights</mat-icon>Resultados</a>
+  <a matFab routerLink="/reportar" class="tab-cta" aria-label="Reportar"><mat-icon>add</mat-icon></a>
+  @if (auth.sesion()) {
+    <a [routerLink]="auth.esEquipo() ? '/panel' : '/mis-reportes'" routerLinkActive="on" matRipple><mat-icon>person</mat-icon>Cuenta</a>
+  } @else {
+    <a routerLink="/ingresar" routerLinkActive="on" matRipple><mat-icon>login</mat-icon>Ingresar</a>
+  }
+</nav>
