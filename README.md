@@ -42,4 +42,4 @@ cd report-and-be-heard-front
 python3 datos-prueba/inyectar_datos.py   # roles, catálogos y cuentas demo
 python3 datos-prueba/inyectar_peru.py    # zonas en las 196 provincias, reclamos y moderaciones
 ```
-Cuentas demo: `ana.torres@demo.pe` (ciudadana), `municipalidad@demo.pe` y `admin@demo.pe`. La contraseña está en `datos-prueba/inyectar_datos.py`.
+Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La contraseña está en `datos-prueba/inyectar_datos.py`.

@@ -118,7 +118,7 @@ public class SuspensionController {
         dto.setActiva(suspension.getActiva());
         dto.setVigente(suspension.estaVigente());
         dto.setNombreUsuario(suspension.getUsuario().getNombres() + " " + suspension.getUsuario().getApellidos());
-        dto.setCorreoUsuario(suspension.getUsuario().getCorreo());
+        dto.setUsernameUsuario(suspension.getUsuario().getUsername());
         return dto;
     }
 }

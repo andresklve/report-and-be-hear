@@ -6,5 +6,5 @@ import pe.edu.upc.reportandbeheard.entities.Usuario;
 import java.util.Optional;
 
 public interface IUsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByCorreo(String correo);
+    Optional<Usuario> findByUsername(String username);
 }

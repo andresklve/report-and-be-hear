@@ -161,7 +161,7 @@
                       <div mat-card-avatar class="avatar avatar-lg">{{ auth.iniciales() }}</div>
                       <mat-card-subtitle>Reportas como</mat-card-subtitle>
                       <mat-card-title>{{ s.nombres }} {{ s.apellidos }}</mat-card-title>
-                      <mat-card-subtitle>{{ s.correo }}</mat-card-subtitle>
+                      <mat-card-subtitle>&#64;{{ s.username }}</mat-card-subtitle>
                     </mat-card-header>
                   } @else {
                     <div class="cuenta-inline" [formGroup]="cuenta">
@@ -178,9 +178,9 @@
                         </div>
                       }
                       <mat-form-field class="full">
-                        <mat-label>Correo</mat-label>
-                        <input matInput type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" />
-                        <mat-error>Ingresa un correo válido.</mat-error>
+                        <mat-label>Usuario</mat-label>
+                        <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+                        <mat-error>{{ usernameAyuda }}</mat-error>
                       </mat-form-field>
                       <mat-form-field class="full">
                         <mat-label>Contraseña</mat-label>

@@ -1,4 +1,5 @@
 import { MatCardModule } from '@angular/material/card';
+import { USERNAME_PATRON, USERNAME_AYUDA } from '../../../shared/ui';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +20,7 @@ import { Toastservice } from '../../../services/toastservice';
   styleUrl: './registrocomponent.css',
 })
 export class Registrocomponent {
+  usernameAyuda = USERNAME_AYUDA
   private auth = inject(Authservice)
   private router = inject(Router)
   private route = inject(ActivatedRoute)
@@ -33,7 +35,7 @@ export class Registrocomponent {
   form = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
-    correo: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   })
 
@@ -49,7 +51,7 @@ export class Registrocomponent {
   })
   fuerzaTxt = computed(() => ['Muy corta', 'Aceptable', 'Buena', 'Fuerte', 'Excelente'][this.fuerza()])
 
-  mal(c: 'nombres' | 'apellidos' | 'correo' | 'password') {
+  mal(c: 'nombres' | 'apellidos' | 'username' | 'password') {
     const ctrl = this.form.controls[c]
     return ctrl.invalid && ctrl.touched
   }
@@ -59,7 +61,7 @@ export class Registrocomponent {
     this.cargando.set(true)
     this.error.set('')
     const v = this.form.value
-    this.auth.registrar(v.nombres!, v.apellidos!, v.correo!, v.password!).subscribe({
+    this.auth.registrar(v.nombres!, v.apellidos!, v.username!, v.password!).subscribe({
       next: s => {
         this.toast.ok(`¡Bienvenida/o, ${s.nombres}! Tu cuenta está lista.`)
         this.router.navigateByUrl(this.volver ?? '/reportar')

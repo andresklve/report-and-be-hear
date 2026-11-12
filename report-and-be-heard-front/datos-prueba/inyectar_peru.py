@@ -113,11 +113,11 @@ NOMBRES = [("Jorge", "Huamán Quispe"), ("María", "Flores Condori"), ("Lucía",
            ("Rosa", "Chávez Paredes"), ("Miguel", "Rojas Vargas"), ("Elena", "Gutiérrez Salazar"), ("Pedro", "Castillo Huanca"),
            ("Carmen", "Vásquez Ríos"), ("José", "Mendoza Aguilar"), ("Ana", "Sánchez Poma"), ("Luis", "Díaz Apaza")]
 usuarios = api("GET", "/apis/usuarios") or []
-correos = {u["correo"] for u in usuarios}
+usernames = {u["username"] for u in usuarios}
 for n, a in NOMBRES:
-    correo = norm(n + "." + a.split()[0]).replace(" ", "") + "@demo.pe"
-    if correo not in correos:
-        u = api("POST", "/apis/usuarios", {"nombres": n, "apellidos": a, "correo": correo, "passwordHash": "Demo1234"})
+    username = norm(n + "." + a.split()[0]).replace(" ", "")
+    if username not in usernames:
+        u = api("POST", "/apis/usuarios", {"nombres": n, "apellidos": a, "username": username, "passwordHash": "Demo1234"})
         if u:
             usuarios.append(u)
 roles = {r["idRol"]: r["nombreRol"] for r in (api("GET", "/apis/roles") or [])}

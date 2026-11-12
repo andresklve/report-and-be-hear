@@ -67,25 +67,25 @@ categorias = sembrar("Categorias", "/apis/categorias", [
 ], "idCategoria")
 
 usuarios = sembrar("Usuarios", "/apis/usuarios", [
-    {"nombres": "Ana", "apellidos": "Torres", "correo": "ana.torres@demo.pe", "passwordHash": "Demo1234"},
-    {"nombres": "Luis", "apellidos": "Quispe", "correo": "luis.quispe@demo.pe", "passwordHash": "Demo1234"},
-    {"nombres": "Rosa", "apellidos": "Mendoza", "correo": "rosa.mendoza@demo.pe", "passwordHash": "Demo1234"},
+    {"nombres": "Ana", "apellidos": "Torres", "username": "ana.torres", "passwordHash": "Demo1234"},
+    {"nombres": "Luis", "apellidos": "Quispe", "username": "luis.quispe", "passwordHash": "Demo1234"},
+    {"nombres": "Rosa", "apellidos": "Mendoza", "username": "rosa.mendoza", "passwordHash": "Demo1234"},
 ], "idUsuario")
 
 # Cuentas del equipo (el registro publico siempre crea CIUDADANO; luego se cambia el rol con PUT)
 ROL = {r["nombreRol"]: r["idRol"] for r in (api("GET", "/apis/roles") or [])}
 todos = api("GET", "/apis/usuarios") or []
-for nombres, apellidos, correo, rol in [
-    ("Carla", "Ramos", "municipalidad@demo.pe", "MUNICIPALIDAD"),
-    ("Admin", "General", "admin@demo.pe", "ADMINISTRADOR"),
+for nombres, apellidos, username, rol in [
+    ("Carla", "Ramos", "municipalidad", "MUNICIPALIDAD"),
+    ("Admin", "General", "admin", "ADMINISTRADOR"),
 ]:
-    u = next((x for x in todos if x["correo"] == correo), None)
+    u = next((x for x in todos if x["username"] == username), None)
     if u is None:
         u = api("POST", "/apis/usuarios", {"nombres": nombres, "apellidos": apellidos,
-                                            "correo": correo, "passwordHash": "Demo1234"})
+                                            "username": username, "passwordHash": "Demo1234"})
     if u and rol in ROL and u.get("idRol") != ROL[rol]:
         if api("PUT", "/apis/usuarios", {**u, "idRol": ROL[rol], "passwordHash": "Demo1234"}):
-            print(f"+ Cuenta {rol}: {correo}")
+            print(f"+ Cuenta {rol}: {username}")
 
 if not (zonas and categorias and usuarios):
     sys.exit("Faltan zonas, categorias o usuarios; no se insertan testimonios.")

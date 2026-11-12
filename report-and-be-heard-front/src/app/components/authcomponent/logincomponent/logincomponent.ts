@@ -1,4 +1,5 @@
 import { MatCardModule } from '@angular/material/card';
+import { USERNAME_PATRON, USERNAME_AYUDA } from '../../../shared/ui';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +19,7 @@ import { Toastservice } from '../../../services/toastservice';
   styleUrl: './logincomponent.css',
 })
 export class Logincomponent {
+  usernameAyuda = USERNAME_AYUDA
   private auth = inject(Authservice)
   private router = inject(Router)
   private route = inject(ActivatedRoute)
@@ -30,20 +32,20 @@ export class Logincomponent {
   volver = this.route.snapshot.queryParamMap.get('volver')
 
   form = this.fb.group({
-    correo: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
     password: ['', Validators.required],
   })
 
-  demo(correo: string) {
-    this.form.setValue({ correo, password: 'Demo1234' })
+  demo(username: string) {
+    this.form.setValue({ username, password: 'Demo1234' })
   }
 
   ingresar() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return }
     this.cargando.set(true)
     this.error.set('')
-    const { correo, password } = this.form.value
-    this.auth.login(correo!, password!).subscribe({
+    const { username, password } = this.form.value
+    this.auth.login(username!, password!).subscribe({
       next: s => {
         this.toast.ok(`Hola de nuevo, ${s.nombres}`)
         this.router.navigateByUrl(this.volver ?? (this.auth.esEquipo() ? '/panel' : '/'))

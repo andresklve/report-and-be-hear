@@ -5,10 +5,10 @@
 
   <form [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
     <mat-form-field>
-      <mat-label>Correo</mat-label>
-      <mat-icon matPrefix>mail</mat-icon>
-      <input matInput type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" />
-      <mat-error>Ingresa un correo válido.</mat-error>
+      <mat-label>Usuario</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+      <mat-error>{{ usernameAyuda }}</mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Contraseña</mat-label>
@@ -31,9 +31,9 @@
   <div class="demo">
     <span class="eyebrow">Cuentas de demostración</span>
     <mat-chip-set aria-label="Cuentas de demostración">
-      <mat-chip (click)="demo('ana.torres@demo.pe')"><mat-icon matChipAvatar>person</mat-icon>Ciudadana</mat-chip>
-      <mat-chip (click)="demo('municipalidad@demo.pe')"><mat-icon matChipAvatar>account_balance</mat-icon>Municipalidad</mat-chip>
-      <mat-chip (click)="demo('admin@demo.pe')"><mat-icon matChipAvatar>admin_panel_settings</mat-icon>Admin</mat-chip>
+      <mat-chip (click)="demo('ana.torres')"><mat-icon matChipAvatar>person</mat-icon>Ciudadana</mat-chip>
+      <mat-chip (click)="demo('municipalidad')"><mat-icon matChipAvatar>account_balance</mat-icon>Municipalidad</mat-chip>
+      <mat-chip (click)="demo('admin')"><mat-icon matChipAvatar>admin_panel_settings</mat-icon>Admin</mat-chip>
     </mat-chip-set>
   </div>
   </mat-card-content>

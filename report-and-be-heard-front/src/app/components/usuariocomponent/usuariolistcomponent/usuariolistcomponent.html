@@ -10,7 +10,7 @@
 <div class="toolbar">
   <mat-form-field class="buscar">
     <mat-icon matPrefix>search</mat-icon>
-    <input matInput type="search" placeholder="Nombre o correo…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+    <input matInput type="search" placeholder="Nombre o usuario…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
   </mat-form-field>
   <mat-button-toggle-group [value]="rolFiltro()" (change)="rolFiltro.set($event.value)" aria-label="Filtrar por rol" hideSingleSelectionIndicator>
     <mat-button-toggle [value]="null">Todos <span class="n">{{ usuarios().length }}</span></mat-button-toggle>
@@ -36,7 +36,7 @@
           <td mat-cell *matCellDef="let u">
             <div class="t-persona">
               <span class="avatar avatar-sm">{{ iniciales(u) }}</span>
-              <div><strong>{{ u.nombres }} {{ u.apellidos }}</strong><span class="muted">{{ u.correo }}</span></div>
+              <div><strong>{{ u.nombres }} {{ u.apellidos }}</strong><span class="muted">&#64;{{ u.username }}</span></div>
             </div>
           </td>
         </ng-container>

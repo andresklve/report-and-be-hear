@@ -4,7 +4,7 @@
 .u-card .mat-mdc-card-header { padding: 16px 16px 8px; }
 .u-card .mat-mdc-card-content { flex: 1; padding: 0 16px; }
 .u-card .mat-mdc-card-title { font-size: .98rem; font-weight: 700; }
-.u-correo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+.u-usuario { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
 .u-dato { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: .82rem; color: var(--ink-3); }
 .u-dato .mat-icon { font-size: 16px; width: 16px; height: 16px; }
 .avatar-lg { width: 40px; height: 40px; }

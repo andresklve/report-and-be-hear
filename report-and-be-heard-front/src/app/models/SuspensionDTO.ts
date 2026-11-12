@@ -13,7 +13,7 @@ export class SuspensionDTO {
   // solo lectura
   vigente: boolean = true;
   nombreUsuario: string = '';
-  correoUsuario: string = '';
+  usernameUsuario: string = '';
 }
 
 export const MOTIVOS_SUSPENSION: { key: MotivoSuspension; label: string }[] = [

@@ -28,17 +28,17 @@ export class Authservice {
   });
 
   // POST /login -> token; luego se completa la sesion con el usuario y su rol
-  login(correo: string, password: string): Observable<SesionDTO> {
-    const body: LoginRequestDTO = { username: correo.trim().toLowerCase(), password };
+  login(username: string, password: string): Observable<SesionDTO> {
+    const body: LoginRequestDTO = { username: username.trim().toLowerCase(), password };
     return this.http.post<LoginResponseDTO>(`${environment.base}/login`, body).pipe(
       switchMap(res => forkJoin({ usuarios: this.uS.list(), roles: this.rS.list() }).pipe(
         map(({ usuarios, roles }) => {
-          const u = usuarios.find(x => x.correo.toLowerCase() === res.username.toLowerCase())
+          const u = usuarios.find(x => x.username.toLowerCase() === res.username.toLowerCase())
           if (!u) throw new Error('Usuario no encontrado')
           const rol = (roles.find(r => r.idRol === u.idRol)?.nombreRol ?? 'CIUDADANO') as RolNombre
           const s: SesionDTO = {
             token: res.token, idUsuario: u.idUsuario, nombres: u.nombres,
-            apellidos: u.apellidos, correo: u.correo, rol
+            apellidos: u.apellidos, username: u.username, rol
           }
           this.guardar(s)
           return s
@@ -48,13 +48,13 @@ export class Authservice {
   }
 
   // Registro publico: el backend siempre crea al usuario como CIUDADANO
-  registrar(nombres: string, apellidos: string, correo: string, password: string): Observable<SesionDTO> {
+  registrar(nombres: string, apellidos: string, username: string, password: string): Observable<SesionDTO> {
     const u: UsuarioDTO = {
       idUsuario: 0, idRol: 0, nombres: nombres.trim(), apellidos: apellidos.trim(),
-      correo: correo.trim().toLowerCase(), passwordHash: password, fechaRegistro: null, activo: true
+      username: username.trim().toLowerCase(), passwordHash: password, fechaRegistro: null, activo: true
     }
     return this.uS.insert(u).pipe(
-      switchMap(() => this.login(u.correo, password))
+      switchMap(() => this.login(u.username, password))
     )
   }
 
@@ -80,7 +80,9 @@ export class Authservice {
     if (!this.browser) return null
     try {
       const raw = localStorage.getItem(CLAVE)
-      return raw ? JSON.parse(raw) as SesionDTO : null
+      const s = raw ? JSON.parse(raw) as SesionDTO : null
+      // Las sesiones guardadas antes del cambio a username (tenian correo) ya no sirven
+      return s?.username ? s : null
     } catch {
       return null
     }
@@ -89,9 +91,9 @@ export class Authservice {
   static mensajeError(err: any): string {
     if (err?.status === 0) return 'No pudimos conectar con el servidor. Intenta de nuevo en un momento.'
     if (/suspendida/i.test(err?.error?.message ?? '')) return err.error.message
-    if (err?.status === 401 || err?.status === 403) return 'Correo o contraseña incorrectos.'
+    if (err?.status === 401 || err?.status === 403) return 'Usuario o contraseña incorrectos.'
     const msg: string = err?.error?.message ?? ''
-    if (/correo|unique|duplicad|llave duplicada/i.test(msg)) return 'Ese correo ya está registrado. Prueba iniciando sesión.'
+    if (/ya está en uso|unique|duplicad|llave duplicada/i.test(msg)) return 'Ese nombre de usuario ya existe. Elige otro o inicia sesión.'
     return msg || 'Algo salió mal. Intenta otra vez.'
   }
 }

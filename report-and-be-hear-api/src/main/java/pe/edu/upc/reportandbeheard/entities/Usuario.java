@@ -20,8 +20,8 @@ public class Usuario {
     @Column(name = "apellidos", length = 100, nullable = false)
     private String apellidos;
 
-    @Column(name = "correo", length = 150, nullable = false, unique = true)
-    private String correo;
+    @Column(name = "username", length = 50, nullable = false, unique = true)
+    private String username;
 
     @Column(name = "passwordHash", length = 255, nullable = false)
     private String passwordHash;
@@ -42,8 +42,8 @@ public class Usuario {
     public void setNombres(String nombres) { this.nombres = nombres; }
     public String getApellidos() { return apellidos; }
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }

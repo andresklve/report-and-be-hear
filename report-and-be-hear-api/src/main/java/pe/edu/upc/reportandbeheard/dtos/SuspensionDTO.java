@@ -32,7 +32,7 @@ public class SuspensionDTO {
     // Solo lectura
     private Boolean vigente;
     private String nombreUsuario;
-    private String correoUsuario;
+    private String usernameUsuario;
 
     public Long getIdSuspension() { return idSuspension; }
     public void setIdSuspension(Long idSuspension) { this.idSuspension = idSuspension; }
@@ -56,6 +56,6 @@ public class SuspensionDTO {
     public void setVigente(Boolean vigente) { this.vigente = vigente; }
     public String getNombreUsuario() { return nombreUsuario; }
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
-    public String getCorreoUsuario() { return correoUsuario; }
-    public void setCorreoUsuario(String correoUsuario) { this.correoUsuario = correoUsuario; }
+    public String getUsernameUsuario() { return usernameUsuario; }
+    public void setUsernameUsuario(String usernameUsuario) { this.usernameUsuario = usernameUsuario; }
 }

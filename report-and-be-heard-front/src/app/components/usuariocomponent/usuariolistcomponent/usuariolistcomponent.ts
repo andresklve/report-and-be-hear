@@ -63,7 +63,7 @@ export class Usuariolistcomponent implements OnInit {
     return this.usuarios().filter(u =>
       (this.rolFiltro() == null || u.idRol === this.rolFiltro()) &&
       enRango(u.fechaRegistro, this.desde(), this.hasta()) &&
-      (!q || `${u.nombres} ${u.apellidos} ${u.correo}`.toLowerCase().includes(q)))
+      (!q || `${u.nombres} ${u.apellidos} ${u.username}`.toLowerCase().includes(q)))
   })
   pagina = computed(() => {
     const ini = this.pageIndex() * this.pageSize()

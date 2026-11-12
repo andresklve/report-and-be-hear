@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.UsuarioDTO;
 import pe.edu.upc.reportandbeheard.entities.Rol;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
+import pe.edu.upc.reportandbeheard.exceptions.OperacionNoPermitidaException;
 import pe.edu.upc.reportandbeheard.exceptions.ResourceNotFoundException;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IRolService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IUsuarioService;
@@ -74,8 +75,12 @@ public class UsuarioController {
                     );
         }
 
+        String username = normalizarUsername(dto.getUsername());
+        validarUsernameLibre(username, null);
+
         Usuario usuario = modelMapper.map(dto, Usuario.class);
         usuario.setIdUsuario(null); // un registro siempre crea; nunca pisa un usuario existente
+        usuario.setUsername(username);
         usuario.setRol(rol);
         usuario.setActivo(esAdmin && dto.getActivo() != null ? dto.getActivo() : Boolean.TRUE);
         usuario.setPasswordHash(passwordEncoder.encode(dto.getPasswordHash()));
@@ -129,7 +134,9 @@ public class UsuarioController {
         }
         existente.setNombres(dto.getNombres());
         existente.setApellidos(dto.getApellidos());
-        existente.setCorreo(dto.getCorreo());
+        String username = normalizarUsername(dto.getUsername());
+        validarUsernameLibre(username, existente.getIdUsuario());
+        existente.setUsername(username);
         String nuevaPassword = dto.getPasswordHash();
         if (nuevaPassword == null || nuevaPassword.isBlank()) {
             // sin contrasena nueva: se conserva el hash que ya tiene el usuario
@@ -171,5 +178,21 @@ public class UsuarioController {
         return authentication != null && authentication.getAuthorities()
                 .stream()
                 .anyMatch(a -> "ADMINISTRADOR".equals(a.getAuthority()));
+    }
+
+    // El nombre de usuario se guarda sin espacios y en minusculas
+    private String normalizarUsername(String username) {
+        return username.trim().toLowerCase();
+    }
+
+    // Evita dos cuentas con el mismo nombre de usuario (idActual = el usuario que se edita)
+    private void validarUsernameLibre(String username, Long idActual) {
+        uS.list().stream()
+                .filter(u -> u.getUsername().equalsIgnoreCase(username))
+                .filter(u -> !u.getIdUsuario().equals(idActual))
+                .findAny()
+                .ifPresent(u -> {
+                    throw new OperacionNoPermitidaException("El nombre de usuario '" + username + "' ya está en uso.");
+                });
     }
 }

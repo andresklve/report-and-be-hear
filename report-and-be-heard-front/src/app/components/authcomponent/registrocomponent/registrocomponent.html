@@ -17,10 +17,10 @@
       </mat-form-field>
     </div>
     <mat-form-field>
-      <mat-label>Correo</mat-label>
-      <mat-icon matPrefix>mail</mat-icon>
-      <input matInput type="email" formControlName="correo" autocomplete="email" placeholder="tu@correo.com" />
-      <mat-error>Ingresa un correo válido.</mat-error>
+      <mat-label>Usuario</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+      <mat-error>{{ usernameAyuda }}</mat-error>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Contraseña</mat-label>

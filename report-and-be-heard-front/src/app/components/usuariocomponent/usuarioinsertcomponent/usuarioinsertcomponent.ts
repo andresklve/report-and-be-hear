@@ -1,3 +1,4 @@
+import { USERNAME_PATRON, USERNAME_AYUDA } from '../../../shared/ui';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -26,6 +27,7 @@ import { Toastservice } from '../../../services/toastservice';
   styleUrl: './usuarioinsertcomponent.css',
 })
 export class Usuarioinsertcomponent implements OnInit {
+  usernameAyuda = USERNAME_AYUDA
   private uS = inject(Usuarioservice)
   private rS = inject(Rolservice)
   private toast = inject(Toastservice)
@@ -43,7 +45,7 @@ export class Usuarioinsertcomponent implements OnInit {
   form = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
-    correo: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
     // Al editar, la contraseña es opcional: vacía = se mantiene la actual
     passwordHash: ['', this.edicion ? [Validators.minLength(6)] : [Validators.required, Validators.minLength(6)]],
     idRol: [null as number | null, Validators.required],
@@ -60,7 +62,7 @@ export class Usuarioinsertcomponent implements OnInit {
       this.uS.listId(this.id).subscribe({
         next: u => {
           this.original = u
-          this.form.patchValue({ nombres: u.nombres, apellidos: u.apellidos, correo: u.correo, idRol: u.idRol, activo: u.activo, passwordHash: '' })
+          this.form.patchValue({ nombres: u.nombres, apellidos: u.apellidos, username: u.username, idRol: u.idRol, activo: u.activo, passwordHash: '' })
         },
         error: () => this.error.set('No se encontró el usuario.'),
       })
@@ -71,7 +73,7 @@ export class Usuarioinsertcomponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return }
     const v = this.form.value
     const datos = {
-      nombres: v.nombres!.trim(), apellidos: v.apellidos!.trim(), correo: v.correo!.trim().toLowerCase(),
+      nombres: v.nombres!.trim(), apellidos: v.apellidos!.trim(), username: v.username!.trim().toLowerCase(),
       idRol: v.idRol!, activo: v.activo ?? true,
     }
     let peticion: Observable<UsuarioDTO>
@@ -93,7 +95,7 @@ export class Usuarioinsertcomponent implements OnInit {
       },
       error: err => {
         this.guardando.set(false)
-        this.error.set(/correo|duplic|unique/i.test(err.error?.message ?? '') ? 'Ese correo ya está registrado.' : (err.error?.message ?? 'No se pudo guardar el usuario'))
+        this.error.set(/ya está en uso|duplic|unique/i.test(err.error?.message ?? '') ? 'Ese nombre de usuario ya existe.' : (err.error?.message ?? 'No se pudo guardar el usuario'))
       },
     })
   }

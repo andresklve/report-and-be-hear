@@ -28,7 +28,7 @@ import { SesionDTO } from '../../models/SesionDTO';
 import { GeoIndice, GeoProps } from '../../models/GeoDTO';
 import { Mapapickercomponent } from '../mapapickercomponent/mapapickercomponent';
 import { Estadotrackcomponent } from '../estadotrackcomponent/estadotrackcomponent';
-import { colorCategoria, iconoCategoria, referencia } from '../../shared/ui';
+import { colorCategoria, iconoCategoria, referencia, USERNAME_PATRON, USERNAME_AYUDA } from '../../shared/ui';
 
 const BORRADOR = 'rbh.borrador';
 
@@ -41,6 +41,7 @@ const BORRADOR = 'rbh.borrador';
   styleUrl: './reportarcomponent.css',
 })
 export class Reportarcomponent implements OnInit {
+  usernameAyuda = USERNAME_AYUDA
   private dS = inject(Datosservice)
   private tS = inject(Testimonioservice)
   private zS = inject(Zonaservice)
@@ -87,7 +88,7 @@ export class Reportarcomponent implements OnInit {
   cuenta: FormGroup = this.fb.group({
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
-    correo: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   })
 
@@ -299,8 +300,8 @@ export class Reportarcomponent implements OnInit {
       if (this.cuenta.invalid) { this.errorCuenta.set('Completa tus datos para enviar el reporte.'); return }
       const c = this.cuenta.value
       sesion$ = this.modoCuenta() === 'registro'
-        ? this.auth.registrar(c.nombres, c.apellidos, c.correo, c.password)
-        : this.auth.login(c.correo, c.password)
+        ? this.auth.registrar(c.nombres, c.apellidos, c.username, c.password)
+        : this.auth.login(c.username, c.password)
     }
     this.enviando.set(true)
     this.errorCuenta.set('')

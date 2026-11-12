@@ -19,7 +19,7 @@
     <table mat-table [dataSource]="filtradas()">
       <ng-container matColumnDef="usuario">
         <th mat-header-cell *matHeaderCellDef>Cuenta</th>
-        <td mat-cell *matCellDef="let s"><div class="persona"><strong>{{ s.nombreUsuario }}</strong><span class="muted">{{ s.correoUsuario }}</span></div></td>
+        <td mat-cell *matCellDef="let s"><div class="persona"><strong>{{ s.nombreUsuario }}</strong><span class="muted">&#64;{{ s.usernameUsuario }}</span></div></td>
       </ng-container>
       <ng-container matColumnDef="motivo">
         <th mat-header-cell *matHeaderCellDef>Motivo</th>

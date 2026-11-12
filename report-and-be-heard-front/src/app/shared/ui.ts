@@ -76,3 +76,7 @@ export function enRango(fecha: string | null | undefined, desde: Date | null, ha
   if (hasta && f >= new Date(hasta.getFullYear(), hasta.getMonth(), hasta.getDate() + 1).getTime()) return false;
   return true;
 }
+
+// Nombre de usuario: 3 a 30 caracteres (letras, numeros, punto, guion o guion bajo). Igual que en el backend.
+export const USERNAME_PATRON = /^[a-zA-Z0-9._-]{3,30}$/;
+export const USERNAME_AYUDA = 'Usa de 3 a 30 caracteres: letras, números, punto, guion o guion bajo.';

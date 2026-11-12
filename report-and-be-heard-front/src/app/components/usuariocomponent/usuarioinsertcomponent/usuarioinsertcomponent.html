@@ -18,9 +18,9 @@
         <mat-error>Campo obligatorio.</mat-error>
       </mat-form-field>
       <mat-form-field class="campo-full">
-        <mat-label>Correo</mat-label>
-        <input matInput type="email" formControlName="correo" placeholder="persona@municipalidad.gob.pe" />
-        <mat-error>Ingresa un correo válido.</mat-error>
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="username" autocomplete="off" placeholder="ej. jperez" />
+        <mat-error>{{ usernameAyuda }}</mat-error>
       </mat-form-field>
       <mat-form-field class="campo-full">
         <mat-label>{{ edicion ? 'Nueva contraseña (opcional)' : 'Contraseña inicial' }}</mat-label>

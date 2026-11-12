@@ -15,6 +15,6 @@ export class SesionDTO {
   idUsuario: number = 0;
   nombres: string = '';
   apellidos: string = '';
-  correo: string = '';
+  username: string = '';
   rol: RolNombre = 'CIUDADANO';
 }
