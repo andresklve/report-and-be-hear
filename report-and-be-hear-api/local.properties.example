@@ -1,0 +1,5 @@
+# Copie este archivo como local.properties (en esta misma carpeta) y ponga los datos de su PostgreSQL.
+# local.properties no se sube a git.
+spring.datasource.url=jdbc:postgresql://localhost:5432/BDReportAndBeHeard
+spring.datasource.username=postgres
+spring.datasource.password=su_contrasena
