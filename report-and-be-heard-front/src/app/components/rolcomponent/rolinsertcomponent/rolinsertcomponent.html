@@ -1,0 +1,32 @@
+<a matButton routerLink="/panel/roles" class="volver"><mat-icon>arrow_back</mat-icon>Roles</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>badge</mat-icon></div>
+    <mat-card-title>{{ edicion ? 'Editar rol' : 'Nuevo rol' }}</mat-card-title>
+    <mat-card-subtitle>Perfiles de acceso. El sistema usa ADMINISTRADOR, MUNICIPALIDAD y CIUDADANO.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+    <mat-card-content class="form-grid">
+      <mat-form-field class="campo-full">
+        <mat-label>Nombre del rol</mat-label>
+        <input matInput formControlName="nombreRol" placeholder="MUNICIPALIDAD" />
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Descripción (opcional)</mat-label>
+        <input matInput formControlName="descripcionRol" placeholder="Atiende y modera los testimonios" />
+      </mat-form-field>
+      @if (error()) { <p class="alerta campo-full"><mat-icon>error</mat-icon>{{ error() }}</p> }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/roles">Cancelar</a>
+      <span class="spacer"></span>
+      @if (!edicion) {
+        <button matButton="outlined" type="button" (click)="registrar(true)" [disabled]="guardando()">Guardar y agregar otro</button>
+      }
+      <button matButton="filled" type="submit" [disabled]="guardando()">
+        @if (guardando()) { <mat-spinner diameter="18" /> } {{ edicion ? 'Guardar cambios' : 'Guardar' }}
+      </button>
+    </mat-card-actions>
+  </form>
+</mat-card>

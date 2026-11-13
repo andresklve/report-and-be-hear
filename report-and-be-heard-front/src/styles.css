@@ -1,0 +1,200 @@
+/* Estilos globales de ReclamaYA. El tema de Angular Material esta en material-theme.scss;
+   los estilos de cada pantalla estan en el .css de su componente. */
+
+/* ===================== Paleta y medidas de la app ===================== */
+/* Paleta de ReclamaYA
+   - Rojo Perú solo para acciones (lo aplica el tema de Material).
+   - Estados: cada estado tiene un color fijo en toda la app.
+   - Categorías: un color por tipo de problema, distinguible para daltónicos
+     (basado en la paleta Okabe-Ito).
+   - Mapa: semáforo de verde a rojo según la cantidad de quejas. */
+:root {
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --surface-2: #F8F9FA;
+  --ink: #16191D;
+  --ink-2: #41474F;
+  --ink-3: #6B727C;
+  --line: #E1E4E8;
+  --line-2: #C9CED5;
+  --signal: #C8102E;
+  --signal-ink: #A00C24;
+  --signal-soft: #FCEBED;
+  --focus: #1E5EFF;
+  --neutral-soft: #EEF0F2;
+
+  /* Estados de un reclamo (texto oscuro + fondo suave + color de gráfico) */
+  --warn: #8A5300;    --warn-soft: #FFF3DF;   --warn-chart: #E8A317;   /* Recibido */
+  --info: #1F5FAD;    --info-soft: #E6EEF8;   --info-chart: #2F7BD6;   /* En atención */
+  --ok: #2E7D32;      --ok-soft: #E7F3E8;     --ok-chart: #3A9A48;     /* Resuelto */
+  --bad: #5B636D;     --bad-soft: #EEF0F2;    --bad-chart: #9AA1AB;    /* Descartado */
+  --error: #B3261E;   --error-soft: #FBE9E7;                            /* Errores de formulario */
+
+  /* Categorías */
+  --cat-baches: #0072B2;
+  --cat-basura: #009E73;
+  --cat-seguridad: #CC79A7;
+  --cat-alumbrado: #E69F00;
+  --cat-agua: #56B4E9;
+  --cat-otros: #7A8089;
+
+  /* Series de los reportes */
+  --chart-tendencia: #2F7BD6;
+  --chart-ranking: #41474F;
+  --chart-dinero: #00876C;
+
+  /* Semáforo del mapa */
+  --mapa-sin: #E9ECEF;
+  --mapa-bajo: #3FA34D;
+  --mapa-medio: #F2A007;
+  --mapa-alto: #D62828;
+
+  --f: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --r-sm: 4px;
+  --r: 6px;
+  --r-lg: 8px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+  --shadow-lg: 0 8px 24px rgba(16, 24, 40, .14);
+  --nav-h: 64px;
+}
+
+/* ===================== Reset y utilidades de texto ===================== */
+/* Reset y utilidades de texto */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -.01em; line-height: 1.2; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+.app-main { min-height: calc(100vh - var(--nav-h)); }
+.mono { font-family: var(--f-mono); font-size: .82em; }
+.muted { color: var(--ink-3); }
+.spacer { flex: 1; }
+.lead { font-size: 1.02rem; color: var(--ink-2); max-width: 62ch; }
+.eyebrow { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-3); margin-bottom: 6px; }
+.page-top { padding-top: 32px; padding-bottom: 20px; }
+.page-title { font-size: 1.75rem; margin-bottom: 6px; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 0 14px; }
+  body { padding-bottom: 68px; }   /* espacio para la barra inferior fija del celular */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* ===================== Bloques que usan varias pantallas ===================== */
+/* Bloques que se repiten en varias pantallas (panel, listas y formularios).
+   Lo que es de una sola pantalla está en el .css de su componente. */
+
+/* ---------- Encabezado de página del panel ---------- */
+.p-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.p-head h1 { font-size: 1.5rem; }
+.p-head .eyebrow { margin-bottom: 2px; }
+.p-head p.muted { margin-top: 4px; max-width: 64ch; }
+
+/* ---------- Barra de búsqueda y filtros sobre una tabla ---------- */
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.toolbar .buscar { width: 320px; max-width: 100%; }
+.toolbar .mat-mdc-form-field-subscript-wrapper { display: none; }
+
+/* ---------- Tabla dentro de una tarjeta ---------- */
+.tabla-card { overflow: hidden; }
+.tabla-card .tabla-scroll { overflow-x: auto; }
+.tabla-card table { width: 100%; }
+.t-id { width: 64px; }
+.t-acc { text-align: right !important; white-space: nowrap; width: 1%; }
+.t-rep { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.t-ico { flex: none; width: 32px; height: 32px; border-radius: var(--r); display: grid; place-items: center; background: var(--neutral-soft); color: var(--ink-2); }
+.clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--ink-2); font-size: .86rem; max-width: 56ch; }
+
+/* ---------- Estado vacío ---------- */
+.vacio { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 32px 16px; color: var(--ink-3); }
+.vacio .mat-icon { font-size: 30px; width: 30px; height: 30px; color: var(--line-2); }
+
+/* ---------- Avatar con iniciales ---------- */
+.avatar { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; font-size: .78rem; font-weight: 700; }
+.avatar-sm { width: 28px; height: 28px; font-size: .7rem; }
+.avatar-lg { width: 44px; height: 44px; font-size: .95rem; background: var(--signal); }
+
+/* ---------- Etiqueta de categoría y lugar ---------- */
+/* Etiqueta de categoria (mat-chip) */
+.cat-tag { --mat-chip-container-height: 28px; --mat-chip-label-text-weight: 600; --mat-chip-label-text-size: .82rem; }
+.cat-tag .sw { width: 10px; height: 10px; border-radius: 2px; }
+.lugar { display: inline-flex; align-items: center; gap: 4px; font-size: .84rem; color: var(--ink-2); }
+.lugar .mat-icon { color: var(--ink-3); font-size: 18px; width: 18px; height: 18px; }
+
+/* ---------- Punto de color por estado ---------- */
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.dot-warn { background: var(--warn-chart); }
+.dot-info { background: var(--info-chart); }
+.dot-ok { background: var(--ok-chart); }
+.dot-bad { background: var(--bad-chart); }
+
+/* ---------- Enlace "volver" ---------- */
+.volver { margin: 0 0 12px -8px; }
+
+/* ---------- Formularios del panel (insertar) ---------- */
+.form-panel { width: 100%; max-width: 720px; }
+.form-panel .mat-mdc-card-header { padding: 20px 24px 8px; }
+.form-panel .mat-mdc-card-content { padding: 12px 24px 4px; }
+.form-panel .mat-mdc-card-subtitle { font-weight: 400; color: var(--ink-3); margin-top: 2px; }
+.form-panel .mat-mdc-card-title { font-size: 1.3rem; font-weight: 700; }
+.form-ico { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--r-lg); background: var(--neutral-soft); color: var(--ink-2); }
+.form-grid, .mat-mdc-card-content.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+.campo-full { grid-column: 1 / -1; }
+.form-acciones { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px 24px 20px !important; border-top: 1px solid var(--line); margin-top: 4px; }
+
+/* ---------- Mensaje de error de formulario ---------- */
+.alerta { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; margin: 0 0 14px; border-radius: var(--r); background: var(--error-soft); color: var(--error); font-size: .88rem; font-weight: 500; border-left: 3px solid var(--error); }
+
+/* ---------- Carga ---------- */
+.cargando-barra { position: relative; height: 4px; }
+
+@media (max-width: 760px) {
+  .form-grid, .mat-mdc-card-content.form-grid { grid-template-columns: 1fr; }
+  .toolbar .buscar { width: 100%; }
+}
+
+/* ===================== Mapas: Leaflet crea su HTML fuera de los componentes ===================== */
+/* Leaflet crea los tooltips, etiquetas y marcadores fuera de los componentes
+   de Angular, por eso sus estilos tienen que ser globales. */
+.leaflet-container { font-family: var(--f); background: #DDE3E8; }
+.leaflet-control-zoom a { color: var(--ink) !important; }
+.leaflet-bar { border: 1px solid var(--line-2) !important; box-shadow: var(--shadow) !important; }
+.leaflet-control-attribution { font-size: 10px; }
+.leaflet-interactive:focus { outline: none; }
+
+/* Tooltip del mapa del Perú */
+.mp-tip { padding: 6px 10px; border-radius: var(--r); border: 0; box-shadow: var(--shadow-lg); font-family: var(--f); font-size: .82rem; color: var(--ink-2); }
+.mp-tip span { display: block; font-weight: 700; color: var(--ink); font-size: .9rem; }
+.mp-tip small { display: block; color: var(--ink-3); margin-bottom: 2px; }
+.mp-tip b { color: var(--ink); }
+
+/* Nombres de departamentos, provincias y distritos */
+.mp-etq span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font-weight: 600; color: #1D2228; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; pointer-events: none; font-size: 11px; }
+.mp-etq-dep span { text-transform: uppercase; letter-spacing: .04em; }
+.mp-etq-dist span { font-weight: 500; }
+
+/* Marcador del punto del reclamo */
+.pin span { position: absolute; left: 2px; top: 0; width: 24px; height: 24px; border-radius: 50% 50% 50% 0; background: var(--signal); transform: rotate(-45deg); box-shadow: 0 2px 6px rgba(0, 0, 0, .35); border: 2px solid #fff; }
+.pin span::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: #fff; }
+
+/* Menu de notificaciones (navbar): panel mas ancho */
+.mat-mdc-menu-panel.menu-notif { width: 380px; max-width: calc(100vw - 24px); }

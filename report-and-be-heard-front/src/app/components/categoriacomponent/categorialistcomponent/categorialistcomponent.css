@@ -1,0 +1,2 @@
+/* El ícono de cada categoría toma el color de su categoría (paleta de reportes) */
+.cat-ico { background: color-mix(in srgb, currentColor 12%, white); }

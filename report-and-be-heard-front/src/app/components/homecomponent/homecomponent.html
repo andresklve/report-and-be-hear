@@ -1,0 +1,105 @@
+<!-- ===== Presentacion con la Plaza de Armas de Lima ===== -->
+<section class="intro">
+  <img class="intro-foto" src="img/portada.webp" alt="" width="1860" height="1080" fetchpriority="high" />
+  <div class="wrap intro-in">
+    <div class="intro-txt">
+      <mat-chip class="intro-insignia" disableRipple>
+        <img matChipAvatar src="img/bandera.webp" alt="Bandera del Perú" width="390" height="252" />
+        Plataforma de reclamos ciudadanos
+      </mat-chip>
+      <h1>Reclamos ciudadanos del Perú, en un solo mapa</h1>
+      <p class="lead">Reporte un problema de su distrito y vea cómo lo atiende su municipalidad.</p>
+      <div class="acciones">
+        <a matButton="filled" routerLink="/reportar"><mat-icon>add</mat-icon>Reportar un problema</a>
+        <a matButton="outlined" routerLink="/mapa" class="btn-claro"><mat-icon>map</mat-icon>Ver el mapa</a>
+      </div>
+    </div>
+    <a routerLink="/mapa" class="intro-mapa" aria-label="Ir al mapa de reclamos">
+      <img src="img/mapa-departamentos-claro.svg" alt="Mapa del Perú por departamentos" width="620" height="898" />
+    </a>
+  </div>
+  <span class="intro-franja" aria-hidden="true"></span>
+</section>
+
+<!-- ===== Informacion de la plataforma ===== -->
+<section class="sec info">
+  <div class="wrap">
+    <p class="info-txt">
+      ReclamaYA reúne en un solo lugar los reclamos sobre los servicios de la ciudad: baches, alumbrado, basura,
+      seguridad y agua y desagüe. Cada reclamo se ubica en su distrito a partir del punto que se marca en el mapa,
+      con los límites oficiales del INEI.
+    </p>
+    <div class="info-cols">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>person</mat-icon>
+          <mat-card-title>Vecinos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content><p>Reportan el problema con una descripción, una foto y el punto exacto en el mapa. Cada reclamo recibe un código RYA para hacerle seguimiento desde <a routerLink="/mis-reportes">Mis reportes</a>.</p></mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>account_balance</mat-icon>
+          <mat-card-title>Municipalidades</mat-card-title>
+        </mat-card-header>
+        <mat-card-content><p>Reciben los reclamos en su bandeja y registran cada acción: en atención, resuelto o descartado, siempre con una nota que explica lo que se hizo.</p></mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>public</mat-icon>
+          <mat-card-title>Cualquier persona</mat-card-title>
+        </mat-card-header>
+        <mat-card-content><p>Puede ver sin cuenta el <a routerLink="/mapa">mapa de reclamos</a> por departamento, provincia y distrito, y los <a routerLink="/resultados">resultados de la gestión</a>.</p></mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="galeria">
+      <mat-card appearance="outlined" class="g-foto">
+        <img mat-card-image src="img/comunidad.webp" alt="Dos mujeres andinas con mantas tradicionales frente a los nevados del Valle Sagrado" width="739" height="415" loading="lazy" />
+      </mat-card>
+      <mat-card appearance="outlined" class="g-noticia">
+        <img mat-card-image src="img/noticia.webp" alt="Noticia: Perú tiene las playas más contaminadas del Pacífico. El 69% de los residuos de las playas peruanas son plásticos." width="399" height="501" loading="lazy" />
+        <mat-card-content class="g-pie">El 69% de los residuos en las playas peruanas son plásticos. Fuente: InnovaLab, 2025.</mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Preguntas frecuentes ===== -->
+<section class="sec alt">
+  <div class="wrap">
+    <header class="sec-head">
+      <h2>Preguntas frecuentes</h2>
+    </header>
+    <mat-accordion class="faq">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header><mat-panel-title>¿Necesito una cuenta para reportar?</mat-panel-title></mat-expansion-panel-header>
+        <p>Sí, para registrar un reclamo se necesita una cuenta con nombre y correo. Se puede crear en el mismo formulario del reclamo, sin perder lo escrito. Para ver el mapa o los resultados no se necesita cuenta.</p>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header><mat-panel-title>¿Cómo hago seguimiento a mi reclamo?</mat-panel-title></mat-expansion-panel-header>
+        <p>Cada reclamo recibe un código con el formato RYA-0000. Con su cuenta puede verlos todos en <a routerLink="/mis-reportes">Mis reportes</a>, donde se muestra el estado y la última nota de la municipalidad.</p>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header><mat-panel-title>¿Qué significa cada estado?</mat-panel-title></mat-expansion-panel-header>
+        <ul class="faq-est">
+          <li><i class="dot dot-warn"></i><b>Recibido:</b> el reclamo está registrado y en la bandeja de la municipalidad.</li>
+          <li><i class="dot dot-info"></i><b>En atención:</b> la municipalidad programó una acción, como una cuadrilla o una inspección.</li>
+          <li><i class="dot dot-ok"></i><b>Resuelto:</b> el problema fue atendido y la nota de cierre queda publicada.</li>
+          <li><i class="dot dot-bad"></i><b>Descartado:</b> el reclamo no procede, por ejemplo por estar duplicado. Se indica el motivo.</li>
+        </ul>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header><mat-panel-title>¿Cuánto tarda la atención?</mat-panel-title></mat-expansion-panel-header>
+        <p>
+          @if (tiempo()) { Actualmente, la municipalidad registra la primera acción en <b>{{ tiempo() }}</b> en promedio. }
+          Depende del tipo de problema y de la zona. Cada acción queda registrada con su fecha en el historial del reclamo.
+        </p>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header><mat-panel-title>¿Quién puede ver mi reclamo?</mat-panel-title></mat-expansion-panel-header>
+        <p>La descripción, la ubicación, la foto y el historial de acciones son públicos, para que cualquier persona pueda hacer seguimiento. Su nombre y su correo no se muestran en las páginas públicas.</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</section>
