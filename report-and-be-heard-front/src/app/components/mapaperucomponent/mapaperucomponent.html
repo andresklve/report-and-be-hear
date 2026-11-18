@@ -1,0 +1,136 @@
+<section class="mp" [class.mp-panel-cerrado]="!panelAbierto()">
+  <div class="mp-mapa" #lienzo aria-label="Mapa del Perú con quejas por zona"></div>
+
+  <!-- Buscador -->
+  <div class="mp-buscar" role="search">
+    <mat-form-field class="mp-buscar-campo" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput type="search" placeholder="Busca un departamento, provincia o distrito…" aria-label="Buscar lugar"
+             [value]="busqueda()" (input)="buscar($any($event.target).value)" [matAutocomplete]="autoMapa" />
+      @if (busqueda()) {
+        <button matIconButton matSuffix (click)="limpiarBusqueda()" aria-label="Limpiar búsqueda"><mat-icon>close</mat-icon></button>
+      }
+      <mat-autocomplete #autoMapa="matAutocomplete" autoActiveFirstOption (optionSelected)="irA($event.option.value)" [displayWith]="nombreLugar">
+        @for (r of resultados(); track r.t + r.id) {
+          <mat-option [value]="r">
+            <mat-icon>{{ r.t === 'x' ? 'location_on' : r.t === 'p' ? 'map' : 'public' }}</mat-icon>
+            <span class="opt"><b>{{ r.n }}</b><small>{{ tipo(r.t) }}{{ r.p ? ' · ' + r.p : '' }}</small></span>
+          </mat-option>
+        }
+        @if (!resultados().length && escribiendo() && busqueda().length >= 2) {
+          <mat-option disabled>No encontramos “{{ busqueda() }}” en el Perú.</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+  <!-- Leyenda -->
+  <mat-card appearance="outlined" class="mp-leyenda">
+    <span class="mp-ley-titulo">Quejas por {{ nivelVista() === 'departamentos' ? 'departamento' : nivelVista() === 'provincias' ? 'provincia' : 'distrito' }}</span>
+    <span><i [style.background]="colores.bajo"></i>Pocas</span>
+    <span><i [style.background]="colores.medio"></i>Moderadas</span>
+    <span><i [style.background]="colores.alto"></i>Muchas</span>
+    <span><i [style.background]="colores.sin" class="borde"></i>Sin quejas</span>
+  </mat-card>
+
+  @if (cargando()) {
+    <mat-card class="mp-cargando"><mat-spinner diameter="20" />Cargando mapa del Perú…</mat-card>
+  }
+  @if (error()) {
+    <mat-card class="mp-cargando mp-error"><mat-icon>cloud_off</mat-icon>No pudimos conectar con el servidor.</mat-card>
+  }
+
+  <!-- Panel -->
+  <aside class="mp-panel" aria-label="Detalle de la zona">
+    <button matIconButton class="mp-panel-toggle" (click)="panelAbierto.set(!panelAbierto())"
+            [matTooltip]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'" [attr.aria-label]="panelAbierto() ? 'Ocultar panel' : 'Mostrar panel'">
+      <mat-icon>{{ panelAbierto() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+
+    <div class="mp-panel-in">
+      <nav class="migas" aria-label="Ubicación">
+        @for (m of migas(); track m.id) {
+          <button matButton class="miga" (click)="m.nivel === 'pais' ? volverPeru() : elegir(m, true)">{{ m.nombre }}</button>
+          <mat-icon>chevron_right</mat-icon>
+        }
+        <span class="miga-actual">{{ sel().nombre }}</span>
+      </nav>
+
+      <header class="mp-head">
+        <h1>{{ sel().nombre }}</h1>
+        <p>{{ sel().sub }}</p>
+      </header>
+
+      <div class="mp-total">
+        <div><b>{{ resumen().total.toLocaleString('es-PE') }}</b><span>quejas registradas</span></div>
+        <div><b>{{ resumen().resueltos | number:'1.0-0' }}%</b><span>resueltas</span></div>
+      </div>
+
+      @if (resumen().total) {
+        <div class="mp-estados" aria-label="Estado de las quejas">
+          <div class="barra-estados">
+            @for (e of resumen().estados; track e.key) {
+              <i [style.width.%]="e.pct" [style.background]="colorEstado(e.key)" [matTooltip]="e.label + ': ' + e.n"></i>
+            }
+          </div>
+          <ul>
+            @for (e of resumen().estados; track e.key) {
+              <li><span class="dot" [class]="'dot dot-' + e.tono"></span>{{ e.label }}<b>{{ e.n }}</b></li>
+            }
+          </ul>
+        </div>
+
+        <h2 class="mp-sec">Qué se reporta</h2>
+        <ul class="mp-cats">
+          @for (c of resumen().categorias; track c.nombre) {
+            <li>
+              <mat-icon [style.color]="colorCategoria(c.nombre)">{{ iconoCategoria(c.nombre) }}</mat-icon>
+              <span class="mp-cat-n">{{ c.nombre }}</span>
+              <mat-progress-bar mode="determinate" class="mp-cat-bar" [value]="c.pct" [style.--mat-progress-bar-active-indicator-color]="colorCategoria(c.nombre)" />
+              <b>{{ c.n }}</b>
+            </li>
+          }
+        </ul>
+      } @else if (!cargando()) {
+        <p class="mp-vacio">Aún no hay quejas registradas aquí.</p>
+      }
+
+      @if (hijos().length) {
+        <h2 class="mp-sec">{{ tituloHijos() }} con más quejas</h2>
+        <mat-action-list class="mp-hijos">
+          @for (h of hijos(); track h.f.properties.id) {
+            <button mat-list-item (click)="elegirHijo(h.f)">
+              <span class="mp-hijo">
+                <i class="sw" [style.background]="colores[h.nivel]"></i>
+                <span class="mp-h-n">{{ h.f.properties.nombre }}</span>
+                <b>{{ h.n }}</b>
+              </span>
+            </button>
+          }
+        </mat-action-list>
+      }
+
+      <!-- Las ultimas quejas solo aparecen al elegir un departamento, provincia o distrito -->
+      @if (sel().nivel !== 'pais' && resumen().ultimos.length) {
+        <h2 class="mp-sec">Últimas quejas</h2>
+        <ul class="mp-ultimos">
+          @for (u of resumen().ultimos; track u.t.idTestimonio) {
+            <li>
+              <a [routerLink]="['/reporte', u.t.idTestimonio]" matRipple>
+                <span class="mp-u-top"><span>{{ u.categoria }} · {{ u.zona }}</span><app-estadochipcomponent [estado]="u.t.estado" /></span>
+                <span class="mp-u-txt">{{ u.t.descripcionTexto }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <footer class="mp-panel-pie">
+      <a matButton routerLink="/resultados" class="bloque ver-res"><mat-icon>insights</mat-icon>Ver resultados de la gestión</a>
+      <a matButton="filled" routerLink="/reportar" [queryParams]="reportarParams()" class="bloque">
+        <mat-icon>add</mat-icon>Reportar un problema{{ sel().nivel === 'distrito' ? ' en ' + sel().nombre : '' }}
+      </a>
+    </footer>
+  </aside>
+</section>
