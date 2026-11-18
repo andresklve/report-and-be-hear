@@ -1,0 +1,6 @@
+.toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar .n { margin-left: 6px; font-size: .74rem; opacity: .75; }
+.persona { display: flex; flex-direction: column; }
+.persona .muted { font-size: .8rem; }
+.detalle { font-size: .8rem; max-width: 42ch; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.peligro { color: var(--signal); }

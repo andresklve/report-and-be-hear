@@ -1,0 +1,19 @@
+<header class="pag-head">
+  <h2>Tipos de problema</h2>
+  <p>Distribución de los reclamos registrados{{ r.departamento() ? ' en ' + r.departamento() : '' }} según el tipo de problema reportado.</p>
+</header>
+
+<mat-card appearance="outlined" class="tarjeta dos">
+  <div>
+    <h3>Reclamos por tipo de problema</h3>
+    <p class="sub">Cantidad de reclamos y porcentaje sobre el total ({{ r.cifras().total.toLocaleString('es-PE') }}).</p>
+    <app-columnascomponent [items]="r.columnasCategorias()" [alto]="260" vacio="No se registran reclamos." />
+  </div>
+  @if (r.porCategoria()[0]; as top) {
+    <aside class="nota">
+      <span class="nota-tit">Dato principal</span>
+      <p><b>{{ top.nombre }}</b> es el problema más reportado: {{ r.pctDe(top.total, r.cifras().total) }}% de los reclamos.</p>
+      @if (r.porCategoria()[1]; as seg) { <p>Le sigue <b>{{ seg.nombre }}</b> con {{ r.pctDe(seg.total, r.cifras().total) }}%.</p> }
+    </aside>
+  }
+</mat-card>
