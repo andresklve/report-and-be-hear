@@ -29,7 +29,7 @@ public class TestimonioDTO {
     @Schema(description = "Texto del testimonio", example = "Gracias a la atención oportuna del equipo, mi caso fue resuelto de manera rápida y clara.")
     private String descripcionTexto;
 
-    @Schema(description = "URL de la foto adjunta al testimonio", example = "https://example.com/foto.jpg")
+    @Schema(description = "Foto adjunta: imagen PNG/JPG en base64 (data URL) o un enlace", example = "data:image/jpeg;base64,/9j/4AAQ...")
     private String fotoUrl;
 
     @Schema(description = "Dirección extraída del texto del testimonio", example = "Av. Brasil 123, Lima")

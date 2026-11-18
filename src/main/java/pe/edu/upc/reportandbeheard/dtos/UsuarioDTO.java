@@ -1,7 +1,7 @@
 package pe.edu.upc.reportandbeheard.dtos;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +16,10 @@ public class UsuarioDTO {
     @NotBlank(message = "Los apellidos son obligatorios.")
     private String apellidos;
 
-    @NotBlank(message = "El correo es obligatorio.")
-    @Email(message = "El correo no tiene un formato válido.")
-    private String correo;
+    @NotBlank(message = "El nombre de usuario es obligatorio.")
+    @Pattern(regexp = "^[a-zA-Z0-9._-]{3,30}$",
+            message = "El nombre de usuario debe tener de 3 a 30 caracteres: letras, números, punto, guion o guion bajo.")
+    private String username;
 
     @NotBlank(message = "La contraseña es obligatoria.")
     private String passwordHash;
@@ -35,8 +36,8 @@ public class UsuarioDTO {
     public void setNombres(String nombres) { this.nombres = nombres; }
     public String getApellidos() { return apellidos; }
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }

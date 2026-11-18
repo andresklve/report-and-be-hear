@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
 import pe.edu.upc.reportandbeheard.repositories.IUsuarioRepository;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.ISuspensionService;
 
 import java.util.List;
 
@@ -16,16 +17,18 @@ import java.util.List;
 public class JwtUserDetailsService implements UserDetailsService {
 
     private final IUsuarioRepository usuarioRepository;
+    private final ISuspensionService suspensionService;
 
-    public JwtUserDetailsService(IUsuarioRepository usuarioRepository) {
+    public JwtUserDetailsService(IUsuarioRepository usuarioRepository, ISuspensionService suspensionService) {
         this.usuarioRepository = usuarioRepository;
+        this.suspensionService = suspensionService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        Usuario usuario = usuarioRepository.findByCorreo(username)
+        Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
                                 "Usuario no encontrado: " + username
@@ -37,10 +40,11 @@ public class JwtUserDetailsService implements UserDetailsService {
         );
 
         return User.builder()
-                .username(usuario.getCorreo())
+                .username(usuario.getUsername())
                 .password(usuario.getPasswordHash())
                 .authorities(authorities)
                 .disabled(!Boolean.TRUE.equals(usuario.getActivo()))
+                .accountLocked(suspensionService.vigente(usuario.getIdUsuario()).isPresent())
                 .build();
     }
 }

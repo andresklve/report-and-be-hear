@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class TestimonioResponseDTO {
     @Schema(description = "Identificador del testimonio", example = "1")
@@ -40,6 +41,17 @@ public class TestimonioResponseDTO {
 
     @Schema(description = "Modelo de IA que clasificó el testimonio", example = "gemini-2.0-flash")
     private String modeloIA;
+
+    @Schema(description = "Fecha y hora en que se registró el testimonio", example = "2026-11-05T20:24:48")
+    private LocalDateTime fechaCreacion;
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
 
     public Long getIdTestimonio() {
         return idTestimonio;

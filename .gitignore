@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 build.log
+
+### Configuracion local (credenciales de cada PC) ###
+local.properties

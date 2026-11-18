@@ -21,6 +21,7 @@ import pe.edu.upc.reportandbeheard.entities.Usuario;
 import pe.edu.upc.reportandbeheard.entities.Zona;
 import pe.edu.upc.reportandbeheard.exceptions.ResourceNotFoundException;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.ICategoriaService;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.ISuspensionService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.ITestimonioService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IUsuarioService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IZonaService;
@@ -37,14 +38,17 @@ public class TestimonioController {
     private final ICategoriaService cS;
     private final IZonaService zS;
     private final ModelMapper modelMapper;
+    private final ISuspensionService sS;
 
     public TestimonioController(ITestimonioService tS, IUsuarioService uS,
-                               ICategoriaService cS, IZonaService zS, ModelMapper modelMapper) {
+                               ICategoriaService cS, IZonaService zS, ModelMapper modelMapper,
+                               ISuspensionService sS) {
         this.tS = tS;
         this.uS = uS;
         this.cS = cS;
         this.zS = zS;
         this.modelMapper = modelMapper;
+        this.sS = sS;
     }
 
     @Operation(summary = "Registrar un testimonio", description = "Crea un nuevo testimonio para un usuario, categoría y zona específicos.")
@@ -58,6 +62,7 @@ public class TestimonioController {
     public ResponseEntity<TestimonioDTO> registrar(@Valid @RequestBody TestimonioDTO dto) {
         Usuario usuario = uS.listId(dto.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el id: " + dto.getIdUsuario()));
+        sS.validarNoSuspendido(usuario.getIdUsuario());
         Categoria categoria = cS.listId(dto.getIdCategoria())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + dto.getIdCategoria()));
         Zona zona = zS.listId(dto.getIdZona())
