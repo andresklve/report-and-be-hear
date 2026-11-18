@@ -1,0 +1,14 @@
+<ul class="barras">
+  @for (b of items(); track b.label) {
+    <li [matTooltip]="b.label + ': ' + (b.texto ?? b.valor)" matTooltipPosition="above">
+      <span class="b-lbl">
+        @if (b.color) { <i class="b-sw" [style.background]="b.color"></i> }
+        {{ b.label }}
+      </span>
+      <mat-progress-bar mode="determinate" class="b-track" [value]="(b.valor / max()) * 100" [style.--mat-progress-bar-active-indicator-color]="b.color ?? color()" />
+      <b class="b-val">{{ b.texto ?? b.valor }}</b>
+    </li>
+  } @empty {
+    <li class="b-vacio">{{ vacio() }}</li>
+  }
+</ul>

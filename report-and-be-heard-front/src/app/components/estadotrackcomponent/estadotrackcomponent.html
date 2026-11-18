@@ -1,0 +1,9 @@
+@if (info().paso === 0) {
+  <mat-chip class="pill pill-bad" disableRipple><mat-icon matChipAvatar>block</mat-icon>Descartado</mat-chip>
+} @else {
+  <mat-stepper class="track" linear [selectedIndex]="info().paso - 1" [attr.aria-label]="'Estado: ' + info().label">
+    @for (p of pasos; track p; let i = $index) {
+      <mat-step [label]="p" [completed]="i < info().paso - 1 || info().paso === 3" [editable]="false" />
+    }
+  </mat-stepper>
+}

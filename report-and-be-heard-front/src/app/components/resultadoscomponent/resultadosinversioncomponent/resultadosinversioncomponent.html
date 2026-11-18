@@ -1,0 +1,20 @@
+<header class="pag-head">
+  <h2>Inversión por departamento</h2>
+  <p>Participación de cada departamento en la inversión registrada en intervenciones, en porcentaje del total nacional.</p>
+</header>
+
+<mat-card appearance="outlined" class="tarjeta">
+  <h3>Participación en la inversión nacional</h3>
+  <p class="sub">Los 25 departamentos, de mayor a menor.@if (r.departamento()) { El departamento elegido aparece en rojo. }</p>
+  <app-columnascomponent [items]="r.barrasInversion()" [alto]="240" color="var(--chart-dinero)" vacio="No se registra inversión." />
+</mat-card>
+
+<aside class="nota abajo">
+  <span class="nota-tit">Dato principal</span>
+  @if (r.inversionElegido(); as e) {
+    @if (e.puesto) { <p><b>{{ e.dep }}</b> ocupa el puesto {{ e.puesto }} de {{ e.de }} departamentos en inversión.</p> }
+    @else { <p>No se registra inversión en <b>{{ e.dep }}</b>.</p> }
+  } @else if (r.barrasInversion().length >= 3) {
+    <p><b>{{ r.barrasInversion()[0].label }}</b>, {{ r.barrasInversion()[1].label }} y {{ r.barrasInversion()[2].label }} concentran el {{ r.top3Inversion() }}% de la inversión.</p>
+  }
+</aside>

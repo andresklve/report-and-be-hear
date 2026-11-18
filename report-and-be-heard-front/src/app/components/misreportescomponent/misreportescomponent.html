@@ -1,0 +1,50 @@
+<section class="page-top wrap">
+  <p class="eyebrow">Mis reportes</p>
+  <h1 class="page-title">Hola, {{ auth.sesion()?.nombres }}.</h1>
+  @if (datos()) {
+    <p class="lead">
+      @if (resumen().total === 0) { Aún no has reportado nada. Cuando lo hagas, verás aquí cómo avanza cada caso. }
+      @else { Tienes <b>{{ resumen().abiertos }}</b> {{ resumen().abiertos === 1 ? 'caso abierto' : 'casos abiertos' }} y <b>{{ resumen().resueltos }}</b> {{ resumen().resueltos === 1 ? 'resuelto' : 'resueltos' }}. }
+    </p>
+  }
+</section>
+
+<section class="wrap mis">
+  @if (!datos() && !error()) { <mat-progress-bar mode="indeterminate" /> }
+
+  @for (x of pagina(); track x.t.idTestimonio) {
+    <mat-card appearance="outlined" class="mi-item">
+      <a class="mi-link" [routerLink]="['/reporte', x.t.idTestimonio]" matRipple>
+        <span class="mi-ico" [style.color]="colorCategoria(x.categoria)"><mat-icon>{{ iconoCategoria(x.categoria) }}</mat-icon></span>
+        <div class="mi-body">
+          <div class="mi-top">
+            <span class="mono muted">{{ referencia(x.t.idTestimonio) }}</span>
+            <app-estadochipcomponent [estado]="x.t.estado" />
+          </div>
+          <p class="mi-txt">{{ x.t.descripcionTexto }}</p>
+          <span class="lugar"><mat-icon>location_on</mat-icon>{{ x.zona }} · {{ x.categoria }}</span>
+          @if (x.ultima?.motivo) {
+            <p class="mi-nota"><mat-icon>chat_bubble</mat-icon><span><b>Municipalidad:</b> {{ x.ultima?.motivo }}</span></p>
+          }
+        </div>
+        <div class="mi-track"><app-estadotrackcomponent [estado]="x.t.estado" /></div>
+      </a>
+    </mat-card>
+  } @empty {
+    @if (datos()) {
+      <mat-card appearance="outlined" class="vacio-grande">
+        <img src="img/sin-reportes.svg" alt="" width="480" height="240" class="vacio-img" />
+        <h3>Tu primer reporte está a un minuto</h3>
+        <p class="muted">Cuenta qué pasa en tu barrio y síguelo desde aquí.</p>
+        <a matButton="filled" routerLink="/reportar"><mat-icon>add_comment</mat-icon>Reportar un problema</a>
+      </mat-card>
+    } @else if (error()) {
+      <div class="vacio"><mat-icon>cloud_off</mat-icon><h3>Sin conexión</h3></div>
+    }
+  }
+
+  @if (mios().length > pageSize()) {
+    <mat-paginator [length]="mios().length" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+                   [pageSizeOptions]="[5, 10, 20]" (page)="cambiarPagina($event)" showFirstLastButtons />
+  }
+</section>

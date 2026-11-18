@@ -1,0 +1,49 @@
+<header class="pag-head">
+  <h2>Casos resueltos</h2>
+  <p>Intervenciones registradas como resueltas por la municipalidad{{ r.departamento() ? ' en ' + r.departamento() : '' }}, de la más reciente a la más antigua. Seleccione un caso para ver su detalle.</p>
+</header>
+
+<div class="barra">
+  <mat-form-field class="buscar">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Buscar casos resueltos</mat-label>
+    <input matInput type="search" placeholder="Problema, distrito, nota o código RYA-…" [value]="texto()" (input)="texto.set($any($event.target).value)" />
+    @if (texto()) {
+      <button matIconButton matSuffix type="button" (click)="texto.set('')" aria-label="Limpiar búsqueda"><mat-icon>close</mat-icon></button>
+    }
+  </mat-form-field>
+  <span class="muted">{{ filtrados().length.toLocaleString('es-PE') }} {{ filtrados().length === 1 ? 'caso' : 'casos' }}</span>
+</div>
+
+<!-- Filtro por tipo de problema -->
+<mat-chip-listbox class="tipos" aria-label="Tipo de problema" [value]="categoria()" (change)="categoria.set($event.value ?? '')" hideSingleSelectionIndicator>
+  <mat-chip-option value="">Todos <span class="n">{{ r.resueltos().length }}</span></mat-chip-option>
+  @for (c of categorias(); track c.nombre) {
+    <mat-chip-option [value]="c.nombre" [style.--cat]="colorCategoria(c.nombre)">
+      <mat-icon matChipAvatar>{{ iconoCategoria(c.nombre) }}</mat-icon>{{ c.nombre }} <span class="n">{{ c.n }}</span>
+    </mat-chip-option>
+  }
+</mat-chip-listbox>
+
+<div class="casos">
+  @for (h of pagina(); track h.m.idModeracion) {
+    <mat-card appearance="outlined" class="caso">
+      <a [routerLink]="['/reporte', h.t.idTestimonio]" matRipple>
+        <div class="caso-top">
+          <span class="h-ico" [style.color]="colorCategoria(h.categoria)"><mat-icon>{{ iconoCategoria(h.categoria) }}</mat-icon></span>
+          <div><b>{{ h.categoria }}</b><small>{{ h.lugar }}</small></div>
+        </div>
+        <p class="caso-txt">{{ h.t.descripcionTexto }}</p>
+        <p class="caso-nota"><mat-icon>check_circle</mat-icon>{{ h.m.motivo || 'Trabajo terminado' }}</p>
+        <small class="caso-fecha">Resuelto el {{ h.m.fechaAccion | date:'d MMM y' }} · {{ referencia(h.t.idTestimonio) }}</small>
+      </a>
+    </mat-card>
+  } @empty {
+    <p class="muted sin">{{ texto() || categoria() ? 'No se encontraron casos con esa búsqueda.' : 'No se registran reclamos resueltos.' }}</p>
+  }
+</div>
+
+@if (filtrados().length > pageSize()) {
+  <mat-paginator [length]="filtrados().length" [pageIndex]="pageIndex()" [pageSize]="pageSize()"
+                 [pageSizeOptions]="[9, 18, 36]" (page)="cambiarPagina($event)" showFirstLastButtons />
+}
