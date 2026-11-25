@@ -1,0 +1,9 @@
+.n { margin-left: 4px; font-size: .75rem; opacity: .7; }
+
+.t-persona { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.t-persona div { display: flex; flex-direction: column; }
+.t-persona .muted { font-size: .82rem; }
+
+/* Vista de tarjetas */
+.u-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; padding: 16px; background: var(--surface-2); }
+.u-vacio { grid-column: 1 / -1; }

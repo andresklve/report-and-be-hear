@@ -1,0 +1,40 @@
+<mat-card appearance="outlined" class="auth-caja">
+  <mat-card-content>
+  <h1>Bienvenido de vuelta</h1>
+  <p class="muted">Ingresa para seguir tus reportes{{ volver?.startsWith('/panel') ? ' o gestionar tu municipalidad' : '' }}.</p>
+
+  <form [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+      <mat-error>{{ usernameAyuda }}</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input matInput [type]="verPass() ? 'text' : 'password'" formControlName="password" autocomplete="current-password" />
+      <button matIconButton matSuffix type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+        <mat-icon>{{ verPass() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error>Escribe tu contraseña.</mat-error>
+    </mat-form-field>
+    @if (error()) { <p class="alerta"><mat-icon>error</mat-icon>{{ error() }}</p> }
+    <button matButton="filled" type="submit" class="bloque oscuro" [disabled]="cargando()">
+      @if (cargando()) { <mat-spinner diameter="18" />Ingresando… } @else { Ingresar }
+    </button>
+  </form>
+
+  <p class="auth-alt">¿No tienes cuenta? <a [routerLink]="['/registro']" [queryParams]="volver ? { volver } : {}">Créala en 30 segundos</a></p>
+  <p class="auth-alt muted">No necesitas cuenta para ver el mapa. <a routerLink="/mapa">Ir al mapa</a></p>
+
+  <div class="demo">
+    <span class="eyebrow">Cuentas de demostración</span>
+    <mat-chip-set aria-label="Cuentas de demostración">
+      <mat-chip (click)="demo('ana.torres')"><mat-icon matChipAvatar>person</mat-icon>Ciudadana</mat-chip>
+      <mat-chip (click)="demo('municipalidad')"><mat-icon matChipAvatar>account_balance</mat-icon>Municipalidad</mat-chip>
+      <mat-chip (click)="demo('admin')"><mat-icon matChipAvatar>admin_panel_settings</mat-icon>Admin</mat-chip>
+    </mat-chip-set>
+  </div>
+  </mat-card-content>
+</mat-card>

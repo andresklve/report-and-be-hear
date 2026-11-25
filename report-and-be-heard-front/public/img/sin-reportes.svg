@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" role="img" aria-labelledby="t">
+  <title id="t">Calle de una ciudad del Perú con un bache, un poste de luz y un contenedor de basura</title>
+  <!-- cielo -->
+  <rect width="480" height="240" fill="#F3F6FA"/>
+  <circle cx="400" cy="52" r="22" fill="#FFE2A8"/>
+  <!-- edificios del fondo -->
+  <g fill="#DCE3EB">
+    <rect x="18" y="70" width="58" height="110"/>
+    <rect x="84" y="96" width="44" height="84"/>
+    <rect x="300" y="60" width="52" height="120"/>
+    <rect x="360" y="92" width="64" height="88"/>
+    <rect x="430" y="76" width="40" height="104"/>
+  </g>
+  <!-- municipalidad -->
+  <g>
+    <rect x="150" y="86" width="140" height="94" fill="#FFFFFF" stroke="#C9CED5" stroke-width="2"/>
+    <polygon points="140,88 220,48 300,88" fill="#C8102E"/>
+    <rect x="212" y="30" width="2" height="22" fill="#41474F"/>
+    <rect x="214" y="30" width="18" height="8" fill="#C8102E"/>
+    <rect x="214" y="38" width="18" height="4" fill="#FFFFFF"/>
+    <g fill="#E1E4E8">
+      <rect x="164" y="102" width="14" height="60"/>
+      <rect x="190" y="102" width="14" height="60"/>
+      <rect x="236" y="102" width="14" height="60"/>
+      <rect x="262" y="102" width="14" height="60"/>
+    </g>
+    <rect x="210" y="128" width="20" height="52" fill="#41474F"/>
+  </g>
+  <!-- ventanas fondo -->
+  <g fill="#FFFFFF">
+    <rect x="28" y="82" width="10" height="10"/><rect x="48" y="82" width="10" height="10"/>
+    <rect x="28" y="104" width="10" height="10"/><rect x="48" y="104" width="10" height="10"/>
+    <rect x="312" y="74" width="10" height="10"/><rect x="330" y="74" width="10" height="10"/>
+    <rect x="312" y="96" width="10" height="10"/><rect x="330" y="96" width="10" height="10"/>
+    <rect x="372" y="104" width="12" height="10"/><rect x="398" y="104" width="12" height="10"/>
+  </g>
+  <!-- vereda y pista -->
+  <rect y="180" width="480" height="12" fill="#C9CED5"/>
+  <rect y="192" width="480" height="48" fill="#41474F"/>
+  <g fill="#FFFFFF" opacity=".85">
+    <rect x="20" y="214" width="40" height="4" rx="2"/><rect x="100" y="214" width="40" height="4" rx="2"/>
+    <rect x="260" y="214" width="40" height="4" rx="2"/><rect x="340" y="214" width="40" height="4" rx="2"/>
+    <rect x="420" y="214" width="40" height="4" rx="2"/>
+  </g>
+  <!-- bache (azul: categoria Baches) -->
+  <ellipse cx="200" cy="218" rx="34" ry="8" fill="#1E2328"/>
+  <ellipse cx="200" cy="216" rx="34" ry="6" fill="none" stroke="#0072B2" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <!-- poste de luz (naranja: Alumbrado) -->
+  <rect x="112" y="110" width="4" height="72" fill="#6B727C"/>
+  <path d="M114 112 q0 -10 14 -10 h6" fill="none" stroke="#6B727C" stroke-width="4"/>
+  <rect x="130" y="100" width="14" height="6" rx="2" fill="#6B727C"/>
+  <path d="M131 106 l-8 22 h28 l-8 -22z" fill="#E69F00" opacity=".35"/>
+  <!-- contenedor de basura (verde: Basura) -->
+  <rect x="330" y="156" width="26" height="26" rx="3" fill="#009E73"/>
+  <rect x="327" y="151" width="32" height="6" rx="2" fill="#007A59"/>
+  <!-- pin de reclamo -->
+  <g transform="translate(186 150)">
+    <path d="M14 0C6 0 0 6 0 14c0 10 14 24 14 24s14-14 14-24C28 6 22 0 14 0z" fill="#C8102E"/>
+    <circle cx="14" cy="14" r="5" fill="#FFFFFF"/>
+  </g>
+</svg>

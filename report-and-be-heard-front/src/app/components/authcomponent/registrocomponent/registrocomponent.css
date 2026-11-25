@@ -1,0 +1,23 @@
+/* Estilos comunes de la seccion */
+/* Estilos compartidos por las cajas de ingreso y registro */
+.auth-caja { width: 100%; max-width: 440px; }
+.auth-caja mat-card-content { padding: 28px; }
+.auth-caja h1 { font-size: 1.7rem; margin-bottom: 4px; }
+.auth-caja > p.muted { margin-bottom: 24px; }
+.fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+mat-form-field { width: 100%; margin-bottom: 4px; }
+.bloque { width: 100%; height: 44px; margin-top: 4px; }
+.auth-alt { margin-top: 16px; text-align: center; font-size: .9rem; }
+.auth-alt a { font-weight: 600; color: var(--info); }
+.auth-alt a:hover { text-decoration: underline; }
+.auth-alt.muted { margin-top: 6px; }
+
+@media (max-width: 760px) {
+  .fila-2 { grid-template-columns: 1fr; }
+}
+
+/* Barra de fuerza de la contraseña: rojo, ámbar, verde */
+.fuerza { margin: 4px 0 16px; border-radius: 2px; --mat-progress-bar-track-color: var(--line); }
+.fuerza.n1 { --mat-progress-bar-active-indicator-color: var(--error); }
+.fuerza.n2 { --mat-progress-bar-active-indicator-color: var(--warn-chart); }
+.fuerza.n3, .fuerza.n4 { --mat-progress-bar-active-indicator-color: var(--ok-chart); }

@@ -1,0 +1,33 @@
+<a matButton routerLink="/panel/categorias" class="volver"><mat-icon>arrow_back</mat-icon>Categorías</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>category</mat-icon></div>
+    <mat-card-title>{{ edicion ? 'Editar categoría' : 'Nueva categoría' }}</mat-card-title>
+    <mat-card-subtitle>Tipos de problema que la ciudadanía puede elegir al reportar.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+    <mat-card-content class="form-grid">
+      <mat-form-field class="campo-full">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombreCategoria" placeholder="Baches" />
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Descripción (opcional)</mat-label>
+        <input matInput formControlName="descripcionCategoria" placeholder="Huecos en pistas y veredas" />
+      </mat-form-field>
+      <mat-slide-toggle class="campo-full visible" formControlName="activo">Visible para la ciudadanía</mat-slide-toggle>
+      @if (error()) { <p class="alerta campo-full"><mat-icon>error</mat-icon>{{ error() }}</p> }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/categorias">Cancelar</a>
+      <span class="spacer"></span>
+      @if (!edicion) {
+        <button matButton="outlined" type="button" (click)="registrar(true)" [disabled]="guardando()">Guardar y agregar otra</button>
+      }
+      <button matButton="filled" type="submit" [disabled]="guardando()">
+        @if (guardando()) { <mat-spinner diameter="18" /> } {{ edicion ? 'Guardar cambios' : 'Guardar' }}
+      </button>
+    </mat-card-actions>
+  </form>
+</mat-card>

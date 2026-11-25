@@ -1,0 +1,19 @@
+:host { display: block; }
+.pie { background: #111418; color: #C9CED5; padding-top: 40px; }
+.pie-in { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.3fr; gap: 32px; padding-bottom: 32px; }
+.pie-marca p { margin-top: 12px; font-size: .86rem; line-height: 1.55; color: #9AA1AB; max-width: 40ch; }
+.pie-col { display: flex; flex-direction: column; gap: 8px; }
+.pie-col h3 { font-size: .78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #FFFFFF; margin-bottom: 4px; }
+.pie-col a { display: inline-flex; align-items: center; gap: 4px; font-size: .88rem; color: #C9CED5; }
+.pie-col a:hover { color: #FFFFFF; text-decoration: underline; }
+.pie-col .mat-icon { font-size: 14px; width: 14px; height: 14px; }
+.pie-div { --mat-divider-color: #2B3036; }
+.pie-base { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 16px; padding-bottom: 20px; font-size: .8rem; color: #9AA1AB; }
+
+@media (max-width: 900px) {
+  .pie-in { grid-template-columns: 1fr 1fr; }
+  .pie-marca { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .pie-in { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,42 @@
+<footer class="pie">
+  <div class="wrap pie-in">
+    <div class="pie-marca">
+      <app-logocomponent [claro]="true" />
+      <p>Plataforma de reclamos ciudadanos del Perú. Registre problemas de su distrito y haga seguimiento a su atención por parte de la municipalidad.</p>
+    </div>
+
+    <nav class="pie-col" aria-label="Plataforma">
+      <h3>Plataforma</h3>
+      <a routerLink="/">Inicio</a>
+      <a routerLink="/mapa">Mapa de reclamos</a>
+      <a routerLink="/resultados">Resultados</a>
+      <a routerLink="/reportar">Reportar un problema</a>
+      @if (auth.sesion()) {
+        <a routerLink="/mis-reportes">Mis reportes</a>
+      } @else {
+        <a routerLink="/ingresar">Ingresar</a>
+      }
+    </nav>
+
+    <nav class="pie-col" aria-label="Resultados">
+      <h3>Resultados</h3>
+      <a routerLink="/resultados/tipos-de-problema">Tipos de problema</a>
+      <a routerLink="/resultados/avance-de-atencion">Avance de atención</a>
+      <a routerLink="/resultados/inversion">Inversión</a>
+      <a routerLink="/resultados/casos-resueltos">Casos resueltos</a>
+    </nav>
+
+    <div class="pie-col">
+      <h3>Fuentes de datos</h3>
+      <a href="https://www.geoidep.gob.pe" target="_blank" rel="noopener">Límites territoriales: INEI · GeoIDEP <mat-icon>open_in_new</mat-icon></a>
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Mapa base: OpenStreetMap <mat-icon>open_in_new</mat-icon></a>
+    </div>
+  </div>
+
+  <mat-divider class="pie-div" />
+
+  <div class="wrap pie-base">
+    <span>© {{ anio }} ReclamaYA · Report and Be Heard</span>
+    <span>Proyecto académico · Arquitectura de Aplicaciones Web · UPC</span>
+  </div>
+</footer>
