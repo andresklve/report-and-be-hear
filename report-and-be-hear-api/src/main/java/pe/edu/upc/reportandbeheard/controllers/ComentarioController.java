@@ -63,8 +63,14 @@ public class ComentarioController {
         // Aviso al autor del testimonio (si no es el mismo que comenta)
         Usuario autor = testimonio.getUsuario();
         if (!autor.getIdUsuario().equals(usuario.getIdUsuario())) {
-            nS.notificar(autor, testimonio, "COMENTARIO",
-                    usuario.getNombres() + " comentó tu reporte " + referencia(testimonio) + ".");
+            String rol = usuario.getRol() != null ? usuario.getRol().getNombreRol() : "";
+            boolean esEquipo = "MUNICIPALIDAD".equals(rol) || "ADMINISTRADOR".equals(rol);
+            String mensaje = esEquipo
+                    ? ("MUNICIPALIDAD".equals(rol) ? "La municipalidad" : "La administración")
+                      + " respondió tu reporte " + referencia(testimonio) + ": \"" + comentario.getTexto() + "\""
+                    : usuario.getNombres() + " comentó tu reporte " + referencia(testimonio) + ".";
+            // Al correo solo llegan las respuestas de la municipalidad o la administracion
+            nS.notificar(autor, testimonio, "COMENTARIO", mensaje, esEquipo);
         }
 
         URI location = ServletUriComponentsBuilder

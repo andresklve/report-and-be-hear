@@ -14,5 +14,9 @@ public interface INotificacionService {
     List<Notificacion> listPorUsuario(Long idUsuario);
 
     // Crea un aviso para el usuario (testimonio puede ser nulo)
+    // Ademas del aviso en la app, se envia al correo del usuario (si tiene uno registrado)
     void notificar(Usuario usuario, Testimonio testimonio, String tipo, String mensaje);
+
+    // Igual, pero eligiendo si tambien se envia el correo
+    void notificar(Usuario usuario, Testimonio testimonio, String tipo, String mensaje, boolean enviarCorreo);
 }

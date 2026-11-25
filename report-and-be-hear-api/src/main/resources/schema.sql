@@ -17,3 +17,16 @@ BEGIN
   END IF;
 END $$;
 ^^^END^^^
+
+-- Migracion: bases de una version anterior tienen en notificaciones una columna titulo obligatoria y un
+-- CHECK con los tipos viejos. La entidad actual no usa titulo y tiene otros tipos (ESTADO, COMENTARIO,
+-- SUSPENSION), asi que cualquier aviso fallaba al guardarse. En una base nueva no hace nada.
+DO $$
+BEGIN
+  ALTER TABLE IF EXISTS notificaciones DROP CONSTRAINT IF EXISTS notificaciones_tipo_check;
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+              WHERE table_name = 'notificaciones' AND column_name = 'titulo' AND is_nullable = 'NO') THEN
+    ALTER TABLE notificaciones ALTER COLUMN titulo DROP NOT NULL;
+  END IF;
+END $$;
+^^^END^^^
