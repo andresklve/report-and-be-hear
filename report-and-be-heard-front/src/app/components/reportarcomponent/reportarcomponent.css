@@ -6,8 +6,11 @@
 .paso-sub { color: var(--ink-2); margin-bottom: 22px; }
 .lbl { display: block; font-size: .86rem; font-weight: 600; margin-bottom: 8px; }
 .full { width: 100%; margin-bottom: 10px; }
-.desc { margin-top: 20px; }
-.desc .ok { color: var(--ok); }
+.desc { margin-top: 4px; }
+.desc .ok { color: var(--ok); font-weight: 500; }
+.hint-ok { font-size: 14px; width: 14px; height: 14px; vertical-align: -2px; margin-right: 2px; }
+.tipo-lbl { margin-top: 22px; }
+.lbl-nota { font-weight: 400; color: var(--info); }
 .campo-error { font-size: .8rem; color: var(--error); font-weight: 500; margin-top: 6px; }
 
 /* Tarjetas de categoria: cada una con el color de su categoria */
@@ -18,13 +21,34 @@
 .opcion strong { font-size: .92rem; }
 .opcion small { color: var(--ink-3); font-size: .78rem; line-height: 1.35; }
 .opcion:hover { border-color: var(--ink-3) !important; }
-.opcion.mat-button-toggle-checked { border-color: var(--cat) !important; background: color-mix(in srgb, var(--cat) 10%, white); box-shadow: inset 0 0 0 1px var(--cat); }
+.opciones-cat .opcion { position: relative; transition: border-color .15s, background-color .15s; }
+.opcion.mat-button-toggle-checked { border-color: var(--cat) !important; background: color-mix(in srgb, var(--cat) 12%, white); box-shadow: inset 0 0 0 2px var(--cat); }
+.opcion.mat-button-toggle-checked strong { color: var(--ink); }
+.opcion .opcion-check { position: absolute; top: 8px; right: 8px; margin: 0; font-size: 20px; width: 20px; height: 20px; color: var(--cat); }
+.opcion-ia { display: inline-flex; align-items: center; gap: 3px; margin-top: 6px; padding: 1px 7px; border-radius: 999px; background: var(--info-soft); color: var(--info); font-size: .72rem; font-weight: 600; }
+.opcion-ia .mat-icon { font-size: 12px; width: 12px; height: 12px; margin: 0; color: var(--info); }
+.hint-ia { color: var(--info); }
+.hint-ia .mat-icon { font-size: 13px; width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; }
 
-.proximo { margin-top: 12px; background: var(--surface-2); border-style: dashed; }
-.proximo .mat-icon[mat-card-avatar] { display: grid; place-items: center; color: var(--ink-3); }
-.proximo mat-card-header { padding-bottom: 12px; }
+/* Tarjeta de clasificacion con IA */
+.ia { margin-top: 14px; padding: 12px 14px; background: var(--surface-2); border-style: dashed; }
+.ia.lista { background: var(--info-soft); border-style: solid; border-color: #C7D8EE; }
+.ia-fila { display: flex; align-items: center; gap: 12px; }
+.ia-icono { color: var(--info); flex: none; }
+.ia-texto { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ia-texto strong { font-size: .92rem; }
+.ia-texto span { font-size: .84rem; color: var(--ink-2); }
+.ia-texto .mono { margin-left: 4px; color: var(--ink-3); }
+@media (max-width: 560px) { .ia-fila { flex-wrap: wrap; } .ia-fila button { width: 100%; } }
 
 /* Paso 2 */
+.sugerencia-geo { display: flex; align-items: center; gap: 10px; width: 100%; margin: -6px 0 10px; padding: 10px 12px; border: 1px solid #C7D8EE; border-radius: var(--r-lg); background: var(--info-soft); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.sugerencia-geo:hover { border-color: var(--info); }
+.sugerencia-geo > .mat-icon { color: var(--info); }
+.sugerencia-geo span { flex: 1; display: flex; flex-direction: column; }
+.sugerencia-geo b { font-size: .92rem; }
+.sugerencia-geo small { color: var(--ink-2); font-size: .8rem; }
+.sugerencia-geo .ir { color: var(--info); }
 .paso-donde { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
 .opt-n { font-weight: 600; margin-right: 6px; }
 .ubicacion { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 18px; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-3); font-size: .88rem; }
@@ -55,7 +79,7 @@
 /* Confirmacion */
 .exito { max-width: 680px; padding-top: 40px; padding-bottom: 64px; }
 .exito-card { text-align: center; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; }
-.exito .lead { margin: 0 auto; }
+.exito .bajada { margin: 0 auto; }
 .exito-sello { width: 72px; height: 72px; margin-bottom: 18px; }
 .exito-sello svg { width: 100%; height: 100%; }
 .exito-sello circle { fill: var(--ok-chart); }
