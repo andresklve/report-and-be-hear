@@ -1,0 +1,15 @@
+.ref { font-weight: 600; color: var(--info); }
+.ref:hover { text-decoration: underline; }
+td .clamp { max-width: 40ch; }
+
+/* Dialogo de edicion */
+.dlg-ref { display: block; font-size: .8rem; font-weight: 500; }
+.lbl { display: block; font-size: .86rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.estados { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 18px; width: 100%; }
+.estados .mat-icon { margin-right: 6px; vertical-align: middle; font-size: 18px; width: 18px; height: 18px; }
+.estados .estado-warn.mat-button-toggle-checked { --mat-button-toggle-selected-state-background-color: var(--warn-chart); --mat-button-toggle-selected-state-text-color: #2B1A00; }
+.estados .estado-info.mat-button-toggle-checked { --mat-button-toggle-selected-state-background-color: var(--info-chart); }
+.estados .estado-ok.mat-button-toggle-checked { --mat-button-toggle-selected-state-background-color: var(--ok-chart); }
+.estados .estado-bad.mat-button-toggle-checked { --mat-button-toggle-selected-state-background-color: var(--bad); }
+.full { width: 100%; margin-bottom: 8px; }
+.nota-estado { display: flex; gap: 8px; align-items: flex-start; font-size: .84rem; color: var(--info); background: var(--info-soft); padding: 8px 10px; border-radius: var(--r); }
