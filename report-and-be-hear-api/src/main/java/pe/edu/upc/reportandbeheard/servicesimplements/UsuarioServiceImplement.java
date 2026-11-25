@@ -2,6 +2,7 @@ package pe.edu.upc.reportandbeheard.servicesimplements;
 
 import org.springframework.stereotype.Service;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
+import pe.edu.upc.reportandbeheard.repositories.IPasswordResetTokenRepository;
 import pe.edu.upc.reportandbeheard.repositories.IUsuarioRepository;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IUsuarioService;
 
@@ -11,9 +12,11 @@ import java.util.Optional;
 @Service
 public class UsuarioServiceImplement implements IUsuarioService {
     private final IUsuarioRepository uR;
+    private final IPasswordResetTokenRepository prR;
 
-    public UsuarioServiceImplement(IUsuarioRepository uR) {
+    public UsuarioServiceImplement(IUsuarioRepository uR, IPasswordResetTokenRepository prR) {
         this.uR = uR;
+        this.prR = prR;
     }
 
     @Override
@@ -32,7 +35,9 @@ public class UsuarioServiceImplement implements IUsuarioService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void delete(Long idUsuario) {
+        prR.eliminarPorUsuario(idUsuario); // enlaces de "olvide mi contrasena" del usuario
         uR.deleteById(idUsuario);
     }
 
