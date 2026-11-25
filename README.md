@@ -23,6 +23,12 @@ cp local.properties.example local.properties   # y edite usuario, contraseña y 
 ```
 `local.properties` no se sube a git.
 
+**IA (opcional):** para que la clasificación de reclamos use Google Gemini, cree una clave en https://aistudio.google.com/api-keys y agréguela en `report-and-be-hear-api/local.properties`:
+```properties
+gemini.api.key=SU_CLAVE
+```
+Sin clave, la app funciona igual y clasifica con reglas por palabras clave.
+
 **2. Backend**
 ```bash
 cd report-and-be-hear-api

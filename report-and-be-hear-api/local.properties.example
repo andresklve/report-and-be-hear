@@ -3,3 +3,6 @@
 spring.datasource.url=jdbc:postgresql://localhost:5432/BDReportAndBeHeard
 spring.datasource.username=postgres
 spring.datasource.password=su_contrasena
+
+# Clave de Google AI Studio para la IA (https://aistudio.google.com/api-keys). Opcional.
+gemini.api.key=

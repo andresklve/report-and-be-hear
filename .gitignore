@@ -1,0 +1,11 @@
+# Archivos del sistema y del editor
+.DS_Store
+.Rhistory
+.idea/
+.vscode/
+
+# Material del curso (solo referencia local, no se sube)
+profesora/
+
+# Configuracion local con contrasenas y claves (cada uno crea el suyo)
+**/local.properties
