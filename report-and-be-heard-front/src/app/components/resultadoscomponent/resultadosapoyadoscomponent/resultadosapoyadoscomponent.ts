@@ -8,7 +8,7 @@ import { Resultadosservice } from '../../../services/resultadosservice';
 import { Estadochipcomponent } from '../../estadochipcomponent/estadochipcomponent';
 import { colorCategoria, iconoCategoria, referencia } from '../../../shared/ui';
 
-// /resultados/mas-apoyados: top de reportes con mas apoyos de la ciudadania
+// /cifras/mas-apoyados: top de reportes con mas apoyos de la ciudadania
 @Component({
   selector: 'app-resultadosapoyadoscomponent',
   imports: [MatProgressBarModule, RouterLink, MatCardModule, MatIconModule, MatRippleModule, Estadochipcomponent],

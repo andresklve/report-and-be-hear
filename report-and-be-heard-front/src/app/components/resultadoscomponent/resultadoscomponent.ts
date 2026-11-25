@@ -21,11 +21,11 @@ export class Resultadoscomponent implements OnInit {
   r = inject(Resultadosservice)
 
   paginas = [
-    { ruta: '/resultados/tipos-de-problema', titulo: 'Tipos de problema', icono: 'category' },
-    { ruta: '/resultados/avance-de-atencion', titulo: 'Avance de atención', icono: 'donut_large' },
-    { ruta: '/resultados/inversion', titulo: 'Inversión', icono: 'payments' },
-    { ruta: '/resultados/casos-resueltos', titulo: 'Casos resueltos', icono: 'task_alt' },
-    { ruta: '/resultados/mas-apoyados', titulo: 'Más apoyados', icono: 'thumb_up' },
+    { ruta: '/cifras/tipos-de-problema', titulo: 'Tipos de problema', icono: 'category' },
+    { ruta: '/cifras/avance-de-atencion', titulo: 'Avance de atención', icono: 'donut_large' },
+    { ruta: '/cifras/inversion', titulo: 'Inversión', icono: 'payments' },
+    { ruta: '/cifras/casos-resueltos', titulo: 'Casos resueltos', icono: 'task_alt' },
+    { ruta: '/cifras/mas-apoyados', titulo: 'Más apoyados', icono: 'thumb_up' },
   ]
 
   ngOnInit(): void {

@@ -7,12 +7,26 @@
   <mat-card appearance="outlined" class="tarjeta">
     <h3>Estado de los reclamos</h3>
     <p class="sub">Recibidos, en atención, resueltos y descartados.</p>
-    <app-donacomponent [items]="r.donaEstados()" [centroValor]="r.cifras().pct + '%'" centroEtiqueta="resueltos" />
+    <div class="grafico">
+      <canvas
+        baseChart
+        [type]="chartTypeEstados"
+        [data]="chartDataEstados"
+        [options]="chartOptionsEstados">
+      </canvas>
+    </div>
   </mat-card>
   <mat-card appearance="outlined" class="tarjeta">
     <h3>Tasa de resolución por tipo</h3>
     <p class="sub">Porcentaje de reclamos resueltos respecto del total de cada tipo.</p>
-    <app-barrascomponent [items]="r.barrasResueltas()" [tope]="100" vacio="No se registran reclamos." />
+    <div class="grafico">
+      <canvas
+        baseChart
+        [type]="chartTypeResueltos"
+        [data]="chartDataResueltos"
+        [options]="chartOptionsResueltos">
+      </canvas>
+    </div>
   </mat-card>
 </div>
 

@@ -23,14 +23,14 @@
   <!-- Estado: dona con el % resuelto al centro -->
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head"><div><h2>Estado de los reportes</h2><span class="muted">Distribución por estado de atención</span></div></header>
-    <app-donacomponent [items]="donaEstados()" [centroValor]="kpis().pct + '%'" centroEtiqueta="resueltos" />
+    <app-reporte06component />
     @if (lecturas().estado; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
   <!-- Categorias: dona con el total al centro -->
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head"><div><h2>Reclamos por categoría</h2><span class="muted">US08 · Distribución por tipo de problema</span></div></header>
-    <app-donacomponent [items]="donaCategorias()" [centroValor]="kpis().total.toLocaleString('es-PE')" centroEtiqueta="reclamos" />
+    <app-reporte01component />
     @if (lecturas().categoria; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
@@ -42,46 +42,35 @@
         <mat-button-toggle value="mes">Por mes</mat-button-toggle>
       </mat-button-toggle-group>
     </header>
-    <div class="columnas">
-      @for (c of columnas(); track c.periodo) {
-        <div class="col" [class.mes]="agrupacion() === 'mes'" [class.pico]="c.pico" [matTooltip]="c.etiqueta + ': ' + c.totalTestimonios + ' reportes'">
-          <span class="col-val">{{ c.totalTestimonios }}</span>
-          <span class="col-bar"><i [style.height.%]="c.pct"></i></span>
-          <span class="col-lbl">{{ c.etiqueta }}</span>
-        </div>
-      } @empty { <p class="muted">Sin datos.</p> }
-    </div>
+    <app-reporte02component [agrupacion]="agrupacion()" />
     @if (lecturas().tendencia; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
   <!-- Costo: dona del gasto por categoria -->
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head"><div><h2>Costo por categoría</h2><span class="muted">US12 · Distribución del gasto en intervenciones</span></div></header>
-    <app-donacomponent [items]="donaCosto()" [centroValor]="totalCostoCorto()" centroEtiqueta="invertidos" vacio="Aún no hay costos registrados" />
+    <app-reporte03component />
     @if (lecturas().costo; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
   <!-- Nuevo: costo promedio por reclamo atendido -->
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head"><div><h2>Costo promedio por reclamo atendido</h2><span class="muted">US12 · Costo total entre reclamos atendidos</span></div></header>
-    <app-barrascomponent [items]="barrasPromedio()" vacio="Aún no hay costos registrados" />
+    <app-reporte07component />
     @if (lecturas().promedio; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head">
       <div><h2>Inversión por departamento</h2><span class="muted">US11 · de mayor a menor</span></div>
-      @if (barrasInversion().length > 8) {
-        <button matButton (click)="verTodosDep.set(!verTodosDep())">{{ verTodosDep() ? 'Ver 8' : 'Ver los ' + barrasInversion().length }}</button>
-      }
     </header>
-    <app-barrascomponent [items]="verTodosDep() ? barrasInversion() : barrasInversion().slice(0, 8)" color="var(--chart-dinero)" vacio="Aún no hay inversión registrada" />
+    <app-reporte04component />
     @if (lecturas().inversion; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 
   <mat-card appearance="outlined" class="p-card">
     <header class="p-card-head"><div><h2>Zonas más activas</h2><span class="muted">US10 · distritos con más reclamos</span></div></header>
-    <app-barrascomponent [items]="barrasRanking()" color="var(--chart-ranking)" />
+    <app-reporte05component />
     @if (lecturas().zonas; as l) { <p class="lectura"><mat-icon>lightbulb</mat-icon><span [innerHTML]="l"></span></p> }
   </mat-card>
 

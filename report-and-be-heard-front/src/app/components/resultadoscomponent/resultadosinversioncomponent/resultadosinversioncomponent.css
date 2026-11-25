@@ -19,3 +19,8 @@
 
 .abajo { margin-top: 16px; }
 
+
+/* CONTENEDOR DEL GRAFICO (ng2-charts) */
+.grafico { width: 100%; height: 320px; position: relative; }
+.grafico.alto { height: 400px; }
+.grafico canvas { width: 100% !important; height: 100% !important; }

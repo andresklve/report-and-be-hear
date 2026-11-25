@@ -1,6 +1,6 @@
 import { MatChipsModule } from '@angular/material/chips';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -23,6 +23,8 @@ import { Zonaservice } from '../../services/zonaservice';
 import { Authservice } from '../../services/authservice';
 import { Toastservice } from '../../services/toastservice';
 import { Geoservice } from '../../services/geoservice';
+import { Iaservice } from '../../services/iaservice';
+import { ClasificacionIADTO } from '../../models/ClasificacionIADTO';
 import { TestimonioDTO } from '../../models/TestimonioDTO';
 import { SesionDTO } from '../../models/SesionDTO';
 import { GeoIndice, GeoProps } from '../../models/GeoDTO';
@@ -34,7 +36,7 @@ const BORRADOR = 'rbh.borrador';
 
 @Component({
   selector: 'app-reportarcomponent',
-  imports: [MatChipsModule, RouterLink, ReactiveFormsModule, Mapapickercomponent, Estadotrackcomponent, MatStepperModule, MatCardModule, MatButtonModule,
+  imports: [DecimalPipe, MatChipsModule, RouterLink, ReactiveFormsModule, Mapapickercomponent, Estadotrackcomponent, MatStepperModule, MatCardModule, MatButtonModule,
     MatButtonToggleModule, MatIconModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, MatProgressBarModule,
     MatProgressSpinnerModule, MatRippleModule],
   templateUrl: './reportarcomponent.html',
@@ -47,6 +49,7 @@ export class Reportarcomponent implements OnInit {
   private zS = inject(Zonaservice)
   private geo = inject(Geoservice)
   private toast = inject(Toastservice)
+  private iaS = inject(Iaservice)
   private route = inject(ActivatedRoute)
   private browser = isPlatformBrowser(inject(PLATFORM_ID))
   auth = inject(Authservice)
@@ -56,6 +59,11 @@ export class Reportarcomponent implements OnInit {
 
   datos = signal<Datos | null>(null)
   paso = signal(1)
+  // Clasificacion con IA (paso 1)
+  ia = signal<ClasificacionIADTO | null>(null)
+  iaCargando = signal(false)
+  iaError = signal(false)
+  private iaTexto = ''
   enviando = signal(false)
   creado = signal<TestimonioDTO | null>(null)
   modoCuenta = signal<'registro' | 'ingreso'>('registro')
@@ -72,6 +80,7 @@ export class Reportarcomponent implements OnInit {
   resultados = signal<GeoIndice[]>([])
   encuadre = signal<[number, number, number, number] | null>(null)
   private indice: GeoIndice[] = []
+  private indiceListo = signal(false)
 
   pasos = ['Qué pasa', 'Dónde', 'Enviar']
 
@@ -103,7 +112,7 @@ export class Reportarcomponent implements OnInit {
       next: d => this.datos.set(d),
       error: () => this.toast.error('No pudimos cargar las categorías. ¿El servidor está encendido?'),
     })
-    this.geo.indice().subscribe(i => this.indice = i)
+    this.geo.indice().subscribe(i => { this.indice = i; this.indiceListo.set(true) })
     this.form.valueChanges.subscribe(v => this.guardarBorrador(v))
 
     // Viene desde el mapa con un distrito elegido
@@ -123,6 +132,51 @@ export class Reportarcomponent implements OnInit {
 
   elegirCategoria(id: number) {
     this.form.patchValue({ idCategoria: id })
+  }
+
+  // ---------- clasificacion con IA ----------
+
+  // Pide a la IA la categoria y la direccion a partir del texto.
+  // auto = true: se llama al salir del campo y solo si aun no se eligio categoria.
+  sugerirConIA(auto = false) {
+    const texto = (this.form.value.descripcionTexto ?? '').trim()
+    if (texto.length < 15 || this.iaCargando()) return
+    if (auto && (this.form.value.idCategoria != null || texto === this.iaTexto)) return
+    this.iaTexto = texto
+    this.iaCargando.set(true)
+    this.iaError.set(false)
+    this.iaS.clasificar(texto).subscribe({
+      next: r => {
+        this.iaCargando.set(false)
+        this.ia.set(r)
+        const cambios: Record<string, unknown> = {}
+        if (r.idCategoria != null) cambios['idCategoria'] = r.idCategoria
+        if (r.direccionTextoExtraida && !this.form.value.direccionTextoExtraida) cambios['direccionTextoExtraida'] = r.direccionTextoExtraida
+        this.form.patchValue(cambios)
+      },
+      error: () => { this.iaCargando.set(false); this.iaError.set(true) }
+    })
+  }
+
+  // Distrito que aparece en la direccion encontrada por la IA (ej. "Av. Arequipa 1520, Lince" -> Lince)
+  distritoSugerido = computed<GeoIndice | null>(() => {
+    const dir = this.ia()?.direccionTextoExtraida
+    if (!dir || !this.indiceListo()) return null
+    const partes = dir.split(',').map(x => x.trim()).filter(Boolean).reverse()
+    for (const parte of partes) {
+      const encontrado = this.geo.buscar(parte, this.indice, 6)
+        .find(e => e.t === 'x' && Geoservice.norm(e.n) === Geoservice.norm(parte))
+      if (encontrado) return encontrado
+    }
+    return null
+  })
+
+  // La confianza y el modelo se guardan solo si el ciudadano se quedo con la categoria sugerida
+  private datosIA(idCategoria: number): { confianzaIA: number | null, modeloIA: string | null } {
+    const r = this.ia()
+    return r && r.idCategoria === idCategoria
+      ? { confianzaIA: r.confianzaIA, modeloIA: r.modeloIA }
+      : { confianzaIA: null, modeloIA: null }
   }
 
   // ---------- ubicacion ----------
@@ -313,7 +367,7 @@ export class Reportarcomponent implements OnInit {
         descripcionTexto: v.descripcionTexto.trim(), fotoUrl: v.fotoUrl?.trim() ?? '',
         direccionTextoExtraida: v.direccionTextoExtraida?.trim() ?? '',
         latitud: Number(v.latitud), longitud: Number(v.longitud), estado: 'PENDIENTE',
-        confianzaIA: null, modeloIA: null,
+        ...this.datosIA(v.idCategoria),
       }))
     ).subscribe({
       next: t => {

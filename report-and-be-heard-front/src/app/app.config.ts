@@ -10,6 +10,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { authInterceptor } from './shared/authinterceptor';
 import { PaginadorEs } from './shared/paginador';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 registerLocaleData(localeEsPE)
 
@@ -26,5 +27,7 @@ export const appConfig: ApplicationConfig = {
     // Selector de fechas (mat-datepicker) en español
     provideNativeDateAdapter(),
     { provide: MAT_DATE_LOCALE, useValue: 'es-PE' },
+    // Graficos con ng2-charts (Chart.js), como en el material del curso
+    provideCharts(withDefaultRegisterables()),
   ]
 };

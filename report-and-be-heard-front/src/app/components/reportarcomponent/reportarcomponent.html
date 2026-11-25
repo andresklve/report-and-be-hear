@@ -7,7 +7,7 @@
       </div>
       <p class="eyebrow">Reporte enviado</p>
       <h1 class="page-title">Te escuchamos, {{ auth.sesion()?.nombres }}.</h1>
-      <p class="lead">Tu reporte ya está en la bandeja de la municipalidad. Guarda tu número de referencia para seguirlo.</p>
+      <p class="bajada">Tu reporte ya está en la bandeja de la municipalidad. Guarda tu número de referencia para seguirlo.</p>
       <div class="exito-ref">
         <span>Referencia</span>
         <b class="mono">{{ ref(c.idTestimonio) }}</b>
@@ -29,45 +29,78 @@
         <mat-stepper #stepper linear animationDuration="0" (selectionChange)="cambioPaso($event)" class="stepper">
 
           <!-- ===== Paso 1: que pasa ===== -->
-          <mat-step label="Qué pasa">
+          <mat-step label="Problema">
             <ng-template matStepContent>
-              <h1 class="paso-titulo">Descripción del problema</h1>
-              <p class="paso-sub">Elige el tipo de problema y cuéntalo con tus palabras.</p>
+              <h1 class="paso-titulo">¿Qué problema quieres reportar?</h1>
+              <p class="paso-sub">Cuéntalo con tus palabras. La IA sugerirá el tipo de problema y la dirección; tú confirmas.</p>
 
-              <span class="lbl">Tipo de problema</span>
+              <mat-form-field class="full desc">
+                <mat-label>Describe el problema</mat-label>
+                <textarea matInput formControlName="descripcionTexto" rows="4" (blur)="sugerirConIA(true)"
+                          placeholder="Ej.: Hay un bache grande en la Av. Larco, frente al parque Kennedy. Ya hubo dos accidentes de motos."></textarea>
+                <mat-hint>Incluye qué pasa, desde cuándo y una referencia del lugar.</mat-hint>
+                <mat-hint align="end" [class.ok]="largo() >= 15">
+                  @if (largo() >= 15) { <mat-icon class="hint-ok">check</mat-icon>{{ largo() }} caracteres } @else { Faltan {{ 15 - largo() }} caracteres }
+                </mat-hint>
+                <mat-error>Cuéntanos un poco más (mínimo 15 caracteres).</mat-error>
+              </mat-form-field>
+
+              <!-- Clasificacion con IA (Google Gemini en el backend) -->
+              <mat-card appearance="outlined" class="ia" [class.lista]="ia()">
+                <div class="ia-fila">
+                  <mat-icon class="ia-icono">auto_awesome</mat-icon>
+                  <div class="ia-texto">
+                    @if (iaCargando()) {
+                      <strong>Analizando tu reclamo…</strong>
+                      <span>La IA está eligiendo la categoría y buscando la dirección.</span>
+                    } @else if (ia(); as r) {
+                      @if (r.idCategoria != null) {
+                        <strong>Sugerencia: {{ r.nombreCategoria }} · {{ (r.confianzaIA * 100) | number:'1.0-0' }}% de confianza</strong>
+                        <span>
+                          @if (r.direccionTextoExtraida) { Dirección encontrada: {{ r.direccionTextoExtraida }}. }
+                          Puedes cambiar la categoría si no es correcta.
+                          <span class="mono">{{ r.modeloIA === 'reglas' ? 'sin IA · reglas' : r.modeloIA }}</span>
+                        </span>
+                      } @else {
+                        <strong>No pudimos sugerir una categoría</strong>
+                        <span>Elige el tipo de problema arriba.</span>
+                      }
+                    } @else if (iaError()) {
+                      <strong>La IA no está disponible ahora</strong>
+                      <span>Elige el tipo de problema arriba; tu reclamo se registra igual.</span>
+                    } @else {
+                      <strong>Clasificación con IA</strong>
+                      <span>Escribe tu reclamo y la IA sugerirá la categoría y la dirección.</span>
+                    }
+                  </div>
+                  <button matButton="tonal" type="button" (click)="sugerirConIA()" [disabled]="largo() < 15 || iaCargando()">
+                    @if (iaCargando()) { <mat-progress-spinner mode="indeterminate" diameter="16" /> } @else { <mat-icon>auto_awesome</mat-icon> }
+                    {{ ia() ? 'Volver a sugerir' : 'Sugerir con IA' }}
+                  </button>
+                </div>
+              </mat-card>
+
+              <span class="lbl tipo-lbl">Tipo de problema
+                @if (ia()?.idCategoria != null && valor().idCategoria === ia()?.idCategoria) { <span class="lbl-nota">· sugerido por la IA, puedes cambiarlo</span> }
+              </span>
               <mat-button-toggle-group class="opciones-cat" [value]="valor().idCategoria" (change)="elegirCategoria($event.value)" hideSingleSelectionIndicator aria-label="Tipo de problema">
                 @for (cat of categoriasActivas(); track cat.idCategoria) {
                   <mat-button-toggle class="opcion" [value]="cat.idCategoria" [style.--cat]="colorCategoria(cat.nombreCategoria)">
+                    @if (valor().idCategoria === cat.idCategoria) { <mat-icon class="opcion-check">check_circle</mat-icon> }
                     <mat-icon>{{ iconoCategoria(cat.nombreCategoria) }}</mat-icon>
                     <strong>{{ cat.nombreCategoria }}</strong>
                     <small>{{ cat.descripcionCategoria }}</small>
+                    @if (ia()?.idCategoria === cat.idCategoria) { <span class="opcion-ia"><mat-icon>auto_awesome</mat-icon>Sugerido</span> }
                   </mat-button-toggle>
                 }
               </mat-button-toggle-group>
               @if (!categoriasActivas().length) { <mat-progress-bar mode="indeterminate" /> }
-              @if (invalido('idCategoria')) { <p class="campo-error">Elige una categoría.</p> }
-
-              <mat-form-field class="full desc">
-                <mat-label>Describe el problema</mat-label>
-                <textarea matInput formControlName="descripcionTexto" rows="5"
-                          placeholder="Ej.: Hay un bache grande en la Av. Larco, frente al parque Kennedy. Ya hubo dos accidentes de motos."></textarea>
-                <mat-hint>Mientras más detalle, más rápido se puede atender.</mat-hint>
-                <mat-hint align="end" [class.ok]="largo() >= 15">{{ largo() }} / 15 mín.</mat-hint>
-                <mat-error>Cuéntanos un poco más (mínimo 15 caracteres).</mat-error>
-              </mat-form-field>
-
-              <mat-card appearance="outlined" class="proximo">
-                <mat-card-header>
-                  <mat-icon mat-card-avatar>auto_awesome</mat-icon>
-                  <mat-card-title>Próximamente: clasificación con IA</mat-card-title>
-                  <mat-card-subtitle>A partir de tu texto, sugeriremos la categoría y la dirección automáticamente.</mat-card-subtitle>
-                </mat-card-header>
-              </mat-card>
+              @if (invalido('idCategoria')) { <p class="campo-error">Elige el tipo de problema.</p> }
             </ng-template>
           </mat-step>
 
           <!-- ===== Paso 2: donde ===== -->
-          <mat-step label="Dónde">
+          <mat-step label="Lugar">
             <ng-template matStepContent>
               <div class="paso-donde">
                 <div>
@@ -89,6 +122,14 @@
                     </mat-autocomplete>
                   </mat-form-field>
 
+                  @if (!distrito() && distritoSugerido(); as s) {
+                    <button type="button" class="sugerencia-geo" matRipple (click)="irA(s)">
+                      <mat-icon>auto_awesome</mat-icon>
+                      <span><b>¿Es en {{ s.n }}?</b><small>La IA lo encontró en tu descripción · {{ s.p }}</small></span>
+                      <mat-icon class="ir">arrow_forward</mat-icon>
+                    </button>
+                  }
+
                   <div class="ubicacion" [class.ok]="distrito()" [class.mal]="fueraDePeru()">
                     @if (ubicando()) {
                       <mat-spinner diameter="22" /><span>Ubicando…</span>
@@ -104,6 +145,11 @@
                   <mat-form-field class="full">
                     <mat-label>Dirección o referencia (opcional)</mat-label>
                     <input matInput formControlName="direccionTextoExtraida" placeholder="Ej.: Av. Próceres 1520, frente al mercado" />
+                    @if (ia()?.direccionTextoExtraida && valor().direccionTextoExtraida === ia()?.direccionTextoExtraida) {
+                      <mat-hint class="hint-ia"><mat-icon>auto_awesome</mat-icon>La IA la encontró en tu descripción. Puedes corregirla.</mat-hint>
+                    } @else {
+                      <mat-hint>Ayuda a la cuadrilla a encontrar el lugar. La ubicación oficial es el punto del mapa.</mat-hint>
+                    }
                   </mat-form-field>
                   <!-- Foto: solo PNG o JPG; se comprime en el navegador antes de enviarla -->
                   <div class="foto">
@@ -179,7 +225,7 @@
                       }
                       <mat-form-field class="full">
                         <mat-label>Usuario</mat-label>
-                        <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+                        <input matInput formControlName="username" autocomplete="username" placeholder="ej. juan.perez" />
                         <mat-error>{{ usernameAyuda }}</mat-error>
                       </mat-form-field>
                       <mat-form-field class="full">
