@@ -1,0 +1,59 @@
+<section class="com">
+  <h2 class="h-sec">Comentarios <span class="muted">{{ comentarios().length }}</span></h2>
+
+  @if (comentarios().length) {
+    <div class="com-lista">
+      @for (c of comentarios(); track c.idComentario) {
+        <mat-card appearance="outlined" class="com">
+          <mat-card-header>
+            <div mat-card-avatar class="avatar avatar-sm">{{ iniciales(c.nombreAutor) }}</div>
+            <mat-card-title>
+              {{ c.nombreAutor }}
+              @if (c.idUsuario === idAutorReporte()) { <mat-chip class="com-tag" disableRipple>Autor del reporte</mat-chip> }
+            </mat-card-title>
+            <mat-card-subtitle>{{ c.fechaCreacion | date:'d MMM y, HH:mm' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content><p>{{ c.texto }}</p></mat-card-content>
+          @if (puedeSuspender(c) || puedeBorrar(c)) {
+            <mat-card-actions align="end">
+              @if (puedeSuspender(c)) {
+                <button matButton type="button" (click)="suspendiendo.set(suspendiendo() === c.idComentario ? null : c.idComentario)" matTooltip="Suspender la cuenta de quien comenta">
+                  <mat-icon>person_off</mat-icon>Suspender
+                </button>
+              }
+              @if (puedeBorrar(c)) {
+                <button matButton type="button" [class.peligro]="confirmando() === c.idComentario" (click)="borrar(c)"
+                        [matTooltip]="confirmando() === c.idComentario ? 'Clic otra vez para eliminar' : 'Eliminar comentario'">
+                  <mat-icon>{{ confirmando() === c.idComentario ? 'delete_forever' : 'delete' }}</mat-icon>{{ confirmando() === c.idComentario ? '¿Eliminar?' : 'Eliminar' }}
+                </button>
+              }
+            </mat-card-actions>
+          }
+          @if (suspendiendo() === c.idComentario) {
+            <mat-card-content>
+              <app-suspendercomponent [idUsuario]="c.idUsuario" [nombre]="c.nombreAutor" motivoInicial="COMENTARIO_OFENSIVO"
+                                      [detalleInicial]="'Comentario: “' + c.texto + '”'"
+                                      (listo)="suspendiendo.set(null)" (cancelar)="suspendiendo.set(null)" />
+            </mat-card-content>
+          }
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <p class="muted com-vacio">Todavía no hay comentarios. Si este problema también le afecta, cuéntelo aquí.</p>
+  }
+
+  @if (auth.sesion()) {
+    <form class="com-form" (ngSubmit)="enviar()">
+      <mat-form-field class="com-campo" subscriptSizing="dynamic">
+        <mat-label>Escribe un comentario</mat-label>
+        <textarea matInput rows="2" maxlength="500" name="texto" [ngModel]="texto()" (ngModelChange)="texto.set($event)"
+                  placeholder="Aporte información útil y respete a los demás."></textarea>
+        <mat-hint align="end">{{ restantes() }}</mat-hint>
+      </mat-form-field>
+      <button matButton="filled" type="submit" [disabled]="!texto().trim() || enviando()"><mat-icon>send</mat-icon>Comentar</button>
+    </form>
+  } @else {
+    <p class="com-login"><a routerLink="/ingresar">Ingrese</a> o <a routerLink="/registro">cree una cuenta</a> para comentar.</p>
+  }
+</section>
