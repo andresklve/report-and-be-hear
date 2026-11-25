@@ -77,10 +77,13 @@ public class UsuarioController {
 
         String username = normalizarUsername(dto.getUsername());
         validarUsernameLibre(username, null);
+        String correo = normalizarCorreo(dto.getCorreo());
+        validarCorreoLibre(correo, null);
 
         Usuario usuario = modelMapper.map(dto, Usuario.class);
         usuario.setIdUsuario(null); // un registro siempre crea; nunca pisa un usuario existente
         usuario.setUsername(username);
+        usuario.setCorreo(correo);
         usuario.setRol(rol);
         usuario.setActivo(esAdmin && dto.getActivo() != null ? dto.getActivo() : Boolean.TRUE);
         usuario.setPasswordHash(passwordEncoder.encode(dto.getPasswordHash()));
@@ -137,6 +140,11 @@ public class UsuarioController {
         String username = normalizarUsername(dto.getUsername());
         validarUsernameLibre(username, existente.getIdUsuario());
         existente.setUsername(username);
+        if (dto.getCorreo() != null) { // sin correo en el body se conserva el que tiene
+            String correo = normalizarCorreo(dto.getCorreo());
+            validarCorreoLibre(correo, existente.getIdUsuario());
+            existente.setCorreo(correo);
+        }
         String nuevaPassword = dto.getPasswordHash();
         if (nuevaPassword == null || nuevaPassword.isBlank()) {
             // sin contrasena nueva: se conserva el hash que ya tiene el usuario
@@ -183,6 +191,23 @@ public class UsuarioController {
     // El nombre de usuario se guarda sin espacios y en minusculas
     private String normalizarUsername(String username) {
         return username.trim().toLowerCase();
+    }
+
+    // El correo se guarda en minusculas; vacio = sin correo
+    private String normalizarCorreo(String correo) {
+        return correo == null || correo.isBlank() ? null : correo.trim().toLowerCase();
+    }
+
+    // Evita dos cuentas con el mismo correo
+    private void validarCorreoLibre(String correo, Long idActual) {
+        if (correo == null) return;
+        uS.list().stream()
+                .filter(u -> correo.equalsIgnoreCase(u.getCorreo()))
+                .filter(u -> !u.getIdUsuario().equals(idActual))
+                .findAny()
+                .ifPresent(u -> {
+                    throw new OperacionNoPermitidaException("El correo '" + correo + "' ya está en uso.");
+                });
     }
 
     // Evita dos cuentas con el mismo nombre de usuario (idActual = el usuario que se edita)
