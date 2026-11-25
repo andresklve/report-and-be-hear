@@ -17,14 +17,20 @@ import {
   CategoriaReporteDTO, CostoCategoriaDTO, DesempenoIADTO, InversionDepartamentoDTO,
   RankingZonaDTO, TendenciaTemporalDTO
 } from '../../models/ReporteDTO';
-import { Barra, Barrascomponent } from '../barrascomponent/barrascomponent';
-import { Donacomponent, Porcion } from '../donacomponent/donacomponent';
+import { Barra, Porcion } from '../../shared/graficos';
+import { Reporte01component } from '../reportecomponent/reporte01component/reporte01component';
+import { Reporte02component } from '../reportecomponent/reporte02component/reporte02component';
+import { Reporte03component } from '../reportecomponent/reporte03component/reporte03component';
+import { Reporte04component } from '../reportecomponent/reporte04component/reporte04component';
+import { Reporte05component } from '../reportecomponent/reporte05component/reporte05component';
+import { Reporte06component } from '../reportecomponent/reporte06component/reporte06component';
+import { Reporte07component } from '../reportecomponent/reporte07component/reporte07component';
 import { ESTADOS, colorCategoria, colorEstado, duracion, soles } from '../../shared/ui';
 
 // Reportes US08 - US14 para Municipalidad y Administrador
 @Component({
   selector: 'app-resumencomponent',
-  imports: [MatChipsModule, Barrascomponent, Donacomponent, DecimalPipe, RouterLink, MatCardModule, MatButtonModule, MatButtonToggleModule, MatIconModule,
+  imports: [MatChipsModule, Reporte01component, Reporte02component, Reporte03component, Reporte04component, Reporte05component, Reporte06component, Reporte07component, DecimalPipe, RouterLink, MatCardModule, MatButtonModule, MatButtonToggleModule, MatIconModule,
     MatBadgeModule, MatTooltipModule, MatTableModule, MatPaginatorModule, MatProgressBarModule],
   templateUrl: './resumencomponent.html',
   styleUrl: './resumencomponent.css',
@@ -43,7 +49,6 @@ export class Resumencomponent implements OnInit {
   costos = signal<CostoCategoriaDTO[]>([])
   tiempo = signal<number | null>(null)
   ia = signal<DesempenoIADTO[]>([])
-  verTodosDep = signal(false)
 
   // Tabla de desempeño de IA con paginador
   columnasIA = ['categoria', 'modelo', 'confianza']
@@ -159,6 +164,8 @@ export class Resumencomponent implements OnInit {
     this.cargarTendencia()
   }
 
+  // El grafico (reporte02) vuelve a pedir sus datos al cambiar la agrupacion;
+  // aqui solo se carga la lista para la frase de lectura.
   cargarTendencia(a: 'dia' | 'mes' = this.agrupacion()) {
     this.agrupacion.set(a)
     this.rS.tendencia(a).subscribe(r => this.tendencia.set(r))

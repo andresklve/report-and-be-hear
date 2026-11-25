@@ -18,13 +18,13 @@ export function estadoInfo(key: string | null | undefined): EstadoInfo {
       : { key: key ?? '', label: key ?? '—', tono: 'neutral', paso: 0, icono: 'help' });
 }
 
-// Icono de Material Symbols segun el nombre de la categoria
+// Icono de Material Icons segun el nombre de la categoria
 export function iconoCategoria(nombre: string | null | undefined): string {
   const n = (nombre ?? '').toLowerCase();
   if (/bache|pista|vered|vía|via|calle/.test(n)) return 'add_road';
   if (/luz|alumbr|poste/.test(n)) return 'emoji_objects';
   if (/basura|residuo|limpie/.test(n)) return 'delete';
-  if (/segur|robo|delinc/.test(n)) return 'shield_person';
+  if (/segur|robo|delinc/.test(n)) return 'local_police';
   if (/agua|desag|fuga/.test(n)) return 'water_drop';
   if (/parque|verde|árbol|arbol/.test(n)) return 'park';
   if (/ruido/.test(n)) return 'volume_up';

@@ -7,8 +7,7 @@ import { Apoyoservice } from './apoyoservice';
 import { RankingApoyoDTO } from '../models/ApoyoDTO';
 import { ModeracionDTO } from '../models/ModeracionDTO';
 import { InversionDepartamentoDTO } from '../models/ReporteDTO';
-import { Porcion } from '../components/donacomponent/donacomponent';
-import { Barra } from '../components/barrascomponent/barrascomponent';
+import { Barra, Porcion } from '../shared/graficos';
 import { ESTADOS, colorCategoria, colorEstado } from '../shared/ui';
 
 // Datos de la seccion publica "Resultados". Lo provee Resultadoscomponent, asi todas

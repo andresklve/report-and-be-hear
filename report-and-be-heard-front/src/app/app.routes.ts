@@ -39,7 +39,7 @@ export const routes: Routes = [
   { path: 'mapa', component: Mapaperucomponent, title: 'Mapa de reclamos · ReclamaYA' },
   { path: 'reporte/:id', component: Detallecomponent, title: 'Reporte · ReclamaYA' },
   {
-    path: 'resultados', component: Resultadoscomponent,
+    path: 'cifras', component: Resultadoscomponent,
     children: [
       { path: '', redirectTo: 'tipos-de-problema', pathMatch: 'full' },
       { path: 'tipos-de-problema', component: Resultadostiposcomponent, title: 'Tipos de problema · ReclamaYA' },
@@ -49,6 +49,9 @@ export const routes: Routes = [
       { path: 'mas-apoyados', component: Resultadosapoyadoscomponent, title: 'Más apoyados · ReclamaYA' },
     ]
   },
+  // La seccion antes se llamaba /resultados: los enlaces viejos siguen funcionando
+  { path: 'resultados', redirectTo: 'cifras', pathMatch: 'full' },
+  { path: 'resultados/:sub', redirectTo: 'cifras/:sub' },
   { path: 'reportar', component: Reportarcomponent, title: 'Reportar un problema · ReclamaYA' },
   {
     path: 'ingresar', component: Authcomponent,

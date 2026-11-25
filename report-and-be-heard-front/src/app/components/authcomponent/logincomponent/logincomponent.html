@@ -7,7 +7,7 @@
     <mat-form-field>
       <mat-label>Usuario</mat-label>
       <mat-icon matPrefix>person</mat-icon>
-      <input matInput formControlName="username" autocomplete="username" placeholder="ej. ana.torres" />
+      <input matInput formControlName="username" autocomplete="username" placeholder="ej. juan.perez" />
       <mat-error>{{ usernameAyuda }}</mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -28,13 +28,5 @@
   <p class="auth-alt">¿No tienes cuenta? <a [routerLink]="['/registro']" [queryParams]="volver ? { volver } : {}">Créala en 30 segundos</a></p>
   <p class="auth-alt muted">No necesitas cuenta para ver el mapa. <a routerLink="/mapa">Ir al mapa</a></p>
 
-  <div class="demo">
-    <span class="eyebrow">Cuentas de demostración</span>
-    <mat-chip-set aria-label="Cuentas de demostración">
-      <mat-chip (click)="demo('ana.torres')"><mat-icon matChipAvatar>person</mat-icon>Ciudadana</mat-chip>
-      <mat-chip (click)="demo('municipalidad')"><mat-icon matChipAvatar>account_balance</mat-icon>Municipalidad</mat-chip>
-      <mat-chip (click)="demo('admin')"><mat-icon matChipAvatar>admin_panel_settings</mat-icon>Admin</mat-chip>
-    </mat-chip-set>
-  </div>
   </mat-card-content>
 </mat-card>

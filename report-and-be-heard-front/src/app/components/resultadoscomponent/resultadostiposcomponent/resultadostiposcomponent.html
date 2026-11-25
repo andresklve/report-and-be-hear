@@ -7,7 +7,14 @@
   <div>
     <h3>Reclamos por tipo de problema</h3>
     <p class="sub">Cantidad de reclamos y porcentaje sobre el total ({{ r.cifras().total.toLocaleString('es-PE') }}).</p>
-    <app-columnascomponent [items]="r.columnasCategorias()" [alto]="260" vacio="No se registran reclamos." />
+    <div class="grafico">
+      <canvas
+        baseChart
+        [type]="chartType"
+        [data]="chartData"
+        [options]="chartOptions">
+      </canvas>
+    </div>
   </div>
   @if (r.porCategoria()[0]; as top) {
     <aside class="nota">

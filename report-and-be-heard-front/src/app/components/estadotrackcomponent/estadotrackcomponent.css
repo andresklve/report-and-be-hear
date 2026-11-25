@@ -12,3 +12,8 @@
 }
 .track ::ng-deep .mat-horizontal-stepper-header { padding: 0 12px 0 0; pointer-events: none; }
 .track ::ng-deep .mat-horizontal-content-container { display: none; }
+
+/* Que las etiquetas (Recibido, En atención, Resuelto) se lean completas, sin "..." */
+.track ::ng-deep .mat-step-label { overflow: visible; text-overflow: clip; white-space: nowrap; min-width: max-content; }
+.track ::ng-deep .mat-step-text-label { overflow: visible; text-overflow: clip; }
+.track ::ng-deep .mat-stepper-horizontal-line { min-width: 24px; margin: 0 8px 0 0; }

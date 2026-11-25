@@ -6,7 +6,14 @@
 <mat-card appearance="outlined" class="tarjeta">
   <h3>Participación en la inversión nacional</h3>
   <p class="sub">Los 25 departamentos, de mayor a menor.@if (r.departamento()) { El departamento elegido aparece en rojo. }</p>
-  <app-columnascomponent [items]="r.barrasInversion()" [alto]="240" color="var(--chart-dinero)" vacio="No se registra inversión." />
+  <div class="grafico alto">
+      <canvas
+        baseChart
+        [type]="chartType"
+        [data]="chartData"
+        [options]="chartOptions">
+      </canvas>
+    </div>
 </mat-card>
 
 <aside class="nota abajo">

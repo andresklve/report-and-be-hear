@@ -1,0 +1,16 @@
+/* CONTENEDOR DEL GRAFICO */
+.grafico {
+  width: 100%;
+  height: 560px;
+  position: relative;
+}
+
+/* CANVAS */
+.grafico canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (max-width: 480px) {
+  .grafico { height: 520px; }
+}

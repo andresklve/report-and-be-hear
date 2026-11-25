@@ -12,7 +12,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { Resultadosservice } from '../../../services/resultadosservice';
 import { colorCategoria, iconoCategoria, referencia } from '../../../shared/ui';
 
-// /resultados/casos-resueltos (tarjetas con paginador)
+// /cifras/casos-resueltos (tarjetas con paginador)
 @Component({
   selector: 'app-resultadoscasoscomponent',
   imports: [DatePipe, RouterLink, MatCardModule, MatIconModule, MatPaginatorModule, MatRippleModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatChipsModule],
