@@ -1,0 +1,26 @@
+<header class="pag-head">
+  <h2>Reportes más apoyados</h2>
+  <p>Los 10 reportes{{ r.departamento() ? ' de ' + r.departamento() : '' }} que más vecinos apoyan. Un reporte con muchos apoyos afecta a más personas. Seleccione uno para verlo y apoyarlo.</p>
+</header>
+
+<ol class="top">
+  @for (h of top(); track h.t.idTestimonio; let i = $index) {
+    <li>
+      <mat-card appearance="outlined">
+        <a [routerLink]="['/reporte', h.t.idTestimonio]" matRipple class="fila">
+          <span class="pos" [class.podio]="i < 3">{{ i + 1 }}</span>
+          <span class="h-ico" [style.color]="colorCategoria(h.categoria)"><mat-icon>{{ iconoCategoria(h.categoria) }}</mat-icon></span>
+          <div class="info">
+            <p class="txt">{{ h.t.descripcionTexto }}</p>
+            <small>{{ h.categoria }} · {{ h.lugar }} · {{ referencia(h.t.idTestimonio) }}</small>
+            <mat-progress-bar mode="determinate" class="barra" [value]="(h.apoyos / max()) * 100" />
+          </div>
+          <app-estadochipcomponent [estado]="h.t.estado" />
+          <span class="n"><mat-icon>thumb_up</mat-icon><b>{{ h.apoyos.toLocaleString('es-PE') }}</b></span>
+        </a>
+      </mat-card>
+    </li>
+  } @empty {
+    <p class="muted">Todavía no hay reportes con apoyos{{ r.departamento() ? ' en ' + r.departamento() : '' }}. Entre a un reporte y pulse “Apoyar” si también le afecta.</p>
+  }
+</ol>

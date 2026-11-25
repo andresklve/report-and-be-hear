@@ -7,14 +7,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Authservice } from '../../../services/authservice';
 import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-logincomponent',
-  imports: [MatCardModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MatChipsModule],
+  imports: [MatCardModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './logincomponent.html',
   styleUrl: './logincomponent.css',
 })
@@ -35,10 +34,6 @@ export class Logincomponent {
     username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
     password: ['', Validators.required],
   })
-
-  demo(username: string) {
-    this.form.setValue({ username, password: 'Demo1234' })
-  }
 
   ingresar() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return }

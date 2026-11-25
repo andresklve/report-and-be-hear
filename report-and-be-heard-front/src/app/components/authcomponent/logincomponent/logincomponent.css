@@ -16,6 +16,3 @@ mat-form-field { width: 100%; margin-bottom: 4px; }
   .fila-2 { grid-template-columns: 1fr; }
 }
 
-.demo { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); }
-.demo .eyebrow { margin-bottom: 8px; }
-.demo mat-chip { cursor: pointer; }

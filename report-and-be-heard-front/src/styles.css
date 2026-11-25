@@ -49,8 +49,8 @@
   --mapa-medio: #F2A007;
   --mapa-alto: #D62828;
 
-  --f: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --f: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'Roboto', system-ui, sans-serif;
 
   --r-sm: 4px;
   --r: 6px;
@@ -82,10 +82,10 @@ img { max-width: 100%; display: block; }
 
 .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 .app-main { min-height: calc(100vh - var(--nav-h)); }
-.mono { font-family: var(--f-mono); font-size: .82em; }
+.mono { font-family: var(--f-mono); font-size: .9em; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: .02em; white-space: nowrap; }
 .muted { color: var(--ink-3); }
 .spacer { flex: 1; }
-.lead { font-size: 1.02rem; color: var(--ink-2); max-width: 62ch; }
+.bajada { font-size: 1.02rem; color: var(--ink-2); max-width: 62ch; }
 .eyebrow { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-3); margin-bottom: 6px; }
 .page-top { padding-top: 32px; padding-bottom: 20px; }
 .page-title { font-size: 1.75rem; margin-bottom: 6px; }

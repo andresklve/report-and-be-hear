@@ -11,7 +11,7 @@
 .intro-insignia { margin-bottom: 18px; --mat-chip-elevated-container-color: rgba(255, 255, 255, .16); --mat-chip-label-text-color: #fff; --mat-chip-label-text-weight: 600; --mat-chip-outline-width: 0; --mat-chip-container-height: 36px; backdrop-filter: blur(6px); }
 .intro-insignia img { width: 30px !important; height: 20px !important; object-fit: cover; border-radius: 3px !important; }
 .intro h1 { font-size: 2.6rem; line-height: 1.12; margin-bottom: 14px; max-width: 18ch; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, .3); }
-.intro .lead { margin-bottom: 28px; color: rgba(255, 255, 255, .88); font-size: 1.08rem; }
+.intro .bajada { margin-bottom: 28px; color: rgba(255, 255, 255, .88); font-size: 1.08rem; }
 .acciones { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn-claro { --mat-button-outlined-label-text-color: #fff; --mat-button-outlined-outline-color: rgba(255, 255, 255, .7); }
 /* franja con los colores de la bandera */

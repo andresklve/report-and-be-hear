@@ -2,7 +2,7 @@
   <p class="eyebrow">Mis reportes</p>
   <h1 class="page-title">Hola, {{ auth.sesion()?.nombres }}.</h1>
   @if (datos()) {
-    <p class="lead">
+    <p class="bajada">
       @if (resumen().total === 0) { Aún no has reportado nada. Cuando lo hagas, verás aquí cómo avanza cada caso. }
       @else { Tienes <b>{{ resumen().abiertos }}</b> {{ resumen().abiertos === 1 ? 'caso abierto' : 'casos abiertos' }} y <b>{{ resumen().resueltos }}</b> {{ resumen().resueltos === 1 ? 'resuelto' : 'resueltos' }}. }
     </p>
