@@ -32,7 +32,6 @@ import { Mapapickercomponent } from '../mapapickercomponent/mapapickercomponent'
 import { Estadotrackcomponent } from '../estadotrackcomponent/estadotrackcomponent';
 import { colorCategoria, iconoCategoria, referencia, USERNAME_PATRON, USERNAME_AYUDA } from '../../shared/ui';
 
-const BORRADOR = 'rbh.borrador';
 
 @Component({
   selector: 'app-reportarcomponent',
@@ -108,13 +107,11 @@ export class Reportarcomponent implements OnInit {
   largo = computed(() => (this.valor().descripcionTexto ?? '').length)
 
   ngOnInit(): void {
-    this.restaurar()
     this.dS.cargar().subscribe({
       next: d => this.datos.set(d),
       error: () => this.toast.error('No pudimos cargar las categorías. ¿El servidor está encendido?'),
     })
     this.geo.indice().subscribe(i => { this.indice = i; this.indiceListo.set(true) })
-    this.form.valueChanges.subscribe(v => this.guardarBorrador(v))
 
     // Viene desde el mapa con un distrito elegido
     const q = this.route.snapshot.queryParamMap
@@ -377,7 +374,6 @@ export class Reportarcomponent implements OnInit {
       next: t => {
         this.enviando.set(false)
         this.creado.set(t)
-        this.limpiarBorrador()
         this.arriba()
       },
       error: err => {
@@ -402,23 +398,5 @@ export class Reportarcomponent implements OnInit {
 
   private arriba() {
     if (this.browser) window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  private guardarBorrador(v: any) {
-    if (!this.browser) return
-    try { sessionStorage.setItem(BORRADOR, JSON.stringify({ ...v, fotoUrl: '' })) } catch { }
-  }
-
-  private restaurar() {
-    if (!this.browser) return
-    try {
-      const raw = sessionStorage.getItem(BORRADOR)
-      if (raw) this.form.patchValue(JSON.parse(raw))
-    } catch { }
-  }
-
-  private limpiarBorrador() {
-    if (!this.browser) return
-    try { sessionStorage.removeItem(BORRADOR) } catch { }
   }
 }
