@@ -1,0 +1,36 @@
+<header class="pag-head">
+  <h2>Avance de atención</h2>
+  <p>Estado actual de los reclamos{{ r.departamento() ? ' en ' + r.departamento() : '' }} y porcentaje resuelto de cada tipo de problema.</p>
+</header>
+
+<div class="columnas2">
+  <mat-card appearance="outlined" class="tarjeta">
+    <h3>Estado de los reclamos</h3>
+    <p class="sub">Recibidos, en atención, resueltos y descartados.</p>
+    <div class="grafico">
+      <canvas
+        baseChart
+        [type]="chartTypeEstados"
+        [data]="chartDataEstados"
+        [options]="chartOptionsEstados">
+      </canvas>
+    </div>
+  </mat-card>
+  <mat-card appearance="outlined" class="tarjeta">
+    <h3>Tasa de resolución por tipo</h3>
+    <p class="sub">Porcentaje de reclamos resueltos respecto del total de cada tipo.</p>
+    <div class="grafico">
+      <canvas
+        baseChart
+        [type]="chartTypeResueltos"
+        [data]="chartDataResueltos"
+        [options]="chartOptionsResueltos">
+      </canvas>
+    </div>
+  </mat-card>
+</div>
+
+<aside class="nota abajo">
+  <span class="nota-tit">Dato principal</span>
+  <p><b>{{ r.cifras().pendientes.toLocaleString('es-PE') }}</b> reclamos ({{ r.pctDe(r.cifras().pendientes, r.cifras().total) }}%) aún esperan su primera atención.</p>
+</aside>

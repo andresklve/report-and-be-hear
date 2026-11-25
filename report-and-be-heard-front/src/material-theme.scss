@@ -1,5 +1,5 @@
 // Tema de Angular Material 3.
-// Base roja (Perú) y tipografía Public Sans; luego se fijan los colores
+// Base roja (Perú) y tipografía Roboto (como en el curso); luego se fijan los colores
 // exactos del sistema para que coincidan con la identidad de ReclamaYA.
 @use '@angular/material' as mat;
 
@@ -12,8 +12,8 @@ html {
       theme-type: light,
     ),
     typography: (
-      plain-family: ('Public Sans', system-ui, sans-serif),
-      brand-family: ('Public Sans', system-ui, sans-serif),
+      plain-family: ('Roboto', system-ui, sans-serif),
+      brand-family: ('Roboto', system-ui, sans-serif),
       bold-weight: 700,
       medium-weight: 600,
       regular-weight: 400,
@@ -49,7 +49,7 @@ html {
 
 /* Ajustes globales de los componentes de Angular Material */
 
-// Íconos: Material Symbols Rounded (se registra en app.ts)
+// Íconos: Material Icons (cargados en index.html)
 .mat-icon {
   flex: none;
   font-size: 20px;
@@ -57,7 +57,6 @@ html {
   height: 20px;
   line-height: 1;
   overflow: visible;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 // Botones con esquinas como el resto de la app

@@ -127,7 +127,7 @@
     </div>
 
     <footer class="mp-panel-pie">
-      <a matButton routerLink="/resultados" class="bloque ver-res"><mat-icon>insights</mat-icon>Ver resultados de la gestión</a>
+      <a matButton routerLink="/cifras" class="bloque ver-res"><mat-icon>insights</mat-icon>Ver las cifras</a>
       <a matButton="filled" routerLink="/reportar" [queryParams]="reportarParams()" class="bloque">
         <mat-icon>add</mat-icon>Reportar un problema{{ sel().nivel === 'distrito' ? ' en ' + sel().nombre : '' }}
       </a>
