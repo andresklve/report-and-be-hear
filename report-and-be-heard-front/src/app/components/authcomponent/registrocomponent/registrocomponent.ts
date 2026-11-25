@@ -36,6 +36,7 @@ export class Registrocomponent {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
+    correo: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   })
 
@@ -51,7 +52,7 @@ export class Registrocomponent {
   })
   fuerzaTxt = computed(() => ['Muy corta', 'Aceptable', 'Buena', 'Fuerte', 'Excelente'][this.fuerza()])
 
-  mal(c: 'nombres' | 'apellidos' | 'username' | 'password') {
+  mal(c: 'nombres' | 'apellidos' | 'username' | 'correo' | 'password') {
     const ctrl = this.form.controls[c]
     return ctrl.invalid && ctrl.touched
   }
@@ -61,7 +62,7 @@ export class Registrocomponent {
     this.cargando.set(true)
     this.error.set('')
     const v = this.form.value
-    this.auth.registrar(v.nombres!, v.apellidos!, v.username!, v.password!).subscribe({
+    this.auth.registrar(v.nombres!, v.apellidos!, v.username!, v.correo!, v.password!).subscribe({
       next: s => {
         this.toast.ok(`¡Bienvenida/o, ${s.nombres}! Tu cuenta está lista.`)
         this.router.navigateByUrl(this.volver ?? '/reportar')

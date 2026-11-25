@@ -23,6 +23,12 @@
         <mat-error>{{ usernameAyuda }}</mat-error>
       </mat-form-field>
       <mat-form-field class="campo-full">
+        <mat-label>Correo (opcional)</mat-label>
+        <input matInput type="email" formControlName="correo" autocomplete="off" placeholder="ej. jperez@gmail.com" />
+        <mat-hint>Para recibir avisos y recuperar la contraseña.</mat-hint>
+        <mat-error>Escribe un correo válido.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
         <mat-label>{{ edicion ? 'Nueva contraseña (opcional)' : 'Contraseña inicial' }}</mat-label>
         <input matInput type="text" formControlName="passwordHash" />
         <mat-hint>{{ edicion ? 'Déjala vacía para mantener la contraseña actual.' : 'Mínimo 6 caracteres. Compártela de forma segura.' }}</mat-hint>

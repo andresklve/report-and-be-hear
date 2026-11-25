@@ -1,0 +1,30 @@
+<mat-card appearance="outlined" class="auth-caja">
+  <mat-card-content>
+  @if (enviado()) {
+    <h1>Revisa tu correo</h1>
+    <p class="muted">Si <b>{{ enviado() }}</b> está registrado, te enviamos un enlace para crear una nueva contraseña. Vence en 30 minutos.</p>
+    @if (tokenDemo()) {
+      <p class="alerta"><mat-icon>science</mat-icon>Modo de prueba: el servidor no tiene Gmail configurado, así que el correo no salió. Usa este botón en su lugar.</p>
+      <a matButton="filled" class="bloque" routerLink="/restablecer" [queryParams]="{ token: tokenDemo() }">Abrir el enlace del correo</a>
+    }
+    <p class="auth-alt muted">¿No llegó? Revisa la carpeta de spam o <a href="" (click)="$event.preventDefault(); otraVez()">inténtalo otra vez</a>.</p>
+  } @else {
+    <h1>¿Olvidaste tu contraseña?</h1>
+    <p class="muted">Escribe el correo de tu cuenta y te enviaremos un enlace para crear una nueva.</p>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+      <mat-form-field>
+        <mat-label>Correo</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" formControlName="correo" autocomplete="email" placeholder="tu@gmail.com" />
+        <mat-error>Escribe un correo válido.</mat-error>
+      </mat-form-field>
+      @if (error()) { <p class="alerta"><mat-icon>error</mat-icon>{{ error() }}</p> }
+      <button matButton="filled" type="submit" class="bloque oscuro" [disabled]="enviando()">
+        @if (enviando()) { <mat-spinner diameter="18" />Enviando… } @else { Enviar enlace }
+      </button>
+    </form>
+  }
+  <p class="auth-alt"><a routerLink="/ingresar">Volver a ingresar</a></p>
+  </mat-card-content>
+</mat-card>

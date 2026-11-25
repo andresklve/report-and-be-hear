@@ -16,3 +16,7 @@ mat-form-field { width: 100%; margin-bottom: 4px; }
   .fila-2 { grid-template-columns: 1fr; }
 }
 
+
+.olvide { margin: -4px 0 12px; text-align: right; font-size: .88rem; }
+.olvide a { font-weight: 600; color: var(--info); }
+.olvide a:hover { text-decoration: underline; }

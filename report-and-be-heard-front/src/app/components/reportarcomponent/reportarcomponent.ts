@@ -98,6 +98,7 @@ export class Reportarcomponent implements OnInit {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
+    correo: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   })
 
@@ -341,6 +342,9 @@ export class Reportarcomponent implements OnInit {
       this.cuenta.get(c)?.setValidators(req)
       this.cuenta.get(c)?.updateValueAndValidity()
     }
+    // El correo solo se pide al crear la cuenta
+    this.cuenta.get('correo')?.setValidators(m === 'registro' ? [Validators.required, Validators.email] : [])
+    this.cuenta.get('correo')?.updateValueAndValidity()
   }
 
   enviar() {
@@ -354,7 +358,7 @@ export class Reportarcomponent implements OnInit {
       if (this.cuenta.invalid) { this.errorCuenta.set('Completa tus datos para enviar el reporte.'); return }
       const c = this.cuenta.value
       sesion$ = this.modoCuenta() === 'registro'
-        ? this.auth.registrar(c.nombres, c.apellidos, c.username, c.password)
+        ? this.auth.registrar(c.nombres, c.apellidos, c.username, c.correo, c.password)
         : this.auth.login(c.username, c.password)
     }
     this.enviando.set(true)

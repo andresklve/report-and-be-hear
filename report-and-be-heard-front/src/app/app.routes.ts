@@ -13,6 +13,8 @@ import { Reportarcomponent } from './components/reportarcomponent/reportarcompon
 import { Authcomponent } from './components/authcomponent/authcomponent';
 import { Logincomponent } from './components/authcomponent/logincomponent/logincomponent';
 import { Registrocomponent } from './components/authcomponent/registrocomponent/registrocomponent';
+import { Recuperarcomponent } from './components/authcomponent/recuperarcomponent/recuperarcomponent';
+import { Restablecercomponent } from './components/authcomponent/restablecercomponent/restablecercomponent';
 import { Misreportescomponent } from './components/misreportescomponent/misreportescomponent';
 import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Resumencomponent } from './components/resumencomponent/resumencomponent';
@@ -60,6 +62,14 @@ export const routes: Routes = [
   {
     path: 'registro', component: Authcomponent,
     children: [{ path: '', component: Registrocomponent, title: 'Crear cuenta · ReclamaYA' }]
+  },
+  {
+    path: 'recuperar', component: Authcomponent,
+    children: [{ path: '', component: Recuperarcomponent, title: 'Recuperar contraseña · ReclamaYA' }]
+  },
+  {
+    path: 'restablecer', component: Authcomponent,
+    children: [{ path: '', component: Restablecercomponent, title: 'Nueva contraseña · ReclamaYA' }]
   },
   { path: 'mis-reportes', component: Misreportescomponent, canActivate: [sesionGuard], title: 'Mis reportes · ReclamaYA' },
   {

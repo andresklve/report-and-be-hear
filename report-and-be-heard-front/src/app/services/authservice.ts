@@ -48,14 +48,26 @@ export class Authservice {
   }
 
   // Registro publico: el backend siempre crea al usuario como CIUDADANO
-  registrar(nombres: string, apellidos: string, username: string, password: string): Observable<SesionDTO> {
+  registrar(nombres: string, apellidos: string, username: string, correo: string, password: string): Observable<SesionDTO> {
     const u: UsuarioDTO = {
       idUsuario: 0, idRol: 0, nombres: nombres.trim(), apellidos: apellidos.trim(),
-      username: username.trim().toLowerCase(), passwordHash: password, fechaRegistro: null, activo: true
+      username: username.trim().toLowerCase(), correo: correo.trim().toLowerCase(),
+      passwordHash: password, fechaRegistro: null, activo: true
     }
     return this.uS.insert(u).pipe(
       switchMap(() => this.login(u.username, password))
     )
+  }
+
+  // Olvide mi contrasena: el backend envia al correo un enlace /restablecer?token=...
+  // enlaceDemo solo llega cuando el backend no tiene Gmail configurado (para poder probar en local)
+  olvidePassword(correo: string): Observable<{ mensaje: string; enlaceDemo: string | null }> {
+    return this.http.post<{ mensaje: string; enlaceDemo: string | null }>(
+      `${environment.base}/auth/olvide-password`, { correo: correo.trim().toLowerCase() })
+  }
+
+  restablecerPassword(token: string, nuevaPassword: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${environment.base}/auth/restablecer-password`, { token, nuevaPassword })
   }
 
   logout() {
@@ -93,6 +105,8 @@ export class Authservice {
     if (/suspendida/i.test(err?.error?.message ?? '')) return err.error.message
     if (err?.status === 401 || err?.status === 403) return 'Usuario o contraseña incorrectos.'
     const msg: string = err?.error?.message ?? ''
+    if (/correo.*ya está en uso/i.test(msg)) return 'Ese correo ya está registrado. Inicia sesión o recupera tu contraseña.'
+    if (/enlace no es válido/i.test(msg)) return msg
     if (/ya está en uso|unique|duplicad|llave duplicada/i.test(msg)) return 'Ese nombre de usuario ya existe. Elige otro o inicia sesión.'
     return msg || 'Algo salió mal. Intenta otra vez.'
   }

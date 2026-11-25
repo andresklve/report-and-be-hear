@@ -19,6 +19,7 @@
       </button>
       <mat-error>Escribe tu contraseña.</mat-error>
     </mat-form-field>
+    <p class="olvide"><a routerLink="/recuperar">¿Olvidaste tu contraseña?</a></p>
     @if (error()) { <p class="alerta"><mat-icon>error</mat-icon>{{ error() }}</p> }
     <button matButton="filled" type="submit" class="bloque oscuro" [disabled]="cargando()">
       @if (cargando()) { <mat-spinner diameter="18" />Ingresando… } @else { Ingresar }

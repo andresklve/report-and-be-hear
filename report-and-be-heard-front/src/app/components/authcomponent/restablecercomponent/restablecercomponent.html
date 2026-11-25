@@ -1,0 +1,40 @@
+<mat-card appearance="outlined" class="auth-caja">
+  <mat-card-content>
+  @if (!token) {
+    <h1>Enlace incompleto</h1>
+    <p class="muted">Abre el enlace completo que te enviamos por correo, o solicita uno nuevo.</p>
+    <a matButton="filled" class="bloque oscuro" routerLink="/recuperar">Solicitar un enlace nuevo</a>
+  } @else {
+    <h1>Crea tu nueva contraseña</h1>
+    <p class="muted">Elige una contraseña que no hayas usado antes.</p>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <mat-form-field>
+        <mat-label>Nueva contraseña</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput [type]="verPass() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" />
+        <button matIconButton matSuffix type="button" (click)="verPass.set(!verPass())" [attr.aria-label]="verPass() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+          <mat-icon>{{ verPass() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error>Mínimo 6 caracteres.</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Repite la contraseña</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput [type]="verPass() ? 'text' : 'password'" formControlName="confirmar" autocomplete="new-password" />
+        <mat-error>Repite la contraseña.</mat-error>
+      </mat-form-field>
+      @if (form.hasError('distintas') && form.controls.confirmar.touched) {
+        <p class="alerta"><mat-icon>error</mat-icon>Las contraseñas no coinciden.</p>
+      }
+      @if (error()) {
+        <p class="alerta"><mat-icon>error</mat-icon>{{ error() }}</p>
+        <p class="auth-alt"><a routerLink="/recuperar">Solicitar un enlace nuevo</a></p>
+      }
+      <button matButton="filled" type="submit" class="bloque oscuro" [disabled]="guardando()">
+        @if (guardando()) { <mat-spinner diameter="18" />Guardando… } @else { Guardar contraseña }
+      </button>
+    </form>
+  }
+  </mat-card-content>
+</mat-card>

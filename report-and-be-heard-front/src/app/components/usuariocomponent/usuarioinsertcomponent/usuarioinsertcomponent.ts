@@ -46,6 +46,7 @@ export class Usuarioinsertcomponent implements OnInit {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
+    correo: ['', Validators.email],
     // Al editar, la contraseña es opcional: vacía = se mantiene la actual
     passwordHash: ['', this.edicion ? [Validators.minLength(6)] : [Validators.required, Validators.minLength(6)]],
     idRol: [null as number | null, Validators.required],
@@ -62,7 +63,7 @@ export class Usuarioinsertcomponent implements OnInit {
       this.uS.listId(this.id).subscribe({
         next: u => {
           this.original = u
-          this.form.patchValue({ nombres: u.nombres, apellidos: u.apellidos, username: u.username, idRol: u.idRol, activo: u.activo, passwordHash: '' })
+          this.form.patchValue({ nombres: u.nombres, apellidos: u.apellidos, username: u.username, correo: u.correo ?? '', idRol: u.idRol, activo: u.activo, passwordHash: '' })
         },
         error: () => this.error.set('No se encontró el usuario.'),
       })
@@ -74,6 +75,7 @@ export class Usuarioinsertcomponent implements OnInit {
     const v = this.form.value
     const datos = {
       nombres: v.nombres!.trim(), apellidos: v.apellidos!.trim(), username: v.username!.trim().toLowerCase(),
+      correo: (v.correo ?? '').trim().toLowerCase(),
       idRol: v.idRol!, activo: v.activo ?? true,
     }
     let peticion: Observable<UsuarioDTO>

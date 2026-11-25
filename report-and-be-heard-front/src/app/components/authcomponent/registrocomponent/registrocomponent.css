@@ -21,3 +21,4 @@ mat-form-field { width: 100%; margin-bottom: 4px; }
 .fuerza.n1 { --mat-progress-bar-active-indicator-color: var(--error); }
 .fuerza.n2 { --mat-progress-bar-active-indicator-color: var(--warn-chart); }
 .fuerza.n3, .fuerza.n4 { --mat-progress-bar-active-indicator-color: var(--ok-chart); }
+.campo-correo { margin-bottom: 16px; }
