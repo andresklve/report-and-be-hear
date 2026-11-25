@@ -1,0 +1,14 @@
+/* mat-stepper usado solo para mostrar el avance: Recibido -> En atencion -> Resuelto */
+.track {
+  background: transparent;
+  --mat-stepper-container-color: transparent;
+  --mat-stepper-header-height: 56px;
+  --mat-stepper-header-label-text-size: .82rem;
+  --mat-stepper-header-done-state-icon-background-color: var(--ok-chart);
+  --mat-stepper-header-done-state-icon-foreground-color: #fff;
+  --mat-stepper-header-selected-state-icon-background-color: var(--ok-chart);
+  --mat-stepper-header-selected-state-icon-foreground-color: #fff;
+  --mat-stepper-line-color: var(--line);
+}
+.track ::ng-deep .mat-horizontal-stepper-header { padding: 0 12px 0 0; pointer-events: none; }
+.track ::ng-deep .mat-horizontal-content-container { display: none; }
