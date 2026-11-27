@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:netlify": "node scripts/set-env.mjs && ng build && node scripts/index-netlify.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:report-and-be-heard-front": "node dist/report-and-be-heard-front/server/server.mjs"

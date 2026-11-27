@@ -49,3 +49,28 @@ python3 datos-prueba/inyectar_datos.py   # roles, catálogos y cuentas demo
 python3 datos-prueba/inyectar_peru.py    # zonas en las 196 provincias, reclamos y moderaciones
 ```
 Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La contraseña está en `datos-prueba/inyectar_datos.py`.
+
+## Despliegue
+
+**Backend (AWS).** Se usa el `Dockerfile` de `report-and-be-hear-api/` y se definen estas variables de entorno
+(`local.properties` no se sube, así que en el servidor todo va por variables):
+
+| Variable | Qué es |
+|---|---|
+| `DB_URL`, `DB_USER`, `DB_PASSWORD` | PostgreSQL en AWS, por ejemplo `jdbc:postgresql://<host>:5432/BDReportAndBeHeard` |
+| `JWT_SECRET` | Clave para firmar el JWT, de 64 caracteres o más y distinta a la de desarrollo |
+| `GEMINI_API_KEY` | Clave de Google AI Studio para clasificar reclamos con IA |
+| `MAIL_USERNAME`, `MAIL_PASSWORD` | Gmail y su contraseña de aplicación, para los correos de verificación y de cambio de contraseña. Son obligatorias en producción: sin ellas el backend no arranca |
+| `FRONT_URL` | URL del front en Netlify (`https://<sitio>.netlify.app`). Va en los links de los correos y se permite en CORS |
+| `CORS_ORIGINS` | Opcional: otros orígenes permitidos, separados por coma |
+
+El backend tiene que responder por **https**: el front en Netlify usa https y el navegador bloquea las llamadas a una API por http.
+
+**Frontend (Netlify).** El repo tiene `netlify.toml`, así que Netlify toma solo la carpeta, el comando de build y las rutas.
+Solo hay que definir en *Site configuration → Environment variables*:
+
+| Variable | Qué es |
+|---|---|
+| `API_URL` | URL del backend en AWS, con https (por ejemplo `https://api.tudominio.com`) |
+
+Sin `API_URL` el build en Netlify falla a propósito, para no publicar un front que llama a `localhost`.
