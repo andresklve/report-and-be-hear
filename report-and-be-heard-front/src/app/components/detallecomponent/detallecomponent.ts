@@ -47,6 +47,7 @@ export class Detallecomponent implements OnInit {
   falso = signal(false)
 
   datos = signal<Datos | null>(null)
+  foto = signal<string | null>(null)
   moderaciones = signal<ModeracionDTO[]>([])
   noExiste = signal(false)
   id = signal(0)
@@ -108,6 +109,9 @@ export class Detallecomponent implements OnInit {
       this.id.set(Number(p.get('id')))
       this.falso.set(false)
       this.cargar()
+      // La lista no trae la foto: se pide solo la de este reclamo
+      this.foto.set(null)
+      this.tS.listId(this.id()).subscribe({ next: x => this.foto.set(x.fotoUrl || null), error: () => {} })
       this.aS.resumen(this.id(), this.auth.sesion()?.idUsuario).subscribe({ next: r => this.apoyo.set(r), error: () => this.apoyo.set(null) })
     })
   }
