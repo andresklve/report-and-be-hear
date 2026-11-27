@@ -1,7 +1,6 @@
-import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
@@ -12,13 +11,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { UsuarioDTO } from '../../../models/UsuarioDTO';
 import { RolDTO } from '../../../models/RolDTO';
 import { Usuarioservice } from '../../../services/usuarioservice';
 import { Rolservice } from '../../../services/rolservice';
 import { Authservice } from '../../../services/authservice';
-import { Toastservice } from '../../../services/toastservice';
 import { Usuariocardcomponent } from '../usuariocardcomponent/usuariocardcomponent';
 import { Rangofechascomponent } from '../../rangofechascomponent/rangofechascomponent';
 import { enRango } from '../../../shared/ui';
@@ -26,86 +23,144 @@ import { enRango } from '../../../shared/ui';
 // Lista de usuarios en tabla o en tarjetas, con el mismo paginador para ambas vistas
 @Component({
   selector: 'app-usuariolistcomponent',
-  imports: [RouterLink, DatePipe, TitleCasePipe, Usuariocardcomponent, Rangofechascomponent, MatTableModule, MatPaginatorModule, MatCardModule, MatButtonModule,
-    MatButtonToggleModule, MatIconModule, MatFormFieldModule, MatInputModule, MatChipsModule, MatTooltipModule, MatProgressBarModule],
+  imports: [
+    RouterLink,
+    DatePipe,
+    TitleCasePipe,
+    Usuariocardcomponent,
+    Rangofechascomponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatCardModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatChipsModule,
+    MatTooltipModule
+  ],
   templateUrl: './usuariolistcomponent.html',
   styleUrl: './usuariolistcomponent.css',
 })
 export class Usuariolistcomponent implements OnInit {
-  private uS = inject(Usuarioservice)
-  private rS = inject(Rolservice)
-  private toast = inject(Toastservice)
-  auth = inject(Authservice)
+  displayedColumns: string[] = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6']
+  dataSource: UsuarioDTO[] = []
+  listaRoles: RolDTO[] = []
+  mensaje: string = ''
 
-  usuarios = signal<UsuarioDTO[]>([])
-  roles = signal<RolDTO[]>([])
-  cargando = signal(true)
-  texto = signal('')
-  rolFiltro = signal<number | null>(null)
-  confirmando = signal<number | null>(null)
-  vista = signal<'tabla' | 'tarjetas'>('tarjetas')
-  desde = signal<Date | null>(null)
-  hasta = signal<Date | null>(null)
-  columnas = ['persona', 'rol', 'registro', 'estado', 'acciones']
+  // Filtros
+  texto: string = ''
+  rolFiltro: number | null = null
+  desde: Date | null = null
+  hasta: Date | null = null
+  vista: string = 'tarjetas'
 
   // Paginacion
-  pageIndex = signal(0)
-  pageSize = signal(8)
+  pageIndex: number = 0
+  pageSize: number = 8
 
-  rolNombre = computed(() => new Map(this.roles().map(r => [r.idRol, r.nombreRol])))
-  conteoRol = computed(() => {
-    const m = new Map<number, number>()
-    this.usuarios().forEach(u => m.set(u.idRol, (m.get(u.idRol) ?? 0) + 1))
-    return m
-  })
-  filtrados = computed(() => {
-    const q = this.texto().trim().toLowerCase()
-    return this.usuarios().filter(u =>
-      (this.rolFiltro() == null || u.idRol === this.rolFiltro()) &&
-      enRango(u.fechaRegistro, this.desde(), this.hasta()) &&
-      (!q || `${u.nombres} ${u.apellidos} ${u.username}`.toLowerCase().includes(q)))
-  })
-  pagina = computed(() => {
-    const ini = this.pageIndex() * this.pageSize()
-    return this.filtrados().slice(ini, ini + this.pageSize())
-  })
-
-  constructor() {
-    // Al cambiar el filtro se vuelve a la primera pagina
-    effect(() => { this.texto(); this.rolFiltro(); this.desde(); this.hasta(); this.pageIndex.set(0) })
-  }
+  constructor(private uS: Usuarioservice,
+    private rS: Rolservice,
+    private auth: Authservice,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-    forkJoin({ u: this.uS.list(), r: this.rS.list() }).subscribe({
-      next: ({ u, r }) => { this.usuarios.set([...u].sort((a, b) => b.idUsuario - a.idUsuario)); this.roles.set(r); this.cargando.set(false) },
-      error: () => { this.cargando.set(false); this.toast.error('No se pudo cargar usuarios') },
+    this.listarUsuarios()
+  }
+
+  listarUsuarios(): void {
+    this.uS.list().subscribe({
+      next: usuarios => {
+        this.rS.list().subscribe({
+          next: roles => {
+            this.dataSource = usuarios.sort((a, b) => b.idUsuario - a.idUsuario)
+            this.listaRoles = roles
+            this.cdr.detectChanges()
+          }, error: err => {
+            console.log(err)
+            this.cdr.detectChanges()
+          }
+        })
+      }, error: err => {
+        console.log('Ocurrió un error al obtener los registros', err)
+        this.mensaje = 'No se pudo conectar con el servidor.'
+        this.cdr.detectChanges()
+      }
     })
   }
 
-  cambiarPagina(e: PageEvent) {
-    this.pageIndex.set(e.pageIndex)
-    this.pageSize.set(e.pageSize)
-  }
-
-  iniciales(u: UsuarioDTO) {
-    return `${u.nombres[0] ?? ''}${u.apellidos[0] ?? ''}`.toUpperCase()
-  }
-
-  tonoRol(id: number) {
-    const n = this.rolNombre().get(id)
-    return n === 'ADMINISTRADOR' ? 'pill pill-error' : n === 'MUNICIPALIDAD' ? 'pill pill-info' : 'pill'
-  }
-
-  eliminar(u: UsuarioDTO) {
-    if (u.idUsuario === this.auth.sesion()?.idUsuario) { this.toast.info('No puedes eliminar tu propia cuenta'); return }
-    if (this.confirmando() !== u.idUsuario) {
-      this.confirmando.set(u.idUsuario)
-      setTimeout(() => { if (this.confirmando() === u.idUsuario) this.confirmando.set(null) }, 3500)
+  eliminarUsuario(u: UsuarioDTO): void {
+    if (u.idUsuario === this.auth.sesion()?.idUsuario) {
+      this.mensaje = 'No puedes eliminar tu propia cuenta.'
       return
     }
     this.uS.delete(u.idUsuario).subscribe({
-      next: () => { this.usuarios.update(l => l.filter(x => x.idUsuario !== u.idUsuario)); this.toast.ok('Usuario eliminado') },
-      error: () => { this.confirmando.set(null); this.toast.error('No se puede eliminar: tiene reportes o moderaciones.') },
+      next: () => {
+        this.mensaje = ''
+        this.listarUsuarios()
+        this.cdr.detectChanges()
+      }, error: err => {
+        console.log('Ocurrió un error al eliminar el registro', err)
+        this.mensaje = 'No se puede eliminar: el usuario tiene reportes o moderaciones.'
+        this.cdr.detectChanges()
+      }
     })
+  }
+
+  // Usuarios que cumplen los filtros
+  get filtrados(): UsuarioDTO[] {
+    const q = this.texto.trim().toLowerCase()
+    return this.dataSource.filter(u =>
+      (this.rolFiltro == null || u.idRol === this.rolFiltro) &&
+      enRango(u.fechaRegistro, this.desde, this.hasta) &&
+      (!q || `${u.nombres} ${u.apellidos} ${u.username}`.toLowerCase().includes(q)))
+  }
+
+  // Usuarios de la pagina actual
+  get pagina(): UsuarioDTO[] {
+    const ini = this.pageIndex * this.pageSize
+    return this.filtrados.slice(ini, ini + this.pageSize)
+  }
+
+  // Al cambiar un filtro se vuelve a la primera pagina
+  filtrar(event: Event): void {
+    this.texto = (event.target as HTMLInputElement).value
+    this.pageIndex = 0
+  }
+  filtrarRol(id: number | null): void {
+    this.rolFiltro = id
+    this.pageIndex = 0
+  }
+  cambiarDesde(f: Date | null): void {
+    this.desde = f
+    this.pageIndex = 0
+  }
+  cambiarHasta(f: Date | null): void {
+    this.hasta = f
+    this.pageIndex = 0
+  }
+
+  cambiarPagina(e: PageEvent): void {
+    this.pageIndex = e.pageIndex
+    this.pageSize = e.pageSize
+  }
+
+  nombreRol(id: number): string {
+    return this.listaRoles.find(r => r.idRol === id)?.nombreRol ?? ''
+  }
+
+  contarRol(id: number): number {
+    return this.dataSource.filter(u => u.idRol === id).length
+  }
+
+  iniciales(u: UsuarioDTO): string {
+    return `${u.nombres[0] ?? ''}${u.apellidos[0] ?? ''}`.toUpperCase()
+  }
+
+  tonoRol(id: number): string {
+    const n = this.nombreRol(id)
+    return n === 'ADMINISTRADOR' ? 'pill pill-error' : n === 'MUNICIPALIDAD' ? 'pill pill-info' : 'pill'
   }
 }

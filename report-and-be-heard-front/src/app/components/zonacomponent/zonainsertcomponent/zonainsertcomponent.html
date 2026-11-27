@@ -1,48 +1,43 @@
-<a matButton routerLink="/panel/zonas" class="volver"><mat-icon>arrow_back</mat-icon>Zonas</a>
+<a matButton routerLink="/panel/zonas/listar" class="volver"><mat-icon>arrow_back</mat-icon>Zonas</a>
 <mat-card appearance="outlined" class="form-panel">
   <mat-card-header>
     <div mat-card-avatar class="form-ico"><mat-icon>location_on</mat-icon></div>
-    <mat-card-title>{{ edicion ? 'Editar zona' : 'Nueva zona' }}</mat-card-title>
+    <mat-card-title>Registro de Zona</mat-card-title>
     <mat-card-subtitle>Distritos donde la ciudadanía puede reportar. Sus coordenadas alimentan el mapa de calor.</mat-card-subtitle>
   </mat-card-header>
-  <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+  <form [formGroup]="zonaForm" (ngSubmit)="insertarZona()">
     <mat-card-content class="form-grid">
       <mat-form-field class="campo-full">
         <mat-label>Distrito o zona</mat-label>
-        <input matInput formControlName="nombreZona" placeholder="Miraflores" />
+        <input matInput placeholder="Miraflores" formControlName="nombre">
         <mat-error>Campo obligatorio.</mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Provincia</mat-label>
-        <input matInput formControlName="provinciaZona" placeholder="Lima" />
+        <input matInput placeholder="Lima" formControlName="provincia">
         <mat-error>Campo obligatorio.</mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Departamento</mat-label>
-        <input matInput formControlName="departamentoZona" placeholder="Lima" />
+        <input matInput placeholder="Lima" formControlName="departamento">
         <mat-error>Campo obligatorio.</mat-error>
       </mat-form-field>
       <mat-form-field>
         <mat-label>Latitud</mat-label>
-        <input matInput type="number" step="any" formControlName="latitudZona" placeholder="-12.1211" />
-        <mat-error>Campo obligatorio.</mat-error>
+        <input matInput type="number" step="any" placeholder="-12.1211" formControlName="latitud">
       </mat-form-field>
       <mat-form-field>
         <mat-label>Longitud</mat-label>
-        <input matInput type="number" step="any" formControlName="longitudZona" placeholder="-77.0297" />
-        <mat-error>Campo obligatorio.</mat-error>
+        <input matInput type="number" step="any" placeholder="-77.0297" formControlName="longitud">
       </mat-form-field>
-      @if (error()) { <p class="alerta campo-full"><mat-icon>error</mat-icon>{{ error() }}</p> }
+      @if(mensaje){
+      <p class="alerta campo-full"><mat-icon>info</mat-icon>{{ mensaje }}</p>
+      }
     </mat-card-content>
     <mat-card-actions class="form-acciones">
-      <a matButton routerLink="/panel/zonas">Cancelar</a>
+      <a matButton routerLink="/panel/zonas/listar">Cancelar</a>
       <span class="spacer"></span>
-      @if (!edicion) {
-        <button matButton="outlined" type="button" (click)="registrar(true)" [disabled]="guardando()">Guardar y agregar otra</button>
-      }
-      <button matButton="filled" type="submit" [disabled]="guardando()">
-        @if (guardando()) { <mat-spinner diameter="18" /> } {{ edicion ? 'Guardar cambios' : 'Guardar' }}
-      </button>
+      <button matButton="filled" type="submit">Registrar</button>
     </mat-card-actions>
   </form>
 </mat-card>

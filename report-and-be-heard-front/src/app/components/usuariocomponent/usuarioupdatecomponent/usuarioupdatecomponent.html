@@ -1,0 +1,64 @@
+<a matButton routerLink="/panel/usuarios/listar" class="volver"><mat-icon>arrow_back</mat-icon>Usuarios</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>manage_accounts</mat-icon></div>
+    <mat-card-title>Actualización de Usuario</mat-card-title>
+    <mat-card-subtitle>Cambia los datos, el rol o el estado de la cuenta.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formUsuario" (ngSubmit)="actualizarUsuario()">
+    <mat-card-content class="form-grid">
+      <mat-form-field class="campo-full">
+        <mat-label>ID</mat-label>
+        <input matInput formControlName="codigo" readonly>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Nombres</mat-label>
+        <input matInput formControlName="nombres">
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Apellidos</mat-label>
+        <input matInput formControlName="apellidos">
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Usuario</mat-label>
+        <input matInput autocomplete="off" formControlName="username">
+        <mat-error>{{ usernameAyuda }}</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Correo (opcional)</mat-label>
+        <input matInput type="email" placeholder="ej. ana@gmail.com" formControlName="correo">
+        <mat-error>Escribe un correo válido.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Nueva contraseña (opcional)</mat-label>
+        <input matInput type="text" formControlName="password">
+        <mat-hint>Déjala vacía para mantener la contraseña actual.</mat-hint>
+        <mat-error>Mínimo 6 caracteres.</mat-error>
+      </mat-form-field>
+      <div class="campo-full rol-campo">
+        <span class="rol-lbl">Rol</span>
+        <mat-radio-group formControlName="rol" class="rol-opciones">
+          @for (r of listaRoles; track r.idRol) {
+          <mat-radio-button [value]="r.idRol" class="rol-op" [class.on]="formUsuario.value.rol === r.idRol">
+            <strong>{{ r.nombreRol }}</strong>
+            <small>{{ r.descripcionRol }}</small>
+          </mat-radio-button>
+          }
+        </mat-radio-group>
+      </div>
+      <section class="campo-full activo">
+        <mat-checkbox formControlName="estado">Cuenta activa</mat-checkbox>
+      </section>
+      @if(mensaje){
+      <p class="alerta campo-full"><mat-icon>info</mat-icon>{{ mensaje }}</p>
+      }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/usuarios/listar">Cancelar</a>
+      <span class="spacer"></span>
+      <button matButton="filled" type="submit">Guardar</button>
+    </mat-card-actions>
+  </form>
+</mat-card>

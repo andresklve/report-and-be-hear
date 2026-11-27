@@ -16,3 +16,8 @@ mat-form-field { width: 100%; margin-bottom: 4px; }
   .fila-2 { grid-template-columns: 1fr; }
 }
 
+
+/* Link "¿Olvidaste tu contraseña?" */
+.olvido { text-align: right; margin: -2px 0 12px; font-size: .86rem; }
+.olvido a { color: var(--info); font-weight: 500; }
+.olvido a:hover { text-decoration: underline; }
