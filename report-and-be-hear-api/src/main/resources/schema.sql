@@ -1,3 +1,13 @@
+-- Datos: el proyecto solo usa Google Gemini como IA. Los reclamos que quedaron
+-- guardados con un modelo "claude-..." se pasan a "gemini-2.5-flash". En una base
+-- nueva (sin la tabla) o ya corregida no hace nada.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'testimonios' AND column_name = 'modelo_ia') THEN
+    UPDATE testimonios SET modelo_ia = 'gemini-2.5-flash' WHERE modelo_ia ILIKE 'claude%';
+  END IF;
+END $$;
+^^^END^^^
 -- Migracion: el usuario ya no usa correo, usa username.
 -- Si la base es de antes (columna "correo"), se renombra a "username" y cada correo
 -- pasa a su parte antes de la @ (ana.torres@demo.pe -> ana.torres). En una base nueva
