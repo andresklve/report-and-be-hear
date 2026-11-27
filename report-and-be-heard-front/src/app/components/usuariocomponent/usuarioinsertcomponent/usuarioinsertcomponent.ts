@@ -63,7 +63,6 @@ export class Usuarioinsertcomponent implements OnInit {
       nombres: this.usuarioForm.value.nombres.trim(),
       apellidos: this.usuarioForm.value.apellidos.trim(),
       username: this.usuarioForm.value.username.trim().toLowerCase(),
-      correo: null,
       passwordHash: this.usuarioForm.value.password,
       idRol: this.usuarioForm.value.rol,
       fechaRegistro: null,

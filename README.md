@@ -60,8 +60,7 @@ Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La 
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | PostgreSQL en AWS, por ejemplo `jdbc:postgresql://<host>:5432/BDReportAndBeHeard` |
 | `JWT_SECRET` | Clave para firmar el JWT, de 64 caracteres o más y distinta a la de desarrollo |
 | `GEMINI_API_KEY` | Clave de Google AI Studio para clasificar reclamos con IA |
-| `MAIL_USERNAME`, `MAIL_PASSWORD` | Gmail y su contraseña de aplicación, para los correos de verificación y de cambio de contraseña. Son obligatorias en producción: sin ellas el backend no arranca |
-| `FRONT_URL` | URL del front en Netlify (`https://<sitio>.netlify.app`). Va en los links de los correos y se permite en CORS |
+| `FRONT_URL` | URL del front en Netlify (`https://<sitio>.netlify.app`). Se permite en CORS |
 | `CORS_ORIGINS` | Opcional: otros orígenes permitidos, separados por coma |
 
 El backend tiene que responder por **https**: el front en Netlify usa https y el navegador bloquea las llamadas a una API por http.

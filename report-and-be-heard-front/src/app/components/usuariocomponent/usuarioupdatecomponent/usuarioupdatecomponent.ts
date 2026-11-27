@@ -56,7 +56,6 @@ export class Usuarioupdatecomponent implements OnInit {
       nombres: ['', Validators.required],
       apellidos: ['', Validators.required],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
-      correo: ['', Validators.email],
       // La contraseña es opcional: vacía = se mantiene la actual
       password: ['', Validators.minLength(6)],
       rol: [0, Validators.required],
@@ -82,7 +81,6 @@ export class Usuarioupdatecomponent implements OnInit {
           nombres: data.nombres,
           apellidos: data.apellidos,
           username: data.username,
-          correo: data.correo,
           rol: data.idRol,
           estado: data.activo
         });
@@ -106,7 +104,6 @@ export class Usuarioupdatecomponent implements OnInit {
       nombres: this.formUsuario.value.nombres.trim(),
       apellidos: this.formUsuario.value.apellidos.trim(),
       username: this.formUsuario.value.username.trim().toLowerCase(),
-      correo: this.formUsuario.value.correo?.trim() || null,
       // Sin contraseña nueva se reenvía el hash actual y el backend lo conserva
       passwordHash: this.formUsuario.value.password || this.usuarioActual.passwordHash,
       idRol: this.formUsuario.value.rol,
