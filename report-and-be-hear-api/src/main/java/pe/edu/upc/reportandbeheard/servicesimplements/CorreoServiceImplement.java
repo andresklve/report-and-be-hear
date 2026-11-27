@@ -24,9 +24,16 @@ public class CorreoServiceImplement implements ICorreoService {
     private final String remitente;
 
     public CorreoServiceImplement(JavaMailSender mailSender,
-                                  @Value("${spring.mail.username:}") String remitente) {
+                                  @Value("${spring.mail.username:}") String remitente,
+                                  @Value("${app.front.url:http://localhost:4200}") String frontUrl) {
         this.mailSender = mailSender;
         this.remitente = remitente == null ? "" : remitente.trim();
+        // En produccion (el front no esta en localhost) los correos son obligatorios:
+        // sin ellos las cuentas registradas con correo nunca se podrian activar
+        if (this.remitente.isEmpty() && !frontUrl.contains("localhost")) {
+            throw new IllegalStateException("Faltan MAIL_USERNAME y MAIL_PASSWORD: sin ellos no se pueden enviar "
+                    + "los correos de verificacion en produccion (FRONT_URL=" + frontUrl + ").");
+        }
         log.info("Correo de verificacion: {}", this.remitente.isEmpty()
                 ? "sin MAIL_USERNAME, el link se mostrara en la consola"
                 : "Gmail " + this.remitente);
