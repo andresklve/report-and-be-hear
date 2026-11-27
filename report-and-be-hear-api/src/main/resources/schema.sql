@@ -17,3 +17,15 @@ BEGIN
   END IF;
 END $$;
 ^^^END^^^
+
+-- Migracion: la foto del reclamo se guarda como data URL en base64 (decenas de miles de caracteres).
+-- En bases antiguas la columna foto_url quedo como varchar(500) y Hibernate no cambia tipos,
+-- asi que al subir una foto el INSERT fallaba. Se pasa a TEXT (en una base nueva no hace nada).
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+              WHERE table_name = 'testimonios' AND column_name = 'foto_url' AND data_type <> 'text') THEN
+    ALTER TABLE testimonios ALTER COLUMN foto_url TYPE TEXT;
+  END IF;
+END $$;
+^^^END^^^
