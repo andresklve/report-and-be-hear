@@ -23,6 +23,12 @@ cp local.properties.example local.properties   # y edite usuario, contraseña y 
 ```
 `local.properties` no se sube a git.
 
+**IA (opcional):** para que la clasificación de reclamos use Google Gemini, cree una clave en https://aistudio.google.com/api-keys y agréguela en `report-and-be-hear-api/local.properties`:
+```properties
+gemini.api.key=SU_CLAVE
+```
+Sin clave, la app funciona igual y clasifica con reglas por palabras clave.
+
 **2. Backend**
 ```bash
 cd report-and-be-hear-api
@@ -43,3 +49,27 @@ python3 datos-prueba/inyectar_datos.py   # roles, catálogos y cuentas demo
 python3 datos-prueba/inyectar_peru.py    # zonas en las 196 provincias, reclamos y moderaciones
 ```
 Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La contraseña está en `datos-prueba/inyectar_datos.py`.
+
+## Despliegue
+
+**Backend (AWS).** Se usa el `Dockerfile` de `report-and-be-hear-api/` y se definen estas variables de entorno
+(`local.properties` no se sube, así que en el servidor todo va por variables):
+
+| Variable | Qué es |
+|---|---|
+| `DB_URL`, `DB_USER`, `DB_PASSWORD` | PostgreSQL en AWS, por ejemplo `jdbc:postgresql://<host>:5432/BDReportAndBeHeard` |
+| `JWT_SECRET` | Clave para firmar el JWT, de 64 caracteres o más y distinta a la de desarrollo |
+| `GEMINI_API_KEY` | Clave de Google AI Studio para clasificar reclamos con IA |
+| `FRONT_URL` | URL del front en Netlify (`https://<sitio>.netlify.app`). Se permite en CORS |
+| `CORS_ORIGINS` | Opcional: otros orígenes permitidos, separados por coma |
+
+El backend tiene que responder por **https**: el front en Netlify usa https y el navegador bloquea las llamadas a una API por http.
+
+**Frontend (Netlify).** El repo tiene `netlify.toml`, así que Netlify toma solo la carpeta, el comando de build y las rutas.
+Solo hay que definir en *Site configuration → Environment variables*:
+
+| Variable | Qué es |
+|---|---|
+| `API_URL` | URL del backend en AWS, con https (por ejemplo `https://api.tudominio.com`) |
+
+Sin `API_URL` el build en Netlify falla a propósito, para no publicar un front que llama a `localhost`.

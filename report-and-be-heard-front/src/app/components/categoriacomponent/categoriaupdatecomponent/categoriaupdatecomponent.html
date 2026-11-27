@@ -1,0 +1,36 @@
+<a matButton routerLink="/panel/categorias/listar" class="volver"><mat-icon>arrow_back</mat-icon>Categorías</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>edit</mat-icon></div>
+    <mat-card-title>Actualización de Categoría</mat-card-title>
+    <mat-card-subtitle>Cambia el nombre, la descripción o si la categoría se muestra al reportar.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formCategoria" (ngSubmit)="actualizarCategoria()">
+    <mat-card-content class="form-grid">
+      <mat-form-field class="campo-full">
+        <mat-label>ID</mat-label>
+        <input matInput formControlName="codigo" readonly>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Nombre</mat-label>
+        <input matInput placeholder="Baches" formControlName="nombre">
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Descripción (opcional)</mat-label>
+        <input matInput formControlName="descripcion">
+      </mat-form-field>
+      <section class="campo-full visible">
+        <mat-checkbox formControlName="estado">Visible para la ciudadanía</mat-checkbox>
+      </section>
+      @if(mensaje){
+      <p class="alerta campo-full"><mat-icon>info</mat-icon>{{ mensaje }}</p>
+      }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/categorias/listar">Cancelar</a>
+      <span class="spacer"></span>
+      <button matButton="filled" type="submit">Guardar</button>
+    </mat-card-actions>
+  </form>
+</mat-card>

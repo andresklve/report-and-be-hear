@@ -150,7 +150,11 @@ export class Reportarcomponent implements OnInit {
         this.iaCargando.set(false)
         this.ia.set(r)
         const cambios: Record<string, unknown> = {}
-        if (r.idCategoria != null) cambios['idCategoria'] = r.idCategoria
+        if (r.variosProblemas) {
+          // Varios problemas: no se elige ninguno solo; el ciudadano escoge cual reportar
+          const actual = this.form.value.idCategoria
+          if (!r.opciones.some(o => o.idCategoria === actual)) cambios['idCategoria'] = null
+        } else if (r.idCategoria != null) cambios['idCategoria'] = r.idCategoria
         if (r.direccionTextoExtraida && !this.form.value.direccionTextoExtraida) cambios['direccionTextoExtraida'] = r.direccionTextoExtraida
         this.form.patchValue(cambios)
       },
@@ -171,9 +175,16 @@ export class Reportarcomponent implements OnInit {
     return null
   })
 
-  // La confianza y el modelo se guardan solo si el ciudadano se quedo con la categoria sugerida
+  // Opcion de la IA para una categoria (si la IA la detecto en el texto)
+  opcionIA(idCategoria: number | null) {
+    return this.ia()?.opciones?.find(o => o.idCategoria === idCategoria) ?? null
+  }
+
+  // La confianza y el modelo se guardan solo si el ciudadano eligio una categoria que sugirio la IA
   private datosIA(idCategoria: number): { confianzaIA: number | null, modeloIA: string | null } {
     const r = this.ia()
+    const opcion = this.opcionIA(idCategoria)
+    if (r && opcion) return { confianzaIA: opcion.confianza, modeloIA: r.modeloIA }
     return r && r.idCategoria === idCategoria
       ? { confianzaIA: r.confianzaIA, modeloIA: r.modeloIA }
       : { confianzaIA: null, modeloIA: null }

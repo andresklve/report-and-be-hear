@@ -2,7 +2,7 @@ import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, switchMap, throwError } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { LoginRequestDTO, LoginResponseDTO, RolNombre, SesionDTO } from '../models/SesionDTO';
 import { UsuarioDTO } from '../models/UsuarioDTO';
 import { Usuarioservice } from './usuarioservice';

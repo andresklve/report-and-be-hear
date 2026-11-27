@@ -54,7 +54,14 @@
                       <strong>Analizando tu reclamo…</strong>
                       <span>La IA está eligiendo la categoría y buscando la dirección.</span>
                     } @else if (ia(); as r) {
-                      @if (r.idCategoria != null) {
+                      @if (r.variosProblemas) {
+                        <strong>Tu reclamo menciona {{ r.opciones.length }} problemas distintos</strong>
+                        <span>
+                          Cada reporte debe tratar un solo problema. ¿Cuál quieres reportar ahora?
+                          Los demás puedes reportarlos después, por separado.
+                          <span class="mono">{{ r.modeloIA === 'reglas' ? 'sin IA · reglas' : r.modeloIA }}</span>
+                        </span>
+                      } @else if (r.idCategoria != null) {
                         <strong>Sugerencia: {{ r.nombreCategoria }} · {{ (r.confianzaIA * 100) | number:'1.0-0' }}% de confianza</strong>
                         <span>
                           @if (r.direccionTextoExtraida) { Dirección encontrada: {{ r.direccionTextoExtraida }}. }
@@ -78,10 +85,30 @@
                     {{ ia() ? 'Volver a sugerir' : 'Sugerir con IA' }}
                   </button>
                 </div>
+                <!-- Varios problemas: la IA pregunta cual reportar -->
+                @if (!iaCargando() && ia()?.variosProblemas) {
+                  <div class="ia-opciones" role="radiogroup" aria-label="Elige el problema que quieres reportar">
+                    @for (op of ia()!.opciones; track op.idCategoria) {
+                      <button type="button" class="ia-opcion" role="radio" [attr.aria-checked]="valor().idCategoria === op.idCategoria"
+                              [class.on]="valor().idCategoria === op.idCategoria" [style.--cat]="colorCategoria(op.nombreCategoria)"
+                              (click)="elegirCategoria(op.idCategoria)">
+                        <mat-icon class="ia-opcion-ico">{{ iconoCategoria(op.nombreCategoria) }}</mat-icon>
+                        <span class="ia-opcion-txt">
+                          <b>{{ op.nombreCategoria }}</b>
+                          @if (op.fragmento) { <small>“{{ op.fragmento }}”</small> }
+                        </span>
+                        <mat-icon class="ia-opcion-check">{{ valor().idCategoria === op.idCategoria ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                      </button>
+                    }
+                  </div>
+                  @if (valor().idCategoria == null) {
+                    <p class="ia-pregunta"><mat-icon>help</mat-icon>Elige un problema para continuar.</p>
+                  }
+                }
               </mat-card>
 
               <span class="lbl tipo-lbl">Tipo de problema
-                @if (ia()?.idCategoria != null && valor().idCategoria === ia()?.idCategoria) { <span class="lbl-nota">· sugerido por la IA, puedes cambiarlo</span> }
+                @if (opcionIA(valor().idCategoria)) { <span class="lbl-nota">· sugerido por la IA, puedes cambiarlo</span> }
               </span>
               <mat-button-toggle-group class="opciones-cat" [value]="valor().idCategoria" (change)="elegirCategoria($event.value)" hideSingleSelectionIndicator aria-label="Tipo de problema">
                 @for (cat of categoriasActivas(); track cat.idCategoria) {
@@ -90,7 +117,7 @@
                     <mat-icon>{{ iconoCategoria(cat.nombreCategoria) }}</mat-icon>
                     <strong>{{ cat.nombreCategoria }}</strong>
                     <small>{{ cat.descripcionCategoria }}</small>
-                    @if (ia()?.idCategoria === cat.idCategoria) { <span class="opcion-ia"><mat-icon>auto_awesome</mat-icon>Sugerido</span> }
+                    @if (opcionIA(cat.idCategoria) || ia()?.idCategoria === cat.idCategoria) { <span class="opcion-ia"><mat-icon>auto_awesome</mat-icon>{{ ia()?.variosProblemas ? 'Detectado' : 'Sugerido' }}</span> }
                   </mat-button-toggle>
                 }
               </mat-button-toggle-group>

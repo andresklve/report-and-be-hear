@@ -1,0 +1,17 @@
+# Despliegue del frontend (Angular) en Netlify.
+# En Netlify > Site configuration > Environment variables definir:
+#   API_URL = URL del backend en AWS (con https), por ejemplo https://api.tudominio.com
+[build]
+  base = "report-and-be-heard-front"
+  command = "npm run build:netlify"
+  publish = "dist/report-and-be-heard-front/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Rutas de Angular (/mapa, /verificar?token=..., /restablecer?token=...):
+# cualquier ruta que no sea un archivo se responde con index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

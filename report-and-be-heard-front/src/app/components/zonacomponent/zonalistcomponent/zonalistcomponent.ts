@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -7,74 +7,69 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { ZonaDTO } from '../../../models/ZonaDTO';
 import { Zonaservice } from '../../../services/zonaservice';
-import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-zonalistcomponent',
-  imports: [RouterLink, MatTableModule, MatPaginatorModule, MatCardModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatTooltipModule, MatProgressBarModule, MatSortModule],
+  imports: [
+    MatTableModule,
+    MatPaginatorModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    RouterLink
+  ],
   templateUrl: './zonalistcomponent.html',
   styleUrl: './zonalistcomponent.css',
 })
 export class Zonalistcomponent implements OnInit {
-  private s = inject(Zonaservice)
-  private toast = inject(Toastservice)
+  displayedColumns: string[] = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7']
+  dataSource: MatTableDataSource<ZonaDTO> = new MatTableDataSource()
+  mensaje: string = ''
 
-  lista = signal<ZonaDTO[]>([])
-  cargando = signal(true)
-  error = signal(false)
-  texto = signal('')
-  confirmando = signal<number | null>(null)
+  @ViewChild(MatPaginator) paginator!: MatPaginator
 
-  // Tabla de Angular Material con paginador
-  columnas = ['idZona', 'nombreZona', 'provinciaZona', 'departamentoZona', 'coordenadas', 'acciones']
-  tabla = new MatTableDataSource<ZonaDTO>([])
-  paginador = viewChild(MatPaginator)
-  orden = viewChild(MatSort)
-
-  filtrados = computed(() => {
-    const q = this.texto().trim().toLowerCase()
-    return q ? this.lista().filter(x => JSON.stringify(x).toLowerCase().includes(q)) : this.lista()
-  })
-
-  constructor() {
-    effect(() => { this.tabla.data = this.filtrados() })
-    effect(() => { this.tabla.paginator = this.paginador() ?? null })
-    effect(() => { this.tabla.sort = this.orden() ?? null })
-  }
+  constructor(private zS: Zonaservice,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-    this.listar()
+    this.listarZonas()
   }
 
-  listar() {
-    this.s.list().subscribe({
-      next: data => { this.lista.set(data); this.cargando.set(false) },
-      error: () => { this.error.set(true); this.cargando.set(false) },
+  listarZonas(): void {
+    this.zS.list().subscribe({
+      next: data => {
+        this.dataSource = new MatTableDataSource(data)
+        this.dataSource.paginator = this.paginator
+        this.cdr.detectChanges()
+      }, error: err => {
+        console.log('Ocurrió un error al obtener los registros', err)
+        this.mensaje = 'No se pudo conectar con el servidor.'
+        this.cdr.detectChanges()
+      }
     })
   }
 
-  // Primer clic pide confirmacion, el segundo elimina
-  eliminar(id: number) {
-    if (this.confirmando() !== id) {
-      this.confirmando.set(id)
-      setTimeout(() => { if (this.confirmando() === id) this.confirmando.set(null) }, 3500)
-      return
-    }
-    this.s.delete(id).subscribe({
+  eliminarZona(id: number): void {
+    this.zS.delete(id).subscribe({
       next: () => {
-        this.lista.update(l => l.filter(x => x.idZona !== id))
-        this.confirmando.set(null)
-        this.toast.ok('Zona eliminada')
-      },
-      error: () => {
-        this.confirmando.set(null)
-        this.toast.error('No se puede eliminar: tiene registros relacionados.')
-      },
+        this.mensaje = ''
+        this.listarZonas()
+        this.cdr.detectChanges()
+      }, error: err => {
+        console.log('Ocurrió un error al eliminar el registro', err)
+        this.mensaje = 'No se puede eliminar: la zona tiene reportes relacionados.'
+        this.cdr.detectChanges()
+      }
     })
+  }
+
+  // Filtro de la tabla de Angular Material
+  filtrar(event: Event): void {
+    this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase()
   }
 }

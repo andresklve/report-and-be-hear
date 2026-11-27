@@ -19,20 +19,25 @@ import { Resumencomponent } from './components/resumencomponent/resumencomponent
 import { Bandejacomponent } from './components/bandejacomponent/bandejacomponent';
 import { Moderacioncomponent } from './components/moderacioncomponent/moderacioncomponent';
 import { Moderacionlistcomponent } from './components/moderacioncomponent/moderacionlistcomponent/moderacionlistcomponent';
+import { Moderacionupdatecomponent } from './components/moderacioncomponent/moderacionupdatecomponent/moderacionupdatecomponent';
 import { Suspensioncomponent } from './components/suspensioncomponent/suspensioncomponent';
 import { Suspensionlistcomponent } from './components/suspensioncomponent/suspensionlistcomponent/suspensionlistcomponent';
 import { Zonacomponent } from './components/zonacomponent/zonacomponent';
 import { Zonalistcomponent } from './components/zonacomponent/zonalistcomponent/zonalistcomponent';
 import { Zonainsertcomponent } from './components/zonacomponent/zonainsertcomponent/zonainsertcomponent';
+import { Zonaupdatecomponent } from './components/zonacomponent/zonaupdatecomponent/zonaupdatecomponent';
 import { Categoriacomponent } from './components/categoriacomponent/categoriacomponent';
 import { Categorialistcomponent } from './components/categoriacomponent/categorialistcomponent/categorialistcomponent';
 import { Categoriainsertcomponent } from './components/categoriacomponent/categoriainsertcomponent/categoriainsertcomponent';
+import { Categoriaupdatecomponent } from './components/categoriacomponent/categoriaupdatecomponent/categoriaupdatecomponent';
 import { Usuariocomponent } from './components/usuariocomponent/usuariocomponent';
 import { Usuariolistcomponent } from './components/usuariocomponent/usuariolistcomponent/usuariolistcomponent';
 import { Usuarioinsertcomponent } from './components/usuariocomponent/usuarioinsertcomponent/usuarioinsertcomponent';
+import { Usuarioupdatecomponent } from './components/usuariocomponent/usuarioupdatecomponent/usuarioupdatecomponent';
 import { Rolcomponent } from './components/rolcomponent/rolcomponent';
 import { Rollistcomponent } from './components/rolcomponent/rollistcomponent/rollistcomponent';
 import { Rolinsertcomponent } from './components/rolcomponent/rolinsertcomponent/rolinsertcomponent';
+import { Rolupdatecomponent } from './components/rolcomponent/rolupdatecomponent/rolupdatecomponent';
 
 export const routes: Routes = [
   { path: '', component: Homecomponent, title: 'ReclamaYA · Reclamos ciudadanos del Perú' },
@@ -74,7 +79,8 @@ export const routes: Routes = [
         path: 'moderaciones', component: Moderacioncomponent,
         children: [
           { path: '', redirectTo: 'listar', pathMatch: 'full' },
-          { path: 'listar', component: Moderacionlistcomponent, title: 'Moderaciones · Panel' }
+          { path: 'listar', component: Moderacionlistcomponent, title: 'Moderaciones · Panel' },
+          { path: 'editar/:id', component: Moderacionupdatecomponent, title: 'Editar · Panel' }
         ]
       },
       {
@@ -90,7 +96,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'listar', pathMatch: 'full' },
           { path: 'listar', component: Zonalistcomponent, title: 'Zonas · Panel' },
           { path: 'insertar', component: Zonainsertcomponent, title: 'Nueva zona · Panel' },
-          { path: 'ediciones/:id', component: Zonainsertcomponent, title: 'Editar · Panel' }
+          { path: 'editar/:id', component: Zonaupdatecomponent, title: 'Editar · Panel' }
         ]
       },
       {
@@ -99,7 +105,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'listar', pathMatch: 'full' },
           { path: 'listar', component: Categorialistcomponent, title: 'Categorías · Panel' },
           { path: 'insertar', component: Categoriainsertcomponent, title: 'Nueva categoría · Panel' },
-          { path: 'ediciones/:id', component: Categoriainsertcomponent, title: 'Editar · Panel' }
+          { path: 'editar/:id', component: Categoriaupdatecomponent, title: 'Editar · Panel' }
         ]
       },
       {
@@ -108,7 +114,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'listar', pathMatch: 'full' },
           { path: 'listar', component: Usuariolistcomponent, title: 'Usuarios · Panel' },
           { path: 'insertar', component: Usuarioinsertcomponent, title: 'Nuevo usuario · Panel' },
-          { path: 'ediciones/:id', component: Usuarioinsertcomponent, title: 'Editar · Panel' }
+          { path: 'editar/:id', component: Usuarioupdatecomponent, title: 'Editar · Panel' }
         ]
       },
       {
@@ -117,7 +123,7 @@ export const routes: Routes = [
           { path: '', redirectTo: 'listar', pathMatch: 'full' },
           { path: 'listar', component: Rollistcomponent, title: 'Roles · Panel' },
           { path: 'insertar', component: Rolinsertcomponent, title: 'Nuevo rol · Panel' },
-          { path: 'ediciones/:id', component: Rolinsertcomponent, title: 'Editar · Panel' }
+          { path: 'editar/:id', component: Rolupdatecomponent, title: 'Editar · Panel' }
         ]
       }
     ]
