@@ -1,0 +1,2 @@
+/* Formulario de moderacion: usa .form-panel, .form-grid y .form-acciones de styles/_compartido.scss */
+.nota-estado { display: flex; gap: 8px; align-items: flex-start; font-size: .84rem; color: var(--info); background: var(--info-soft); padding: 8px 10px; border-radius: var(--r); }

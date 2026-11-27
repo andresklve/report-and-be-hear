@@ -1,0 +1,33 @@
+<a matButton routerLink="/panel/roles/listar" class="volver"><mat-icon>arrow_back</mat-icon>Roles</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>edit</mat-icon></div>
+    <mat-card-title>Actualización de Rol</mat-card-title>
+    <mat-card-subtitle>Cambia el nombre o la descripción del perfil de acceso.</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formRol" (ngSubmit)="actualizarRol()">
+    <mat-card-content class="form-grid">
+      <mat-form-field class="campo-full">
+        <mat-label>ID</mat-label>
+        <input matInput formControlName="codigo" readonly>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Nombre del rol</mat-label>
+        <input matInput formControlName="nombre">
+        <mat-error>Campo obligatorio.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Descripción (opcional)</mat-label>
+        <input matInput formControlName="descripcion">
+      </mat-form-field>
+      @if(mensaje){
+      <p class="alerta campo-full"><mat-icon>info</mat-icon>{{ mensaje }}</p>
+      }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/roles/listar">Cancelar</a>
+      <span class="spacer"></span>
+      <button matButton="filled" type="submit">Guardar</button>
+    </mat-card-actions>
+  </form>
+</mat-card>

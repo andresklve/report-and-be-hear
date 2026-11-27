@@ -1,5 +1,6 @@
 package pe.edu.upc.reportandbeheard.dtos;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -21,6 +22,10 @@ public class UsuarioDTO {
             message = "El nombre de usuario debe tener de 3 a 30 caracteres: letras, números, punto, guion o guion bajo.")
     private String username;
 
+    // Opcional. Si se registra con correo, se envia un link para activar la cuenta
+    @Email(message = "Escribe un correo válido.")
+    private String correo;
+
     @NotBlank(message = "La contraseña es obligatoria.")
     private String passwordHash;
 
@@ -38,6 +43,8 @@ public class UsuarioDTO {
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+    public String getCorreo() { return correo; }
+    public void setCorreo(String correo) { this.correo = correo; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }

@@ -1,0 +1,21 @@
+.dona { display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center; }
+svg { width: 170px; height: 170px; overflow: visible; }
+circle { transition: opacity .15s, stroke-width .15s; cursor: pointer; }
+circle.atenuado { opacity: .3; }
+circle.on { stroke-width: 28; }
+.c-valor { font-size: 22px; font-weight: 800; fill: var(--ink); font-family: var(--f); }
+.c-etq { font-size: 10.5px; fill: var(--ink-3); font-family: var(--f); }
+
+.leyenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.leyenda li { display: grid; grid-template-columns: 12px 1fr auto 40px; gap: 8px; align-items: center; padding: 5px 6px; border-radius: var(--r); font-size: .86rem; cursor: default; }
+.leyenda li.on { background: var(--surface-2); }
+.leyenda i { width: 12px; height: 12px; border-radius: 3px; }
+.l-n { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leyenda b { font-variant-numeric: tabular-nums; color: var(--ink); }
+.l-p { text-align: right; color: var(--ink-3); font-variant-numeric: tabular-nums; font-size: .8rem; }
+.vacio-txt { color: var(--ink-3); font-size: .88rem; }
+
+@media (max-width: 520px) {
+  .dona { grid-template-columns: 1fr; justify-items: center; }
+  .leyenda { width: 100%; }
+}

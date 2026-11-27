@@ -59,6 +59,13 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+		<!-- Envio de correos (Gmail SMTP) para verificar el registro -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+
 		<!-- JWT / OAuth2 Resource Server -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
