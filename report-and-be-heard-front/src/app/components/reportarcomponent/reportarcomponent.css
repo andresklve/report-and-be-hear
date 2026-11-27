@@ -106,3 +106,16 @@
 .foto-prev { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
 .foto-prev img { width: 100%; max-height: 180px; object-fit: cover; }
 .foto-acts { display: flex; justify-content: flex-end; gap: 4px; padding: 4px; background: var(--surface-2); }
+
+/* Varios problemas en un reclamo: la IA pregunta cual reportar */
+.ia-opciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin-top: 12px; }
+.ia-opcion { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--surface); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.ia-opcion:hover { border-color: var(--cat, var(--info)); }
+.ia-opcion.on { border-color: var(--cat, var(--info)); box-shadow: inset 0 0 0 1px var(--cat, var(--info)); }
+.ia-opcion-ico { color: var(--cat, var(--info)); flex: none; }
+.ia-opcion-txt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.ia-opcion-txt b { font-size: .92rem; }
+.ia-opcion-txt small { color: var(--ink-2); font-size: .8rem; overflow: hidden; text-overflow: ellipsis; }
+.ia-opcion-check { color: var(--cat, var(--info)); flex: none; }
+.ia-pregunta { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; font-size: .84rem; color: var(--info); font-weight: 500; }
+.ia-pregunta .mat-icon { font-size: 18px; width: 18px; height: 18px; }

@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,23 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 "Tu cuenta está suspendida por incumplir las normas de la comunidad.",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+
+    // Login de una cuenta inactiva (por ejemplo, registrada con correo y sin verificar)
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleCuentaInactiva(
+            DisabledException ex,
+            HttpServletRequest request) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Tu cuenta aún no está activa. Si te registraste con correo, abre el link que te enviamos para verificarla.",
                 request.getRequestURI()
         );
 

@@ -1,81 +1,69 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CategoriaDTO } from '../../../models/CategoriaDTO';
 import { Categoriaservice } from '../../../services/categoriaservice';
-import { Toastservice } from '../../../services/toastservice';
 
 @Component({
   selector: 'app-categoriainsertcomponent',
-  imports: [ReactiveFormsModule, RouterLink, MatCardModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule, MatSlideToggleModule],
+  imports: [
+    ReactiveFormsModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatCheckboxModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    RouterLink
+  ],
   templateUrl: './categoriainsertcomponent.html',
   styleUrl: './categoriainsertcomponent.css',
 })
-// Sirve para crear y para editar (ruta /panel/categorias/ediciones/:id)
-export class Categoriainsertcomponent implements OnInit {
-  private s = inject(Categoriaservice)
-  private toast = inject(Toastservice)
-  private router = inject(Router)
-  private fb = inject(FormBuilder)
-  private route = inject(ActivatedRoute)
+export class Categoriainsertcomponent {
+  categoriaForm: any
+  mensaje: string = ''
 
-  id = Number(this.route.snapshot.paramMap.get('id') ?? 0)
-  edicion = this.id > 0
-
-  guardando = signal(false)
-  error = signal('')
-
-  form = this.fb.group({
-    nombreCategoria: ['', [Validators.required]],
-    descripcionCategoria: ['', []],
-    activo: [true, []],
-  })
-
-  ngOnInit(): void {
-    if (this.edicion) {
-      this.s.listId(this.id).subscribe({
-        next: x => this.form.patchValue(x as any),
-        error: () => this.error.set('No se encontró el registro.'),
-      })
-    }
+  constructor(private cS: Categoriaservice, private fb: FormBuilder) {
+    this.categoriaForm = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: [''],
+      estado: [true]
+    });
   }
 
-  mal(c: string): boolean {
-    const ctrl = this.form.get(c)
-    return !!ctrl && ctrl.invalid && ctrl.touched
-  }
-
-  registrar(seguir = false) {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return }
-    const v = this.form.value
-    const obj: CategoriaDTO = {
-      // Al crear, el id va vacio para que la base de datos lo genere (con 0 Hibernate busca un registro existente)
-      idCategoria: this.edicion ? this.id : null as unknown as number,
-      nombreCategoria: v.nombreCategoria!,
-      descripcionCategoria: v.descripcionCategoria!,
-      activo: v.activo!,
+  insertarCategoria(): void {
+    if (this.categoriaForm.invalid) {
+      this.mensaje = 'Por favor, complete todos los campos correctamente!!'
+      return
     }
-    this.guardando.set(true)
-    this.error.set('')
-    const peticion = this.edicion ? this.s.update(obj) : this.s.insert(obj)
-    peticion.subscribe({
-      next: () => {
-        this.guardando.set(false)
-        this.toast.ok(this.edicion ? 'Categoría actualizada' : 'Categoría registrada correctamente')
-        if (seguir && !this.edicion) this.form.reset({ nombreCategoria: '', descripcionCategoria: '', activo: true })
-        else this.router.navigate(['/panel/categorias'])
+    this.mensaje = ''
+    const categoria: CategoriaDTO = {
+      // El id va vacio para que la base de datos lo genere (con 0 Hibernate busca un registro existente)
+      idCategoria: null as any,
+      nombreCategoria: this.categoriaForm.value.nombre,
+      descripcionCategoria: this.categoriaForm.value.descripcion,
+      activo: this.categoriaForm.value.estado,
+    }
+
+    this.cS.insert(categoria).subscribe({
+      next: (data) => {
+        this.mensaje = 'Categoría registrada correctamente!!'
+        this.categoriaForm.reset(
+          {
+            estado: true
+          }
+        )
       },
-      error: err => {
-        this.guardando.set(false)
-        this.error.set(err.error?.message ?? 'No se pudo registrar')
-      },
+      error: (error) => {
+        this.mensaje = 'Error al registrar la categoría!!'
+        console.log(error)
+      }
     })
   }
 }

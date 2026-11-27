@@ -51,7 +51,7 @@ export class Authservice {
   registrar(nombres: string, apellidos: string, username: string, password: string): Observable<SesionDTO> {
     const u: UsuarioDTO = {
       idUsuario: 0, idRol: 0, nombres: nombres.trim(), apellidos: apellidos.trim(),
-      username: username.trim().toLowerCase(), passwordHash: password, fechaRegistro: null, activo: true
+      username: username.trim().toLowerCase(), correo: null, passwordHash: password, fechaRegistro: null, activo: true
     }
     return this.uS.insert(u).pipe(
       switchMap(() => this.login(u.username, password))
@@ -90,9 +90,10 @@ export class Authservice {
 
   static mensajeError(err: any): string {
     if (err?.status === 0) return 'No pudimos conectar con el servidor. Intenta de nuevo en un momento.'
-    if (/suspendida/i.test(err?.error?.message ?? '')) return err.error.message
+    if (/suspendida|no está activa/i.test(err?.error?.message ?? '')) return err.error.message
     if (err?.status === 401 || err?.status === 403) return 'Usuario o contraseña incorrectos.'
     const msg: string = err?.error?.message ?? ''
+    if (/correo .* ya está registrado|enviar el correo/i.test(msg)) return msg
     if (/ya está en uso|unique|duplicad|llave duplicada/i.test(msg)) return 'Ese nombre de usuario ya existe. Elige otro o inicia sesión.'
     return msg || 'Algo salió mal. Intenta otra vez.'
   }

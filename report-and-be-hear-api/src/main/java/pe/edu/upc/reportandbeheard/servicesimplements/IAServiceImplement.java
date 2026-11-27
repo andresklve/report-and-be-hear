@@ -9,11 +9,14 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import pe.edu.upc.reportandbeheard.dtos.ClasificacionIADTO;
+import pe.edu.upc.reportandbeheard.dtos.OpcionCategoriaDTO;
 import pe.edu.upc.reportandbeheard.entities.Categoria;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.ICategoriaService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IIAService;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,23 +89,39 @@ public class IAServiceImplement implements IIAService {
 
         String instrucciones = """
                 Eres el clasificador de reclamos ciudadanos de ReclamaYA, una plataforma del Perú.
-                Lee el reclamo y elige UNA categoría de esta lista (usa su número):
+                Categorías disponibles (usa su número):
                 %s
 
+                Cada reporte debe tratar UN solo problema. Lee el reclamo y detecta si describe
+                problemas DISTINTOS que pertenecen a categorías diferentes
+                (por ejemplo "hay un bache y además la basura no la recogen" = 2 problemas).
+                Un mismo problema contado con varios detalles es UN solo problema.
+
                 Responde solo con el JSON pedido:
-                - idCategoria: número de la categoría que mejor describe el problema.
+                - problemas: un elemento por cada problema distinto, del más importante al menos importante,
+                  sin repetir categoría. Cada uno con:
+                    - idCategoria: número de la categoría de ese problema.
+                    - confianza: qué tan seguro estás de esa categoría, de 0 a 1.
+                    - fragmento: frase corta (máximo 12 palabras) del reclamo que habla de ese problema.
+                  Si el reclamo trata un solo problema, la lista tiene un solo elemento.
                 - direccion: la dirección o referencia de lugar que aparezca en el texto
                   (por ejemplo "Av. Arequipa 1520, Lince"); cadena vacía si no hay ninguna.
-                - confianza: qué tan seguro estás, de 0 a 1.
                 """.formatted(lista);
 
         Map<String, Object> esquema = Map.of(
                 "type", "OBJECT",
                 "properties", Map.of(
-                        "idCategoria", Map.of("type", "INTEGER"),
-                        "direccion", Map.of("type", "STRING"),
-                        "confianza", Map.of("type", "NUMBER")),
-                "required", List.of("idCategoria", "direccion", "confianza"));
+                        "problemas", Map.of(
+                                "type", "ARRAY",
+                                "items", Map.of(
+                                        "type", "OBJECT",
+                                        "properties", Map.of(
+                                                "idCategoria", Map.of("type", "INTEGER"),
+                                                "confianza", Map.of("type", "NUMBER"),
+                                                "fragmento", Map.of("type", "STRING")),
+                                        "required", List.of("idCategoria", "confianza", "fragmento"))),
+                        "direccion", Map.of("type", "STRING")),
+                "required", List.of("problemas", "direccion"));
 
         Map<String, Object> cuerpo = Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", instrucciones))),
@@ -127,17 +146,36 @@ public class IAServiceImplement implements IIAService {
         String json = (String) partes.get(0).get("text");
         Map<String, Object> datos = JsonParserFactory.getJsonParser().parseMap(json);
 
-        Long idCategoria = ((Number) datos.get("idCategoria")).longValue();
-        Categoria categoria = categorias.stream()
-                .filter(c -> c.getIdCategoria().equals(idCategoria))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Gemini devolvio una categoria que no existe: " + idCategoria));
-
-        double confianza = Math.max(0, Math.min(1, ((Number) datos.get("confianza")).doubleValue()));
+        // Un problema por categoria (se ignoran categorias que no existen o repetidas)
+        Map<Long, OpcionCategoriaDTO> porCategoria = new LinkedHashMap<>();
+        for (Map<String, Object> p : (List<Map<String, Object>>) datos.get("problemas")) {
+            Long idCategoria = ((Number) p.get("idCategoria")).longValue();
+            Optional<Categoria> categoria = categorias.stream()
+                    .filter(c -> c.getIdCategoria().equals(idCategoria))
+                    .findFirst();
+            if (categoria.isEmpty() || porCategoria.containsKey(idCategoria)) continue;
+            double confianza = Math.max(0, Math.min(1, ((Number) p.get("confianza")).doubleValue()));
+            String fragmento = ((String) p.getOrDefault("fragmento", "")).trim();
+            porCategoria.put(idCategoria, new OpcionCategoriaDTO(idCategoria, categoria.get().getNombreCategoria(),
+                    redondear(confianza), fragmento.isEmpty() ? null : recortar(fragmento)));
+        }
+        if (porCategoria.isEmpty()) {
+            throw new IllegalStateException("Gemini no devolvio ninguna categoria valida");
+        }
         String direccion = ((String) datos.getOrDefault("direccion", "")).trim();
 
-        return new ClasificacionIADTO(categoria.getIdCategoria(), categoria.getNombreCategoria(),
-                direccion.isEmpty() ? null : recortar(direccion), redondear(confianza), modelo);
+        return armarResultado(new ArrayList<>(porCategoria.values()),
+                direccion.isEmpty() ? null : recortar(direccion), modelo);
+    }
+
+    // La primera opcion es la sugerencia principal; con 2 o mas, el ciudadano debe elegir una
+    private ClasificacionIADTO armarResultado(List<OpcionCategoriaDTO> opciones, String direccion, String modelo) {
+        OpcionCategoriaDTO principal = opciones.get(0);
+        ClasificacionIADTO dto = new ClasificacionIADTO(principal.getIdCategoria(), principal.getNombreCategoria(),
+                direccion, principal.getConfianza(), modelo);
+        dto.setOpciones(opciones);
+        dto.setVariosProblemas(opciones.size() > 1);
+        return dto;
     }
 
     // ===================== Respaldo por palabras clave =====================
@@ -159,8 +197,8 @@ public class IAServiceImplement implements IIAService {
 
     private ClasificacionIADTO clasificarConReglas(String texto, List<Categoria> categorias) {
         String t = texto.toLowerCase();
-        Categoria elegida = null;
-        int mejor = 0;
+        // Coincidencias de palabras clave por categoria
+        Map<Categoria, Integer> conteo = new LinkedHashMap<>();
         for (Categoria c : categorias) {
             String nombre = c.getNombreCategoria().toLowerCase();
             for (Map.Entry<Pattern, Pattern> r : REGLAS.entrySet()) {
@@ -168,14 +206,18 @@ public class IAServiceImplement implements IIAService {
                 Matcher m = r.getValue().matcher(t);
                 int coincidencias = 0;
                 while (m.find()) coincidencias++;
-                if (coincidencias > mejor) { mejor = coincidencias; elegida = c; }
+                if (coincidencias > conteo.getOrDefault(c, 0)) conteo.put(c, coincidencias);
             }
         }
+        List<Map.Entry<Categoria, Integer>> encontradas = conteo.entrySet().stream()
+                .filter(e -> e.getValue() > 0)
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .toList();
         Optional<String> direccion = Optional.empty();
         Matcher d = DIRECCION.matcher(texto);
         if (d.find()) direccion = Optional.of(recortar(d.group(1).trim()));
 
-        if (elegida == null) {
+        if (encontradas.isEmpty()) {
             // Sin coincidencias: "Otros" si existe; si no, sin categoria sugerida
             Optional<Categoria> otros = categorias.stream()
                     .filter(c -> c.getNombreCategoria().toLowerCase().startsWith("otro"))
@@ -184,9 +226,11 @@ public class IAServiceImplement implements IIAService {
                     otros.map(Categoria::getNombreCategoria).orElse(null),
                     direccion.orElse(null), 0.2, MODELO_REGLAS);
         }
-        double confianza = Math.min(0.8, 0.4 + 0.15 * (mejor - 1));
-        return new ClasificacionIADTO(elegida.getIdCategoria(), elegida.getNombreCategoria(),
-                direccion.orElse(null), redondear(confianza), MODELO_REGLAS);
+        List<OpcionCategoriaDTO> opciones = encontradas.stream()
+                .map(e -> new OpcionCategoriaDTO(e.getKey().getIdCategoria(), e.getKey().getNombreCategoria(),
+                        redondear(Math.min(0.8, 0.4 + 0.15 * (e.getValue() - 1))), null))
+                .toList();
+        return armarResultado(opciones, direccion.orElse(null), MODELO_REGLAS);
     }
 
     private static String recortar(String s) {

@@ -9,3 +9,8 @@ profesora/
 
 # Configuracion local con contrasenas y claves (cada uno crea el suyo)
 **/local.properties
+
+# Archivos personales que no se suben
+ReportAndBeHeard-progreso.md
+infoaparte.pdf
+reclamaya-icono.png

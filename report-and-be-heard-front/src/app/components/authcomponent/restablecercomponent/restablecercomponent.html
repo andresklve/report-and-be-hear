@@ -1,0 +1,43 @@
+<mat-card appearance="outlined" class="auth-caja">
+  <mat-card-content>
+  @if(listo){
+    <div class="enviado">
+      <span class="enviado-ico"><mat-icon>lock_reset</mat-icon></span>
+      <h1>Contraseña cambiada</h1>
+      <p class="muted">{{ mensaje }}</p>
+      @if(username){
+      <p class="muted pequeno">Tu usuario es <b>{{ username }}</b>.</p>
+      }
+      <a matButton="filled" class="bloque" routerLink="/ingresar">Ingresar</a>
+    </div>
+  }@else {
+    <h1>Crea una contraseña nueva</h1>
+    <p class="muted">Escríbela dos veces. Debe tener al menos 6 caracteres.</p>
+
+    <form [formGroup]="restablecerForm" (ngSubmit)="restablecerPassword()">
+      <mat-form-field>
+        <mat-label>Contraseña nueva</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput [type]="verPass ? 'text' : 'password'" formControlName="password" autocomplete="new-password">
+        <button matIconButton matSuffix type="button" (click)="verPass = !verPass">
+          <mat-icon>{{ verPass ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error>Mínimo 6 caracteres.</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Repite la contraseña</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput [type]="verPass ? 'text' : 'password'" formControlName="confirmar" autocomplete="new-password">
+        <mat-error>Obligatorio.</mat-error>
+      </mat-form-field>
+      @if(mensaje){
+      <p class="alerta"><mat-icon>error</mat-icon>{{ mensaje }}</p>
+      }
+      <button matButton="filled" type="submit" class="bloque" [disabled]="enviando">
+        {{ enviando ? 'Guardando…' : 'Guardar contraseña' }}
+      </button>
+    </form>
+    <p class="auth-alt"><a routerLink="/recuperar">Pedir un link nuevo</a></p>
+  }
+  </mat-card-content>
+</mat-card>

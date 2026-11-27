@@ -3,6 +3,7 @@ export class UsuarioDTO {
   nombres: string = '';
   apellidos: string = '';
   username: string = '';
+  correo: string | null = null;
   passwordHash: string = '';
   idRol: number = 0;
   fechaRegistro: string | null = null;

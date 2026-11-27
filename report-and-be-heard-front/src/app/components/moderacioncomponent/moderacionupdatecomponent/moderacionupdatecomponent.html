@@ -1,0 +1,45 @@
+<a matButton routerLink="/panel/moderaciones/listar" class="volver"><mat-icon>arrow_back</mat-icon>Moderaciones</a>
+<mat-card appearance="outlined" class="form-panel">
+  <mat-card-header>
+    <div mat-card-avatar class="form-ico"><mat-icon>gavel</mat-icon></div>
+    <mat-card-title>Actualización de Moderación</mat-card-title>
+    <mat-card-subtitle>Reporte {{ referencia(moderacionActual.idTestimonio) }}</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formModeracion" (ngSubmit)="actualizarModeracion()">
+    <mat-card-content class="form-grid">
+      <mat-form-field>
+        <mat-label>ID</mat-label>
+        <input matInput formControlName="codigo" readonly>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Acción</mat-label>
+        <mat-select formControlName="accion">
+          @for (e of acciones; track e.key) {
+          <mat-option [value]="e.key">{{ e.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Nota para la ciudadanía</mat-label>
+        <textarea matInput rows="3" formControlName="motivo"></textarea>
+        <mat-error>Escribe una nota (máximo 255 caracteres).</mat-error>
+      </mat-form-field>
+      <mat-form-field class="campo-full">
+        <mat-label>Costo de la intervención en S/ (opcional)</mat-label>
+        <mat-icon matPrefix>payments</mat-icon>
+        <input matInput type="number" min="0" step="0.01" formControlName="costo">
+      </mat-form-field>
+      @if(esUltima){
+      <p class="nota-estado campo-full"><mat-icon>info</mat-icon>Es la acción más reciente: el estado del reporte se actualizará a la acción elegida.</p>
+      }
+      @if(mensaje){
+      <p class="alerta campo-full"><mat-icon>info</mat-icon>{{ mensaje }}</p>
+      }
+    </mat-card-content>
+    <mat-card-actions class="form-acciones">
+      <a matButton routerLink="/panel/moderaciones/listar">Cancelar</a>
+      <span class="spacer"></span>
+      <button matButton="filled" type="submit">Guardar</button>
+    </mat-card-actions>
+  </form>
+</mat-card>
