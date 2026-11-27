@@ -42,13 +42,9 @@ npm install
 npm start                       # http://localhost:4200
 ```
 
-**4. Datos de prueba** (opcional, con el backend encendido y la base vacía)
-```bash
-cd report-and-be-heard-front
-python3 datos-prueba/inyectar_datos.py   # roles, catálogos y cuentas demo
-python3 datos-prueba/inyectar_peru.py    # zonas en las 196 provincias, reclamos y moderaciones
-```
-Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La contraseña está en `datos-prueba/inyectar_datos.py`.
+**4. Datos de prueba** (opcional)
+En `report-and-be-heard-front/datos-prueba/` están `mas_datos.sql` (12 meses de historia para los gráficos) y `limpiar_datos.sql`.
+Cuentas demo (usuario): `ana.torres` (ciudadana), `municipalidad` y `admin`. La contraseña la tiene el equipo.
 
 ## Despliegue
 

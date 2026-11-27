@@ -1,4 +1,4 @@
--- Mas datos de prueba para ReclamaYA (se corre DESPUES de inyectar_datos.py e inyectar_peru.py).
+-- Mas datos de prueba para ReclamaYA (se corre sobre una base que ya tiene usuarios, zonas y reclamos).
 -- Va directo a PostgreSQL porque la API siempre pone la fecha de hoy y aqui se necesita
 -- historia de 12 meses para que los graficos de tendencia tengan sentido.
 --

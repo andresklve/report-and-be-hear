@@ -14,11 +14,7 @@ npm start            # http://localhost:4200
 ```
 
 ## Datos de prueba (opcional)
-Con el backend encendido y la base vacía, desde esta carpeta:
-```bash
-python3 datos-prueba/inyectar_datos.py   # roles, catálogos y cuentas demo
-python3 datos-prueba/inyectar_peru.py    # zonas en las 196 provincias, reclamos y moderaciones
-```
+En `datos-prueba/` están `mas_datos.sql` (12 meses de historia para los gráficos, va directo a PostgreSQL) y `limpiar_datos.sql`.
 
 ## Estructura
 Sigue el formato del proyecto de ejemplo del curso:
