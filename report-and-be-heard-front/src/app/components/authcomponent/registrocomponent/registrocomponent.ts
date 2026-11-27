@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,13 +7,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { UsuarioDTO } from '../../../models/UsuarioDTO';
-import { Usuarioservice } from '../../../services/usuarioservice';
-import { Verificacionservice } from '../../../services/verificacionservice';
 import { Authservice } from '../../../services/authservice';
 import { USERNAME_AYUDA, USERNAME_PATRON } from '../../../shared/ui';
 
-// Registro publico con correo: la cuenta se activa al abrir el link que llega al correo
+// Registro publico: el backend crea la cuenta como CIUDADANO y luego se inicia sesion
 @Component({
   selector: 'app-registrocomponent',
   imports: [
@@ -34,14 +31,12 @@ export class Registrocomponent {
   mensaje: string = ''
   enviando: boolean = false
   verPass: boolean = false
-  // Correo al que se envio el link (cuando ya se registro)
-  correoEnviado: string = ''
   usernameAyuda = USERNAME_AYUDA
   volver: string | null = null
 
-  constructor(private uS: Usuarioservice,
-    private vS: Verificacionservice,
+  constructor(private aS: Authservice,
     private fb: FormBuilder,
+    private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {
@@ -49,7 +44,6 @@ export class Registrocomponent {
     this.registroForm = this.fb.group({
       nombres: ['', Validators.required],
       apellidos: ['', Validators.required],
-      correo: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATRON)]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -63,41 +57,15 @@ export class Registrocomponent {
     }
     this.mensaje = ''
     this.enviando = true
-    const usuario: UsuarioDTO = {
-      idUsuario: 0,
-      idRol: 0,
-      nombres: this.registroForm.value.nombres.trim(),
-      apellidos: this.registroForm.value.apellidos.trim(),
-      username: this.registroForm.value.username.trim().toLowerCase(),
-      correo: this.registroForm.value.correo.trim().toLowerCase(),
-      passwordHash: this.registroForm.value.password,
-      fechaRegistro: null,
-      activo: false
-    }
-
-    this.uS.insert(usuario).subscribe({
-      next: (data) => {
-        this.enviando = false
-        this.correoEnviado = data.correo ?? usuario.correo ?? ''
-        this.cdr.detectChanges()
+    const v = this.registroForm.value
+    this.aS.registrar(v.nombres, v.apellidos, v.username, v.password).subscribe({
+      next: () => {
+        this.router.navigateByUrl(this.volver ?? '/reportar')
       },
       error: (error) => {
         this.enviando = false
         this.mensaje = Authservice.mensajeError(error)
         console.log(error)
-        this.cdr.detectChanges()
-      }
-    })
-  }
-
-  reenviarCorreo(): void {
-    this.vS.reenviar(this.correoEnviado).subscribe({
-      next: (data) => {
-        this.mensaje = data.mensaje
-        this.cdr.detectChanges()
-      },
-      error: (error) => {
-        this.mensaje = error.error?.message ?? 'No se pudo reenviar el correo.'
         this.cdr.detectChanges()
       }
     })

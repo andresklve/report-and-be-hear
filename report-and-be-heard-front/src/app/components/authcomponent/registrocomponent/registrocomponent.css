@@ -22,9 +22,3 @@ mat-form-field { width: 100%; margin-bottom: 4px; }
 .fuerza.n2 { --mat-progress-bar-active-indicator-color: var(--warn-chart); }
 .fuerza.n3, .fuerza.n4 { --mat-progress-bar-active-indicator-color: var(--ok-chart); }
 
-/* Paso "Revisa tu correo" */
-.enviado { text-align: center; }
-.enviado .bloque { margin-top: 10px; }
-.enviado-ico { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--info-soft); color: var(--info); margin-bottom: 12px; }
-.enviado-ico .mat-icon { font-size: 28px; width: 28px; height: 28px; }
-.pequeno { font-size: .85rem; }
