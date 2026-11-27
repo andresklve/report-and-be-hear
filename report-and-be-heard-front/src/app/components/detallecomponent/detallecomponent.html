@@ -30,8 +30,8 @@
           </span>
         </div>
 
-        @if (t.fotoUrl) {
-          <figure class="detalle-foto"><img [src]="t.fotoUrl" alt="Foto adjunta al reporte" loading="lazy" /></figure>
+        @if (foto()) {
+          <figure class="detalle-foto"><img [src]="foto()" alt="Foto adjunta al reporte" loading="lazy" /></figure>
         }
 
         <div class="detalle-estado">

@@ -112,6 +112,8 @@ public class TestimonioController {
                     if (item.getUsuario() != null) dto.setIdUsuario(item.getUsuario().getIdUsuario());
                     if (item.getCategoria() != null) dto.setIdCategoria(item.getCategoria().getIdCategoria());
                     if (item.getZona() != null) dto.setIdZona(item.getZona().getIdZona());
+                    // La foto no va en la lista (pesa cientos de KB); se obtiene en GET /{id}
+                    dto.setFotoUrl(null);
                     return dto;
                 })
                 .toList();
@@ -157,7 +159,8 @@ public class TestimonioController {
         testimonio.setCategoria(categoria);
         testimonio.setZona(zona);
         testimonio.setDescripcionTexto(dto.getDescripcionTexto());
-        testimonio.setFotoUrl(dto.getFotoUrl());
+        // Si no llega una foto nueva se conserva la actual (la lista no trae la foto)
+        if (dto.getFotoUrl() != null && !dto.getFotoUrl().isBlank()) testimonio.setFotoUrl(dto.getFotoUrl());
         testimonio.setDireccionTextoExtraida(dto.getDireccionTextoExtraida());
         testimonio.setLatitud(dto.getLatitud());
         testimonio.setLongitud(dto.getLongitud());
